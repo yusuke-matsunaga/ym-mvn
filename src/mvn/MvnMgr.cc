@@ -7,13 +7,13 @@
 /// All rights reserved.
 
 
-#include "YmNetworks/MvnMgr.h"
+#include "ym/MvnMgr.h"
 
-#include "YmNetworks/MvnModule.h"
-#include "YmNetworks/MvnPort.h"
+#include "ym/MvnModule.h"
+#include "ym/MvnPort.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS_MVN
+BEGIN_NAMESPACE_YM_MVN
 
 //////////////////////////////////////////////////////////////////////
 // クラス MvnMgr
@@ -477,6 +477,9 @@ MvnMgr::connect(MvnNode* src_node,
   }
   src_node->mDstPinList.push_back(dst_pin);
   dst_pin->mSrcNode = src_node;
+  dst_pin->mListIter = src_node->mDstPinList.end();
+  -- dst_pin->mListIter;
+  ASSERT_COND( *(dst_pin->mListIter) == dst_pin );
   return true;
 }
 
@@ -493,7 +496,8 @@ MvnMgr::disconnect(MvnNode* src_node,
 {
   MvnInputPin* dst_pin = dst_node->_input(dst_pin_pos);
   ASSERT_COND( dst_pin->mSrcNode == src_node );
-  src_node->mDstPinList.erase(dst_pin);
+  ASSERT_COND( *dst_pin->mListIter == dst_pin );
+  src_node->mDstPinList.erase(dst_pin->mListIter);
   dst_pin->mSrcNode = nullptr;
 }
 
@@ -508,12 +512,12 @@ MvnMgr::reconnect(MvnNode* old_node,
 		  MvnNode* new_node,
 		  ymuint new_pin_pos)
 {
-  const MvnInputPinList& fo_list = old_node->dst_pin_list();
+  const list<MvnInputPin*>& fo_list = old_node->dst_pin_list();
   // リンクトリストをたどっている途中でリンクの変更はできないので
   // 配列にコピーする．
   vector<MvnInputPin*> tmp_list;
   tmp_list.reserve(fo_list.size());
-  for (MvnInputPinList::const_iterator p = fo_list.begin();
+  for (list<MvnInputPin*>::const_iterator p = fo_list.begin();
        p != fo_list.end(); ++ p) {
     MvnInputPin* ipin = *p;
     tmp_list.push_back(ipin);
@@ -521,9 +525,13 @@ MvnMgr::reconnect(MvnNode* old_node,
   for (vector<MvnInputPin*>::iterator p = tmp_list.begin();
        p != tmp_list.end(); ++ p) {
     MvnInputPin* ipin = *p;
-    old_node->mDstPinList.erase(ipin);
+    ASSERT_COND( *ipin->mListIter == ipin );
+    old_node->mDstPinList.erase(ipin->mListIter);
     ipin->mSrcNode = new_node;
     new_node->mDstPinList.push_back(ipin);
+    ipin->mListIter = new_node->mDstPinList.end();
+    -- ipin->mListIter;
+    ASSERT_COND( *(ipin->mListIter) == ipin );
   }
 }
 
@@ -550,6 +558,8 @@ MvnMgr::reg_node(MvnNode* node)
        node->type() != MvnNode::kInout ) {
     MvnModule* module = node->mParent;
     module->mNodeList.push_back(node);
+    node->mListIter = module->mNodeList.end();
+    -- node->mListIter;
   }
 }
 
@@ -565,7 +575,7 @@ MvnMgr::unreg_node(MvnNode* node)
        node->type() != MvnNode::kOutput &&
        node->type() != MvnNode::kInout ) {
     MvnModule* module = node->mParent;
-    module->mNodeList.erase(node);
+    module->mNodeList.erase(node->mListIter);
   }
 }
 
@@ -588,4 +598,4 @@ MvnInputPin::~MvnInputPin()
 {
 }
 
-END_NAMESPACE_YM_NETWORKS_MVN
+END_NAMESPACE_YM_MVN

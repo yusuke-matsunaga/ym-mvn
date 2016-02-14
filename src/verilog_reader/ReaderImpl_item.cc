@@ -13,29 +13,29 @@
 #include "Env.h"
 #include "EnvMerger.h"
 #include "AsyncControl.h"
-#include "YmNetworks/MvnMgr.h"
-#include "YmNetworks/MvnNode.h"
-#include "YmVerilog/BitVector.h"
-#include "YmVerilog/VlValue.h"
-#include "YmVerilog/vl/VlModule.h"
-#include "YmVerilog/vl/VlPrimitive.h"
-#include "YmVerilog/vl/VlUdp.h"
-#include "YmVerilog/vl/VlPort.h"
-#include "YmVerilog/vl/VlContAssign.h"
-#include "YmVerilog/vl/VlProcess.h"
-#include "YmVerilog/vl/VlStmt.h"
-#include "YmVerilog/vl/VlControl.h"
-#include "YmVerilog/vl/VlExpr.h"
-#include "YmCell/Cell.h"
-#include "YmCell/CellPin.h"
-#include "YmUtils/MsgMgr.h"
+#include "ym/MvnMgr.h"
+#include "ym/MvnNode.h"
+#include "ym/BitVector.h"
+#include "ym/VlValue.h"
+#include "ym/vl/VlModule.h"
+#include "ym/vl/VlPrimitive.h"
+#include "ym/vl/VlUdp.h"
+#include "ym/vl/VlPort.h"
+#include "ym/vl/VlContAssign.h"
+#include "ym/vl/VlProcess.h"
+#include "ym/vl/VlStmt.h"
+#include "ym/vl/VlControl.h"
+#include "ym/vl/VlExpr.h"
+#include "ym/Cell.h"
+#include "ym/CellPin.h"
+#include "ym/MsgMgr.h"
 
 
 BEGIN_NONAMESPACE
 bool debug = false;
 END_NONAMESPACE
 
-BEGIN_NAMESPACE_YM_NETWORKS_MVN_VERILOG
+BEGIN_NAMESPACE_YM_MVN_VERILOG
 
 // @brief 要素を生成する．
 // @param[in] module モジュール
@@ -762,4 +762,4 @@ ReaderImpl::gen_cont_assign(MvnModule* parent_module,
   }
 }
 
-END_NAMESPACE_YM_NETWORKS_MVN_VERILOG
+END_NAMESPACE_YM_MVN_VERILOG

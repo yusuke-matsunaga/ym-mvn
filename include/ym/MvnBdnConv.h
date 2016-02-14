@@ -1,7 +1,7 @@
 ﻿#ifndef YM_MVNBDNCONV_H
 #define YM_MVNBDNCONV_H
 
-/// @file YmNetworks/MvnBdnConv.h
+/// @file ym/MvnBdnConv.h
 /// @brief MvnBdnConv のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

@@ -10,10 +10,10 @@
 
 
 #include "MvnNodeBase.h"
-#include "YmNetworks/MvnMgr.h"
+#include "ym/MvnMgr.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS_MVN
+BEGIN_NAMESPACE_YM_MVN
 
 //////////////////////////////////////////////////////////////////////
 /// @class MvnDff MvnDff.h "MvnDff.h"
@@ -92,6 +92,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_NETWORKS_MVN
+END_NAMESPACE_YM_MVN
 
 #endif // MVNDFF_H

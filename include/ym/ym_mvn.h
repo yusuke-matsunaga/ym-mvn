@@ -10,7 +10,6 @@
 
 
 #include "ym_config.h"
-#include "YmUtils/DlList.h"
 
 
 /// @brief mvn 用の名前空間の開始
@@ -45,8 +44,8 @@ class MvnPortRef;
 class MvnNode;
 class MvnInputPin;
 
-typedef DlList<MvnNode> MvnNodeList;
-typedef DlList<MvnInputPin> MvnInputPinList;
+//typedef DlList<MvnNode> MvnNodeList;
+//typedef DlList<MvnInputPin> MvnInputPinList;
 
 class MvnVerilogReader;
 class MvnVlMap;
@@ -63,9 +62,9 @@ using nsMvn::MvnModule;
 using nsMvn::MvnPort;
 using nsMvn::MvnPortRef;
 using nsMvn::MvnNode;
-using nsMvn::MvnNodeList;
+//using nsMvn::MvnNodeList;
 using nsMvn::MvnInputPin;
-using nsMvn::MvnInputPinList;
+//using nsMvn::MvnInputPinList;
 
 using nsMvn::MvnVerilogReader;
 using nsMvn::MvnVlMap;

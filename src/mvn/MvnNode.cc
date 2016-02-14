@@ -7,10 +7,10 @@
 /// All rights reserved.
 
 
-#include "YmNetworks/MvnNode.h"
+#include "ym/MvnNode.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS_MVN
+BEGIN_NAMESPACE_YM_MVN
 
 // @brief コンストラクタ
 // @param[in] module 親のモジュール
@@ -24,4 +24,4 @@ MvnNode::~MvnNode()
 {
 }
 
-END_NAMESPACE_YM_NETWORKS_MVN
+END_NAMESPACE_YM_MVN

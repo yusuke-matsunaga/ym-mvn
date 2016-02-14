@@ -9,11 +9,11 @@
 /// All rights reserved.
 
 
-#include "YmNetworks/mvn.h"
-#include "YmUtils/FileRegion.h"
+#include "ym/ym_mvn.h"
+#include "ym/FileRegion.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS_MVN_VERILOG
+BEGIN_NAMESPACE_YM_MVN_VERILOG
 
 //////////////////////////////////////////////////////////////////////
 /// @class Driver Driver.h "Driver.h"
@@ -289,6 +289,6 @@ operator!=(const Driver& lhs,
   return !(lhs == rhs);
 }
 
-END_NAMESPACE_YM_NETWORKS_MVN_VERILOG
+END_NAMESPACE_YM_MVN_VERILOG
 
 #endif // DRIVER_H

@@ -8,10 +8,10 @@
 
 
 #include "MvnDff.h"
-#include "YmNetworks/MvnMgr.h"
+#include "ym/MvnMgr.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS_MVN
+BEGIN_NAMESPACE_YM_MVN
 
 //////////////////////////////////////////////////////////////////////
 // クラス MvnDff
@@ -119,4 +119,4 @@ MvnMgr::new_dff(MvnModule* module,
   return node;
 }
 
-END_NAMESPACE_YM_NETWORKS_MVN
+END_NAMESPACE_YM_MVN

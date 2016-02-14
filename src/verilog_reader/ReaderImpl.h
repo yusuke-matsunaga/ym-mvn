@@ -9,17 +9,17 @@
 /// All rights reserved.
 
 
-#include "YmNetworks/mvn.h"
-#include "YmNetworks/MvnVlMap.h"
-#include "YmVerilog/VlMgr.h"
-#include "YmVerilog/vl/VlFwd.h"
+#include "ym/ym_mvn.h"
+#include "ym/MvnVlMap.h"
+#include "ym/VlMgr.h"
+#include "ym/vl/VlFwd.h"
 #include "DeclHash.h"
 #include "DeclMap.h"
 #include "Driver.h"
 #include "Env.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS_MVN_VERILOG
+BEGIN_NAMESPACE_YM_MVN_VERILOG
 
 class EnvMerger;
 class Xmask;
@@ -395,6 +395,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_NETWORKS_MVN_VERILOG
+END_NAMESPACE_YM_MVN_VERILOG
 
 #endif // READERIMPL_H

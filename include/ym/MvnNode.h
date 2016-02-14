@@ -10,8 +10,8 @@
 
 
 #include "ym/ym_mvn.h"
+#include "ym/ym_cell.h"
 #include "ym/MvnInputPin.h"
-#include "ym/cell_nsdef.h"
 
 
 BEGIN_NAMESPACE_YM_MVN
@@ -20,8 +20,7 @@ BEGIN_NAMESPACE_YM_MVN
 /// @class MvnNode MvnNode.h "ym/MvnNode.h"
 /// @brief MvNetwork のノードを表すクラス
 //////////////////////////////////////////////////////////////////////
-class MvnNode :
-  public DlElem
+class MvnNode
 {
   friend class MvnMgr;
 
@@ -173,7 +172,7 @@ public:
   bit_width() const;
 
   /// @brief 出力に接続している入力ピンのリストを得る．
-  const MvnInputPinList&
+  const list<MvnInputPin*>&
   dst_pin_list() const;
 
   /// @brief クロック信号の極性を得る．
@@ -262,11 +261,14 @@ private:
   // 親のモジュール
   MvnModule* mParent;
 
+  // 親のモジュールの mNodeList 上の反復子
+  list<MvnNode*>::iterator mListIter;
+
   // 出力のビット幅
   ymuint32 mBitWidth;
 
   // ファンアウト先の入力ピンのリスト
-  MvnInputPinList mDstPinList;
+  list<MvnInputPin*> mDstPinList;
 
 };
 
@@ -301,7 +303,7 @@ MvnNode::bit_width() const
 
 // @brief 接続している入力ピンのリストを得る．
 inline
-const MvnInputPinList&
+const list<MvnInputPin*>&
 MvnNode::dst_pin_list() const
 {
   return mDstPinList;

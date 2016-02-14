@@ -9,11 +9,11 @@
 /// All rights reserved.
 
 
-#include "YmNetworks/mvn.h"
+#include "ym/ym_mvn.h"
 #include "Env.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS_MVN_VERILOG
+BEGIN_NAMESPACE_YM_MVN_VERILOG
 
 //////////////////////////////////////////////////////////////////////
 /// @class EnvMerger EnvMerger.h "EnvMerger.h"
@@ -189,6 +189,6 @@ EnvMerger::mgr() const
 }
 
 
-END_NAMESPACE_YM_NETWORKS_MVN_VERILOG
+END_NAMESPACE_YM_MVN_VERILOG
 
 #endif // ENVMERGER_H

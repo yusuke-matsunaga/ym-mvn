@@ -7,11 +7,11 @@
 /// All rights reserved.
 
 
-#include "YmNetworks/MvnVerilogReader.h"
+#include "ym/MvnVerilogReader.h"
 #include "ReaderImpl.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS_MVN
+BEGIN_NAMESPACE_YM_MVN
 
 // @brief コンストラクタ
 MvnVerilogReader::MvnVerilogReader() :
@@ -71,4 +71,4 @@ MvnVerilogReader::gen_network(MvnMgr& mgr,
   return mImpl->gen_network(mgr, library, node_map);
 }
 
-END_NAMESPACE_YM_NETWORKS_MVN
+END_NAMESPACE_YM_MVN

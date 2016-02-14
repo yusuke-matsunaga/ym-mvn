@@ -18,23 +18,23 @@
 
 #include "VerilogWriterImpl.h"
 
-#include "YmNetworks/MvnMgr.h"
-#include "YmNetworks/MvnModule.h"
-#include "YmNetworks/MvnPort.h"
-#include "YmNetworks/MvnNode.h"
-#include "YmNetworks/MvnInputPin.h"
+#include "ym/MvnMgr.h"
+#include "ym/MvnModule.h"
+#include "ym/MvnPort.h"
+#include "ym/MvnNode.h"
+#include "ym/MvnInputPin.h"
 
-#include "YmNetworks/MvnVlMap.h"
+#include "ym/MvnVlMap.h"
 
-#include "YmCell/Cell.h"
-#include "YmCell/CellPin.h"
+#include "ym/Cell.h"
+#include "ym/CellPin.h"
 
-#include "YmVerilog/vl/VlDecl.h"
-#include "YmVerilog/vl/VlDeclArray.h"
-#include "YmVerilog/vl/VlRange.h"
+#include "ym/vl/VlDecl.h"
+#include "ym/vl/VlDeclArray.h"
+#include "ym/vl/VlRange.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS_MVN
+BEGIN_NAMESPACE_YM_MVN
 
 //////////////////////////////////////////////////////////////////////
 // クラス VerilogWriterImpl
@@ -172,8 +172,8 @@ VerilogWriterImpl::dump_module(ostream& s,
   }
   s << endl;
 
-  const MvnNodeList& node_list = module->node_list();
-  for (MvnNodeList::const_iterator p = node_list.begin();
+  const list<MvnNode*>& node_list = module->node_list();
+  for (list<MvnNode*>::const_iterator p = node_list.begin();
        p != node_list.end(); ++ p) {
     MvnNode* node = *p;
     ymuint bw = node->bit_width();
@@ -206,7 +206,7 @@ VerilogWriterImpl::dump_module(ostream& s,
     const MvnNode* node = module->inout(i);
     dump_node(s, node);
   }
-  for (MvnNodeList::const_iterator p = node_list.begin();
+  for (list<MvnNode*>::const_iterator p = node_list.begin();
        p != node_list.end(); ++ p) {
     MvnNode* node = *p;
     dump_node(s, node);
@@ -740,4 +740,4 @@ VerilogWriterImpl::set_node_name(const MvnNode* node,
   mNameArray[node->id()] = name;
 }
 
-END_NAMESPACE_YM_NETWORKS_MVN
+END_NAMESPACE_YM_MVN

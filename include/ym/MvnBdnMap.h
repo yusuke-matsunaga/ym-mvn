@@ -1,7 +1,7 @@
 ﻿#ifndef YM_MVNBDNMAP_H
 #define YM_MVNBDNMAP_H
 
-/// @file YmNetworks/MvnBdnMap.h
+/// @file ym/MvnBdnMap.h
 /// @brief MvnBdnMap のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///

@@ -9,12 +9,12 @@
 /// All rights reserved.
 
 
-#include "YmNetworks/mvn.h"
-#include "YmVerilog/vl/VlFwd.h"
-#include "YmUtils/UnitAlloc.h"
+#include "ym/ym_mvn.h"
+#include "ym/vl/VlFwd.h"
+#include "ym/UnitAlloc.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS_MVN_VERILOG
+BEGIN_NAMESPACE_YM_MVN_VERILOG
 
 //////////////////////////////////////////////////////////////////////
 /// @class DeclHash DeclHash.h "DeclHash.h"
@@ -126,6 +126,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_NETWORKS_MVN_VERILOG
+END_NAMESPACE_YM_MVN_VERILOG
 
 #endif // DECLHASH_H

@@ -13,19 +13,19 @@
 #include "Env.h"
 #include "Xmask.h"
 
-#include "YmNetworks/MvnMgr.h"
-#include "YmNetworks/MvnModule.h"
-#include "YmNetworks/MvnNode.h"
-#include "YmVerilog/BitVector.h"
-#include "YmVerilog/VlValue.h"
-#include "YmVerilog/vl/VlDecl.h"
-#include "YmVerilog/vl/VlExpr.h"
-#include "YmVerilog/vl/VlRange.h"
+#include "ym/MvnMgr.h"
+#include "ym/MvnModule.h"
+#include "ym/MvnNode.h"
+#include "ym/BitVector.h"
+#include "ym/VlValue.h"
+#include "ym/vl/VlDecl.h"
+#include "ym/vl/VlExpr.h"
+#include "ym/vl/VlRange.h"
 
-#include "YmUtils/MsgMgr.h"
+#include "ym/MsgMgr.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS_MVN_VERILOG
+BEGIN_NAMESPACE_YM_MVN_VERILOG
 
 // @brief 式に対応したノードの木を作る．
 // @param[in] parent_module 親のモジュール
@@ -815,4 +815,4 @@ ReaderImpl::splice_rhs(MvnModule* parent_module,
   return src_node;
 }
 
-END_NAMESPACE_YM_NETWORKS_MVN_VERILOG
+END_NAMESPACE_YM_MVN_VERILOG

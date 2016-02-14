@@ -10,7 +10,7 @@
 
 
 #include "ym/ym_mvn.h"
-#include "ym/vl/YlFwd.h"
+#include "ym/vl/VlFwd.h"
 #include "ym/SimpleAlloc.h"
 
 

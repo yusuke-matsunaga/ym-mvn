@@ -7,10 +7,10 @@
 /// All rights reserved.
 
 
-#include "YmNetworks/MvnModule.h"
+#include "ym/MvnModule.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS_MVN
+BEGIN_NAMESPACE_YM_MVN
 
 // @brief コンストラクタ
 // @param[in] name 名前
@@ -37,4 +37,4 @@ MvnModule::~MvnModule()
 {
 }
 
-END_NAMESPACE_YM_NETWORKS_MVN
+END_NAMESPACE_YM_MVN

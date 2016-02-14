@@ -18,8 +18,7 @@ BEGIN_NAMESPACE_YM_MVN
 /// @class MvnInputPin MvnInputPin.h "ym/MvnInputPin.h"
 /// @brief ノードの入力ピンを表すクラス
 //////////////////////////////////////////////////////////////////////
-class MvnInputPin :
-  public DlElem
+class MvnInputPin
 {
   friend class MvnMgr;
   friend class MvnNodeBase;
@@ -83,6 +82,9 @@ private:
 
   // 接続しているノード
   MvnNode* mSrcNode;
+
+  // mSrcNode の mDstPinList 上の反復子
+  list<MvnInputPin*>::iterator mListIter;
 
 };
 

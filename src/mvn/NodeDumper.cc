@@ -10,7 +10,7 @@
 #include "NodeDumper.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS_MVN
+BEGIN_NAMESPACE_YM_MVN
 
 //////////////////////////////////////////////////////////////////////
 // クラス UnaryOpDumper
@@ -349,4 +349,4 @@ PartSelectDumper::operator()(ostream& s,
 }
 
 
-END_NAMESPACE_YM_NETWORKS_MVN
+END_NAMESPACE_YM_MVN

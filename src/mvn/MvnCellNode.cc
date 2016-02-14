@@ -8,12 +8,12 @@
 
 
 #include "MvnCellNode.h"
-#include "YmNetworks/MvnMgr.h"
-#include "YmCell/Cell.h"
-#include "YmCell/CellPin.h"
+#include "ym/MvnMgr.h"
+#include "ym/Cell.h"
+#include "ym/CellPin.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS_MVN
+BEGIN_NAMESPACE_YM_MVN
 
 //////////////////////////////////////////////////////////////////////
 // クラス MvnCellNode
@@ -149,4 +149,4 @@ MvnMgr::new_cell(MvnModule* module,
   return node;
 }
 
-END_NAMESPACE_YM_NETWORKS_MVN
+END_NAMESPACE_YM_MVN

@@ -7,11 +7,11 @@
 /// All rights reserved.
 
 
-#include "YmNetworks/MvnVlMap.h"
+#include "ym/MvnVlMap.h"
 #include "MapRec.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS_MVN
+BEGIN_NAMESPACE_YM_MVN
 
 //////////////////////////////////////////////////////////////////////
 // クラス MvnVlMap
@@ -314,4 +314,4 @@ ArrayMapRec::get_array_offset() const
   return mOffset;
 }
 
-END_NAMESPACE_YM_NETWORKS_MVN
+END_NAMESPACE_YM_MVN

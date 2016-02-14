@@ -11,29 +11,29 @@
 #include "DeclMap.h"
 #include "Driver.h"
 #include "Env.h"
-#include "YmNetworks/MvnMgr.h"
-#include "YmNetworks/MvnModule.h"
-#include "YmNetworks/MvnPort.h"
-#include "YmNetworks/MvnNode.h"
-#include "YmVerilog/BitVector.h"
-#include "YmVerilog/vl/VlModule.h"
-#include "YmVerilog/vl/VlPrimitive.h"
-#include "YmVerilog/vl/VlUdp.h"
-#include "YmVerilog/vl/VlIODecl.h"
-#include "YmVerilog/vl/VlDecl.h"
-#include "YmVerilog/vl/VlDeclArray.h"
-#include "YmVerilog/vl/VlPort.h"
-#include "YmVerilog/vl/VlContAssign.h"
-#include "YmVerilog/vl/VlProcess.h"
-#include "YmVerilog/vl/VlStmt.h"
-#include "YmVerilog/vl/VlControl.h"
-#include "YmVerilog/vl/VlExpr.h"
-#include "YmVerilog/vl/VlRange.h"
+#include "ym/MvnMgr.h"
+#include "ym/MvnModule.h"
+#include "ym/MvnPort.h"
+#include "ym/MvnNode.h"
+#include "ym/BitVector.h"
+#include "ym/vl/VlModule.h"
+#include "ym/vl/VlPrimitive.h"
+#include "ym/vl/VlUdp.h"
+#include "ym/vl/VlIODecl.h"
+#include "ym/vl/VlDecl.h"
+#include "ym/vl/VlDeclArray.h"
+#include "ym/vl/VlPort.h"
+#include "ym/vl/VlContAssign.h"
+#include "ym/vl/VlProcess.h"
+#include "ym/vl/VlStmt.h"
+#include "ym/vl/VlControl.h"
+#include "ym/vl/VlExpr.h"
+#include "ym/vl/VlRange.h"
 
-#include "YmUtils/MsgMgr.h"
+#include "ym/MsgMgr.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS_MVN_VERILOG
+BEGIN_NAMESPACE_YM_MVN_VERILOG
 
 
 BEGIN_NONAMESPACE
@@ -661,4 +661,4 @@ ReaderImpl::error_drivers(MvnNode* node,
 		  buf.str());
 }
 
-END_NAMESPACE_YM_NETWORKS_MVN_VERILOG
+END_NAMESPACE_YM_MVN_VERILOG

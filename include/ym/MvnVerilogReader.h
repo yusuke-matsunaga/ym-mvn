@@ -14,7 +14,7 @@
 #include "ym/vl/VlFwd.h"
 #include "ym/File.h"
 #include "ym/MsgHandler.h"
-#include "ym/cell_nsdef.h"
+#include "ym/ym_cell.h"
 
 
 BEGIN_NAMESPACE_YM_MVN_VERILOG

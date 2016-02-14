@@ -6,12 +6,12 @@
 /// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
 /// All rights reserved.
 
-#include "YmNetworks/MvnVerilogWriter.h"
+#include "ym/MvnVerilogWriter.h"
 
 #include "VerilogWriterImpl.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS_MVN
+BEGIN_NAMESPACE_YM_MVN
 
 //////////////////////////////////////////////////////////////////////
 // クラス MvnVerilogWriter
@@ -51,4 +51,4 @@ MvnVerilogWriter::operator()(ostream& s,
   mImpl->dump(s, mgr, node_map);
 }
 
-END_NAMESPACE_YM_NETWORKS_MVN
+END_NAMESPACE_YM_MVN

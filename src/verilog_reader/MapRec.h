@@ -9,10 +9,10 @@
 /// All rights reserved.
 
 
-#include "YmNetworks/mvn.h"
+#include "ym/ym_mvn.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS_MVN
+BEGIN_NAMESPACE_YM_MVN
 
 //////////////////////////////////////////////////////////////////////
 /// @class MapRec MapRec.h "MapRec.h"
@@ -189,6 +189,6 @@ private:
 
 };
 
-END_NAMESPACE_YM_NETWORKS_MVN
+END_NAMESPACE_YM_MVN
 
 #endif // MAPREC_H

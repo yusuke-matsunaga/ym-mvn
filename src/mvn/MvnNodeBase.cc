@@ -8,10 +8,10 @@
 
 
 #include "MvnNodeBase.h"
-#include "YmNetworks/MvnMgr.h"
+#include "ym/MvnMgr.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS_MVN
+BEGIN_NAMESPACE_YM_MVN
 
 //////////////////////////////////////////////////////////////////////
 // クラス MvnNodeBase
@@ -723,4 +723,4 @@ MvnMgr::new_nary_op(MvnModule* module,
   return node;
 }
 
-END_NAMESPACE_YM_NETWORKS_MVN
+END_NAMESPACE_YM_MVN

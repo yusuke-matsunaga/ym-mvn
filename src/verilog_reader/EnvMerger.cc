@@ -8,11 +8,11 @@
 
 
 #include "EnvMerger.h"
-#include "YmNetworks/MvnMgr.h"
-#include "YmNetworks/MvnNode.h"
+#include "ym/MvnMgr.h"
+#include "ym/MvnNode.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS_MVN_VERILOG
+BEGIN_NAMESPACE_YM_MVN_VERILOG
 
 //////////////////////////////////////////////////////////////////////
 // クラス EnvMerger
@@ -308,4 +308,4 @@ EnvMerger2::operator()(MvnModule* parent_module,
   }
 }
 
-END_NAMESPACE_YM_NETWORKS_MVN_VERILOG
+END_NAMESPACE_YM_MVN_VERILOG

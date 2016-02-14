@@ -8,11 +8,11 @@
 
 
 #include "DeclMap.h"
-#include "YmNetworks/MvnNode.h"
-#include "YmVerilog/vl/VlDecl.h"
+#include "ym/MvnNode.h"
+#include "ym/vl/VlDecl.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS_MVN_VERILOG
+BEGIN_NAMESPACE_YM_MVN_VERILOG
 
 BEGIN_NONAMESPACE
 
@@ -191,4 +191,4 @@ DeclMap::hash_func(const VlDecl* decl,
   return (reinterpret_cast<ympuint>(decl) * (offset + 1) + offset) % mSize;
 }
 
-END_NAMESPACE_YM_NETWORKS_MVN_VERILOG
+END_NAMESPACE_YM_MVN_VERILOG

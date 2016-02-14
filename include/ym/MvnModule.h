@@ -85,15 +85,15 @@ public:
   node_num() const;
 
   /// @brief 内部ノードのリストを得る．
-  const MvnNodeList&
+  const list<MvnNode*>&
   node_list() const;
 
   /// @brief 内部ノードのリストの先頭の反復子を得る．
-  MvnNodeList::const_iterator
+  list<MvnNode*>::const_iterator
   nodes_begin() const;
 
   /// @brief 内部ノードのリストの末尾の反復子を得る．
-  MvnNodeList::const_iterator
+  list<MvnNode*>::const_iterator
   nodes_end() const;
 
   /// @}
@@ -147,7 +147,7 @@ private:
   vector<MvnNode*> mInoutArray;
 
   // 内部ノードのリスト
-  MvnNodeList mNodeList;
+  list<MvnNode*> mNodeList;
 
 };
 
@@ -259,7 +259,7 @@ MvnModule::node_num() const
 
 // @brief 内部ノードのリストを得る．
 inline
-const MvnNodeList&
+const list<MvnNode*>&
 MvnModule::node_list() const
 {
   return mNodeList;
@@ -267,7 +267,7 @@ MvnModule::node_list() const
 
 // @brief 内部ノードのリストの先頭の反復子を得る．
 inline
-MvnNodeList::const_iterator
+list<MvnNode*>::const_iterator
 MvnModule::nodes_begin() const
 {
   return mNodeList.begin();
@@ -275,7 +275,7 @@ MvnModule::nodes_begin() const
 
 // @brief 内部ノードのリストの末尾の反復子を得る．
 inline
-MvnNodeList::const_iterator
+list<MvnNode*>::const_iterator
 MvnModule::nodes_end() const
 {
   return mNodeList.end();

@@ -8,10 +8,10 @@
 
 
 #include "MvnConst.h"
-#include "YmNetworks/MvnMgr.h"
+#include "ym/MvnMgr.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS_MVN
+BEGIN_NAMESPACE_YM_MVN
 
 // @brief コンストラクタ
 // @param[in] module 親のモジュール
@@ -54,4 +54,4 @@ MvnMgr::new_const(MvnModule* module,
   return node;
 }
 
-END_NAMESPACE_YM_NETWORKS_MVN
+END_NAMESPACE_YM_MVN

@@ -12,7 +12,7 @@
 #include "ym/ym_mvn.h"
 #include "ym/MvnNode.h"
 #include "ym/ItvlMgr.h"
-#include "ym/cell_nsdef.h"
+#include "ym/ym_cell.h"
 
 
 BEGIN_NAMESPACE_YM_MVN

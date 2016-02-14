@@ -9,12 +9,12 @@
 /// All rights reserved.
 
 
-#include "YmNetworks/mvn.h"
-#include "YmVerilog/vl/VlFwd.h"
+#include "ym/ym_mvn.h"
+#include "ym/vl/VlFwd.h"
 #include "Env.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS_MVN_VERILOG
+BEGIN_NAMESPACE_YM_MVN_VERILOG
 
 //////////////////////////////////////////////////////////////////////
 /// @class AsyncControl AsyncControl.h "AsyncControl.h"
@@ -38,6 +38,6 @@ struct AsyncControl
 
 };
 
-END_NAMESPACE_YM_NETWORKS_MVN_VERILOG
+END_NAMESPACE_YM_MVN_VERILOG
 
 #endif // ASYNCCONTROL_H

@@ -7,11 +7,11 @@
 /// All rights reserved.
 
 
-#include "YmNetworks/MvnPort.h"
-#include "YmNetworks/MvnNode.h"
+#include "ym/MvnPort.h"
+#include "ym/MvnNode.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS_MVN
+BEGIN_NAMESPACE_YM_MVN
 
 //////////////////////////////////////////////////////////////////////
 // クラス MvnPortRef
@@ -132,4 +132,4 @@ MvnPort::bit_width() const
   return ans;
 }
 
-END_NAMESPACE_YM_NETWORKS_MVN
+END_NAMESPACE_YM_MVN

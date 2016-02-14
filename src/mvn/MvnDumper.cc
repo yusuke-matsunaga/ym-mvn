@@ -7,19 +7,19 @@
 /// All rights reserved.
 
 
-#include "YmNetworks/MvnDumper.h"
+#include "ym/MvnDumper.h"
 
-#include "YmNetworks/MvnMgr.h"
+#include "ym/MvnMgr.h"
 
-#include "YmNetworks/MvnModule.h"
-#include "YmNetworks/MvnPort.h"
-#include "YmNetworks/MvnNode.h"
-#include "YmNetworks/MvnInputPin.h"
+#include "ym/MvnModule.h"
+#include "ym/MvnPort.h"
+#include "ym/MvnNode.h"
+#include "ym/MvnInputPin.h"
 
-#include "YmCell/Cell.h"
+#include "ym/Cell.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS_MVN
+BEGIN_NAMESPACE_YM_MVN
 
 BEGIN_NONAMESPACE
 
@@ -191,8 +191,8 @@ dump_node(ostream& s,
       dump_inputpin(s, pin);
     }
     s << "  Output(" << node->bit_width() << ")" << endl;
-    const MvnInputPinList& fo_list = node->dst_pin_list();
-    for (MvnInputPinList::const_iterator p = fo_list.begin();
+    const list<MvnInputPin*>& fo_list = node->dst_pin_list();
+    for (list<MvnInputPin*>::const_iterator p = fo_list.begin();
 	 p != fo_list.end(); ++ p) {
       const MvnInputPin* ipin = *p;
       s << "    ==> InputPin#" << ipin->pos()
@@ -271,7 +271,7 @@ MvnDumper::operator()(ostream& s,
     for (ymuint j = 0; j < nio; ++ j) {
       dump_node(s, module->inout(j));
     }
-    for (MvnNodeList::const_iterator p = module->nodes_begin();
+    for (list<MvnNode*>::const_iterator p = module->nodes_begin();
 	 p != module->nodes_end(); ++ p) {
       MvnNode* node = *p;
       dump_node(s, node);
@@ -281,4 +281,4 @@ MvnDumper::operator()(ostream& s,
   }
 }
 
-END_NAMESPACE_YM_NETWORKS_MVN
+END_NAMESPACE_YM_MVN

@@ -9,10 +9,10 @@
 /// All rights reserved.
 
 
-#include "YmNetworks/mvn.h"
+#include "ym/ym_mvn.h"
 
 
-BEGIN_NAMESPACE_YM_NETWORKS_MVN_VERILOG
+BEGIN_NAMESPACE_YM_MVN_VERILOG
 
 //////////////////////////////////////////////////////////////////////
 /// @class Xmask Xmask.h "Xmask.h"
@@ -297,6 +297,6 @@ operator|(const Xmask& left,
   return Xmask(left).operator|=(right);
 }
 
-END_NAMESPACE_YM_NETWORKS_MVN_VERILOG
+END_NAMESPACE_YM_MVN_VERILOG
 
 #endif // XMASK_H
