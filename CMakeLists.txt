@@ -85,31 +85,8 @@ set ( verilog_writer_SOURCES
 # ===================================================================
 #  ターゲットの設定
 # ===================================================================
-ym_add_library ( ym_mvn
-  SHARED
+ym_add_object_library ( ym_mvn
   ${mvn_SOURCES}
   ${verilog_reader_SOURCES}
   ${verilog_writer_SOURCES}
-  DESTINATION ${YM_INSTALL_LIBDIR}
-  )
-
-target_link_libraries ( ym_mvn
-  ym_verilog
-  ym_cell
-  ym_logic
-  ym_common
-  )
-
-target_link_libraries ( ym_mvn_d
-  ym_verilog_d
-  ym_cell_d
-  ym_logic_d
-  ym_common_d
-  )
-
-target_link_libraries ( ym_mvn_p
-  ym_verilog_p
-  ym_cell_p
-  ym_logic_p
-  ym_common_p
   )
