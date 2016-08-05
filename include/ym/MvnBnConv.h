@@ -1,17 +1,16 @@
-﻿#ifndef YM_MVNBDNCONV_H
-#define YM_MVNBDNCONV_H
+﻿#ifndef YM_MVNBNCONV_H
+#define YM_MVNBNCONV_H
 
-/// @file ym/MvnBdnConv.h
-/// @brief MvnBdnConv のヘッダファイル
+/// @file ym/MvnBnConv.h
+/// @brief MvnBnConv のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
+/// Copyright (C) 2016 Yusuke Matsunaga
 /// All rights reserved.
 
 
-#include "YmNetworks/mvnbdnconv_nsdef.h"
 #include "ym/ym_mvn.h"
-#include "YmNetworks/bdn.h"
+#include "ym/ym_bnet.h"
 
 
 BEGIN_NAMESPACE_YM_NETWORKSBDNCONV
@@ -22,15 +21,15 @@ class MvnConv;
 /// @class MvnBdnConv MvnBdnConv.h "MvnBdnConv.h"
 /// @brief Mvn から BdnMgr に変換するクラス
 //////////////////////////////////////////////////////////////////////
-class MvnBdnConv
+class MvnBnConv
 {
 public:
 
   /// @brief コンストラクタ
-  MvnBdnConv();
+  MvnBnConv();
 
   /// @brief デストラクタ
-  ~MvnBdnConv();
+  ~MvnBnConv();
 
 
 public:
@@ -44,8 +43,8 @@ public:
   /// @param[out] mvnode_map 対応関係を格納するオブジェクト
   void
   operator()(const MvnMgr& mvmgr,
-	     BdnMgr& bdn,
-	     MvnBdnMap& mvnode_map);
+	     BnBuilder& builder,
+	     MvnBnMap& mvnode_map);
 
 
 private:
