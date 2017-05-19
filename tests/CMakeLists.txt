@@ -33,7 +33,7 @@ add_executable ( mvn_read_test
   $<TARGET_OBJECTS:ym_verilog_d>
   $<TARGET_OBJECTS:ym_cell_d>
   $<TARGET_OBJECTS:ym_logic_d>
-  $<TARGET_OBJECTS:ym_common_d>
+  $<TARGET_OBJECTS:ym_base_d>
   )
 
 target_compile_options ( mvn_read_test
