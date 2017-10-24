@@ -65,7 +65,7 @@ MvnVerilogReader::gen_network(MvnMgr& mgr,
 // @retval false 生成中にエラーが起こった．
 bool
 MvnVerilogReader::gen_network(MvnMgr& mgr,
-			      const CellLibrary* library,
+			      const ClibCellLibrary* library,
 			      MvnVlMap& node_map)
 {
   return mImpl->gen_network(mgr, library, node_map);

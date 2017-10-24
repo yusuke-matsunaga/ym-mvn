@@ -9,8 +9,8 @@
 /// All rights reserved.
 
 
-#include "ym/ym_mvn.h"
-#include "ym/ym_cell.h"
+#include "ym/mvn.h"
+#include "ym/clib.h"
 #include "ym/MvnInputPin.h"
 
 
@@ -234,7 +234,7 @@ public:
   /// @note type() が kCell の時のみ意味を持つ．
   /// @note デフォルトの実装では nullptr を返す．
   virtual
-  const Cell*
+  const ClibCell*
   cell() const = 0;
 
 

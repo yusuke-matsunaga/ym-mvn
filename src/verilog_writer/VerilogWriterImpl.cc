@@ -26,8 +26,8 @@
 
 #include "ym/MvnVlMap.h"
 
-#include "ym/Cell.h"
-#include "ym/CellPin.h"
+#include "ym/ClibCell.h"
+#include "ym/ClibCellPin.h"
 
 #include "ym/vl/VlDecl.h"
 #include "ym/vl/VlDeclArray.h"
@@ -624,7 +624,7 @@ VerilogWriterImpl::dump_node(ostream& s,
 
   case MvnNode::kCell:
     {
-      const Cell* cell = node->cell();
+      const ClibCell* cell = node->cell();
       ymuint ni = cell->input_num();
       ymuint no = cell->output_num();
       ymuint nio = cell->inout_num();
@@ -640,7 +640,7 @@ VerilogWriterImpl::dump_node(ostream& s,
 
       // 入力
       for (ymuint i = 0; i < ni; ++ i) {
-	const CellPin* pin = cell->input(i);
+	const ClibCellPin* pin = cell->input(i);
 	const MvnInputPin* ipin = node->input(i);
 	const MvnNode* src_node = ipin->src_node();
 

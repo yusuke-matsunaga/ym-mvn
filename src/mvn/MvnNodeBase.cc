@@ -152,7 +152,7 @@ MvnNodeBase::xmask(vector<ymuint32>& val) const
 // @brief セルを得る．
 // @note type() が kCell の時のみ意味をモツ．
 // @note デフォルトの実装では nullptr を返す．
-const Cell*
+const ClibCell*
 MvnNodeBase::cell() const
 {
   return nullptr;

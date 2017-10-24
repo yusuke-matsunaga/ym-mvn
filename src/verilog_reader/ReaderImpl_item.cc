@@ -26,8 +26,8 @@
 #include "ym/vl/VlStmt.h"
 #include "ym/vl/VlControl.h"
 #include "ym/vl/VlExpr.h"
-#include "ym/Cell.h"
-#include "ym/CellPin.h"
+#include "ym/ClibCell.h"
+#include "ym/ClibCellPin.h"
 #include "ym/MsgMgr.h"
 
 
@@ -564,7 +564,7 @@ void
 ReaderImpl::gen_cellinst(MvnModule* parent_module,
 			 const VlPrimitive* prim)
 {
-  const Cell* cell = prim->cell();
+  const ClibCell* cell = prim->cell();
   ymuint np = cell->pin_num();
   ymuint ni = cell->input_num();
   ymuint no = cell->output_num();
@@ -574,7 +574,7 @@ ReaderImpl::gen_cellinst(MvnModule* parent_module,
   for (ymuint pos = 0; pos < np; ++ pos) {
     const VlPrimTerm* term = prim->prim_term(pos);
     const VlExpr* expr = term->expr();
-    const CellPin* pin = cell->pin(pos);
+    const ClibCellPin* pin = cell->pin(pos);
     if ( pin->is_input() ) {
       ymuint input_id = pin->input_id();
       MvnNode* node = gen_expr(parent_module, expr, mGlobalEnv);

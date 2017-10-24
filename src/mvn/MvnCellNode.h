@@ -32,7 +32,7 @@ private:
   /// @param[in] module 親のモジュール
   /// @param[in] cell セル
   MvnCellNode(MvnModule* module,
-	      const Cell* cell);
+	      const ClibCell* cell);
 
   /// @brief デストラクタ
   virtual
@@ -47,7 +47,7 @@ public:
   /// @brief セルを得る．
   /// @note type() が kCell の時のみ意味を持つ．
   virtual
-  const Cell*
+  const ClibCell*
   cell() const;
 
   /// @brief セルの出力ピン番号を返す．
@@ -70,7 +70,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // セル
-  const Cell* mCell;
+  const ClibCell* mCell;
 
 };
 
@@ -110,7 +110,7 @@ public:
   /// @brief セルを得る．
   /// @note type() が kCell の時のみ意味を持つ．
   virtual
-  const Cell*
+  const ClibCell*
   cell() const;
 
   /// @brief セルの出力ピン番号を返す．

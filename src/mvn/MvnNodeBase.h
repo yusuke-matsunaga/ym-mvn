@@ -126,7 +126,7 @@ public:
   /// @note type() が kCell の時のみ意味を持つ．
   /// @note デフォルトの実装では nullptr を返す．
   virtual
-  const Cell*
+  const ClibCell*
   cell() const;
 
   /// @brief セルの出力ピン番号を返す．

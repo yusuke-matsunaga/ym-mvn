@@ -8,7 +8,7 @@
 
 
 #include "DeclHash.h"
-#include "ym/ym_mvn.h"
+#include "ym/mvn.h"
 #include "ym/vl/VlDecl.h"
 #include "ym/vl/VlDeclArray.h"
 

@@ -9,7 +9,7 @@
 /// All rights reserved.
 
 
-#include "ym/ym_mvn.h"
+#include "ym/mvn.h"
 #include "ym/MvnVlMap.h"
 #include "ym/VlMgr.h"
 #include "ym/vl/VlFwd.h"
@@ -64,7 +64,7 @@ public:
   /// @retval false 生成中にエラーが起こった．
   bool
   gen_network(MvnMgr& mgr,
-	      const CellLibrary* cell_library,
+	      const ClibCellLibrary* cell_library,
 	      MvnVlMap& node_map);
 
 

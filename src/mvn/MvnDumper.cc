@@ -16,7 +16,7 @@
 #include "ym/MvnNode.h"
 #include "ym/MvnInputPin.h"
 
-#include "ym/Cell.h"
+#include "ym/ClibCell.h"
 
 
 BEGIN_NAMESPACE_YM_MVN

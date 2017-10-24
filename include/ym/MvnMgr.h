@@ -9,10 +9,10 @@
 /// All rights reserved.
 
 
-#include "ym/ym_mvn.h"
+#include "ym/mvn.h"
 #include "ym/MvnNode.h"
 #include "ym/ItvlMgr.h"
-#include "ym/ym_cell.h"
+#include "ym/clib.h"
 
 
 BEGIN_NAMESPACE_YM_MVN
@@ -529,7 +529,7 @@ public:
   /// @param[in] cell セル
   MvnNode*
   new_cell(MvnModule* module,
-	   const Cell* cell);
+	   const ClibCell* cell);
 
   /// @brief ノードを削除する．
   /// @param[in] node 対象のノード

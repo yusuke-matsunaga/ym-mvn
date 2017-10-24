@@ -9,8 +9,8 @@
 
 #include "MvnCellNode.h"
 #include "ym/MvnMgr.h"
-#include "ym/Cell.h"
-#include "ym/CellPin.h"
+#include "ym/ClibCell.h"
+#include "ym/ClibCellPin.h"
 
 
 BEGIN_NAMESPACE_YM_MVN
@@ -23,7 +23,7 @@ BEGIN_NAMESPACE_YM_MVN
 // @param[in] module 親のモジュール
 // @param[in] cell セル
 MvnCellNode::MvnCellNode(MvnModule* module,
-			 const Cell* cell) :
+			 const ClibCell* cell) :
   MvnNodeBase(module, MvnNode::kCell, 0),
   mCell(cell)
 {
@@ -36,7 +36,7 @@ MvnCellNode::~MvnCellNode()
 
 // @brief セルを得る．
 // @note type() が kCell の時のみ意味を持つ．
-const Cell*
+const ClibCell*
 MvnCellNode::cell() const
 {
   return mCell;
@@ -84,7 +84,7 @@ MvnExtCellNode::~MvnExtCellNode()
 
 // @brief セルを得る．
 // @note type() が kCell の時のみ意味を持つ．
-const Cell*
+const ClibCell*
 MvnExtCellNode::cell() const
 {
   return mCellNode->cell();
@@ -113,14 +113,14 @@ MvnExtCellNode::cell_node() const
 // @param[in] cell セル
 MvnNode*
 MvnMgr::new_cell(MvnModule* module,
-		 const Cell* cell)
+		 const ClibCell* cell)
 {
   ymuint ni = 0;
   ymuint no = 0;
   ymuint np = cell->pin_num();
   vector<ymuint32> pin_pos(np);
   for (ymuint i = 0; i < np; ++ i) {
-    const CellPin* pin = cell->pin(i);
+    const ClibCellPin* pin = cell->pin(i);
     if ( pin->is_input() ) {
       pin_pos[i] = (ni << 1);
       ++ ni;

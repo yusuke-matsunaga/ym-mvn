@@ -83,7 +83,7 @@ ReaderImpl::read(const string& filename,
 // @retval false 生成中にエラーが起こった．
 bool
 ReaderImpl::gen_network(MvnMgr& mgr,
-			const CellLibrary* cell_library,
+			const ClibCellLibrary* cell_library,
 			MvnVlMap& node_map)
 {
   if ( MsgMgr::error_num() > 0 ) {

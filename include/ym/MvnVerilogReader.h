@@ -9,12 +9,12 @@
 /// All rights reserved.
 
 
-#include "ym/ym_mvn.h"
+#include "ym/mvn.h"
 #include "ym/ym_verilog.h"
 #include "ym/vl/VlFwd.h"
 #include "ym/File.h"
 #include "ym/MsgHandler.h"
-#include "ym/ym_cell.h"
+#include "ym/clib.h"
 
 
 BEGIN_NAMESPACE_YM_MVN_VERILOG
@@ -75,7 +75,7 @@ public:
   /// @retval false 生成中にエラーが起こった．
   bool
   gen_network(MvnMgr& mgr,
-	      const CellLibrary* library,
+	      const ClibCellLibrary* library,
 	      MvnVlMap& node_map);
 
 
