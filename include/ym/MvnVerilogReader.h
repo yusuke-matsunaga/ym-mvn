@@ -10,7 +10,7 @@
 
 
 #include "ym/mvn.h"
-#include "ym/ym_verilog.h"
+#include "ym/verilog.h"
 #include "ym/vl/VlFwd.h"
 #include "ym/File.h"
 #include "ym/MsgHandler.h"
