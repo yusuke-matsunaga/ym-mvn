@@ -118,6 +118,8 @@ MvnMgr::new_cell(MvnModule* module,
   ymuint ni = 0;
   ymuint no = 0;
   ymuint np = cell->pin_num();
+
+#if 0 // 2018/03/01 わけわからいのでコメントアウトした
   vector<ymuint32> pin_pos(np);
   for (ymuint i = 0; i < np; ++ i) {
     const ClibCellPin* pin = cell->pin(i);
@@ -137,6 +139,7 @@ MvnMgr::new_cell(MvnModule* module,
       ASSERT_NOT_REACHED;
     }
   }
+#endif
 
   MvnCellNode* node = new MvnCellNode(module, cell);
   reg_node(node);
