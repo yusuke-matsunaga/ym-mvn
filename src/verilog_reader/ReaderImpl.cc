@@ -123,7 +123,7 @@ ReaderImpl::gen_network(MvnMgr& mgr,
     else {
       MsgMgr::put_msg(__FILE__, __LINE__,
 		      vl_module->file_region(),
-		      kMsgError,
+		      MsgType::Error,
 		      "MVN_VL",
 		      "More than one top modules.");
       return false;
@@ -269,7 +269,7 @@ ReaderImpl::gen_module(const VlModule* vl_module)
     default:
       MsgMgr::put_msg(__FILE__, __LINE__,
 		      io->file_region(),
-		      kMsgError,
+		      MsgType::Error,
 		      "MVN_VL",
 		      "Only Input/Output/Inout types are supported");
       return nullptr;
@@ -491,7 +491,7 @@ ReaderImpl::gen_portref(const VlExpr* expr)
     buf << decl->full_name() << ": Not found.";
     MsgMgr::put_msg(__FILE__, __LINE__,
 		    decl->file_region(),
-		    kMsgError,
+		    MsgType::Error,
 		    "MVN_VL",
 		    buf.str());
     return MvnPortRef();
@@ -538,7 +538,7 @@ ReaderImpl::connect_lhs(MvnNode* dst_node,
     if ( !decl->calc_bit_offset(expr->index_val(), offset) ) {
       MsgMgr::put_msg(__FILE__, __LINE__,
 		      expr->file_region(),
-		      kMsgError,
+		      MsgType::Error,
 		      "MVN_VL",
 		      "Index is out of range.");
       return;
@@ -553,7 +553,7 @@ ReaderImpl::connect_lhs(MvnNode* dst_node,
     if ( !decl->calc_bit_offset(expr->left_range_val(), msb) ) {
       MsgMgr::put_msg(__FILE__, __LINE__,
 		      expr->file_region(),
-		      kMsgError,
+		      MsgType::Error,
 		      "MVN_VL",
 		      "Left index is out of range.");
       return;
@@ -562,7 +562,7 @@ ReaderImpl::connect_lhs(MvnNode* dst_node,
     if ( !decl->calc_bit_offset(expr->right_range_val(), lsb) ) {
       MsgMgr::put_msg(__FILE__, __LINE__,
 		      expr->file_region(),
-		      kMsgError,
+		      MsgType::Error,
 		      "MVN_VL",
 		      "Right index is out of range.");
       return;
@@ -656,7 +656,7 @@ ReaderImpl::error_drivers(MvnNode* node,
       << "Previous driver is " << driver1.loc();
   MsgMgr::put_msg(__FILE__, __LINE__,
 		  driver2.loc(),
-		  kMsgError,
+		  MsgType::Error,
 		  "MVN_VL",
 		  buf.str());
 }

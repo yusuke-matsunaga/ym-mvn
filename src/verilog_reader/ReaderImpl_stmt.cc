@@ -104,7 +104,7 @@ ReaderImpl::gen_stmt(MvnModule* module,
       if ( expr_node == nullptr ) {
 	MsgMgr::put_msg(__FILE__, __LINE__,
 			expr->file_region(),
-			kMsgWarning,
+			MsgType::Warning,
 			"MVN_VL",
 			"Case expression contains 'x' or 'z', "
 			"which is never match.");
@@ -121,7 +121,7 @@ ReaderImpl::gen_stmt(MvnModule* module,
   default:
     MsgMgr::put_msg(__FILE__, __LINE__,
 		    stmt->file_region(),
-		    kMsgError,
+		    MsgType::Error,
 		    "MVN_VL",
 		    "Unsupported statement for synthesis.");
     return false;
@@ -177,7 +177,7 @@ ReaderImpl::gen_caseitem(MvnModule* module,
 	  << "' contains 'x' or 'z', which is never match.";
       MsgMgr::put_msg(__FILE__, __LINE__,
 		      label_expr->file_region(),
-		      kMsgWarning,
+		      MsgType::Warning,
 		      "MVN_VL",
 		      buf.str());
     }
@@ -283,7 +283,7 @@ ReaderImpl::gen_assign(MvnModule* module,
 	if ( !lhs_declbase->calc_bit_offset(lhs1->index_val(), offset) ) {
 	  MsgMgr::put_msg(__FILE__, __LINE__,
 			  lhs1->file_region(),
-			  kMsgError,
+			  MsgType::Error,
 			  "MVN_VL",
 			  "Index is out of range");
 	  return;
@@ -333,7 +333,7 @@ ReaderImpl::gen_assign(MvnModule* module,
 	if ( !lhs_declbase->calc_bit_offset(lhs1->left_range_val(), msb) ) {
 	  MsgMgr::put_msg(__FILE__, __LINE__,
 			  lhs1->file_region(),
-			  kMsgError,
+			  MsgType::Error,
 			  "MVN_VL",
 			  "Left index is out of range");
 	  return;
@@ -342,7 +342,7 @@ ReaderImpl::gen_assign(MvnModule* module,
 	if ( !lhs_declbase->calc_bit_offset(lhs1->right_range_val(), lsb) ) {
 	  MsgMgr::put_msg(__FILE__, __LINE__,
 			  lhs1->file_region(),
-			  kMsgError,
+			  MsgType::Error,
 			  "MVN_VL",
 			  "Right index is out of range");
 	  return;

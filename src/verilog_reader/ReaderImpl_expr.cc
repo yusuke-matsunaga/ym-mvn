@@ -75,7 +75,7 @@ ReaderImpl::gen_expr(MvnModule* parent_module,
 	if ( !decl->calc_bit_offset(expr->index_val(), bitpos) ) {
 	  MsgMgr::put_msg(__FILE__, __LINE__,
 			  expr->file_region(),
-			  kMsgError,
+			  MsgType::Error,
 			  "MVN_VL",
 			  "Index is out of range.");
 	  return nullptr;
@@ -104,7 +104,7 @@ ReaderImpl::gen_expr(MvnModule* parent_module,
 	if ( !decl->calc_bit_offset(expr->left_range_val(), msb) ) {
 	  MsgMgr::put_msg(__FILE__, __LINE__,
 			  expr->left_range()->file_region(),
-			  kMsgError,
+			  MsgType::Error,
 			  "MVN_VL",
 			  "Left range is out of range");
 	  return nullptr;
@@ -113,7 +113,7 @@ ReaderImpl::gen_expr(MvnModule* parent_module,
 	if ( !decl->calc_bit_offset(expr->right_range_val(), lsb) ) {
 	  MsgMgr::put_msg(__FILE__, __LINE__,
 			  expr->right_range()->file_region(),
-			  kMsgError,
+			  MsgType::Error,
 			  "MVN_VL",
 			  "Right range is out of range");
 	  return nullptr;
@@ -220,7 +220,7 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
       // X を含む値との演算は合成不可
       MsgMgr::put_msg(__FILE__, __LINE__,
 		      expr->file_region(),
-		      kMsgError,
+		      MsgType::Error,
 		      "MVN_VLXXX",
 		      "'X' or 'Z' value in the operands");
       return nullptr;
@@ -658,7 +658,7 @@ ReaderImpl::gen_primary(const VlExpr* expr,
       if ( node == nullptr ) {
 	MsgMgr::put_msg(__FILE__, __LINE__,
 			expr->file_region(),
-			kMsgError,
+			MsgType::Error,
 			"MVN_VL",
 			"Index is out of range.");
 	return nullptr;

@@ -172,7 +172,7 @@ ReaderImpl::gen_process(MvnModule* parent_module,
     // always 文以外(initial文)はダメ
     MsgMgr::put_msg(__FILE__, __LINE__,
 		    process->file_region(),
-		    kMsgError,
+		    MsgType::Error,
 		    "MVN_VL",
 		    "'initial' should not be used.");
     return false;
@@ -183,7 +183,7 @@ ReaderImpl::gen_process(MvnModule* parent_module,
     // always の直後は '@' でなければダメ
     MsgMgr::put_msg(__FILE__, __LINE__,
 		    stmt->file_region(),
-		    kMsgError,
+		    MsgType::Error,
 		    "MVN_VL",
 		    "only '@' is allowed here.");
     return false;
@@ -204,7 +204,7 @@ ReaderImpl::gen_process(MvnModule* parent_module,
       else {
 	MsgMgr::put_msg(__FILE__, __LINE__,
 			expr->file_region(),
-			kMsgError,
+			MsgType::Error,
 			"MVN_VL",
 			"only edge descriptor should be used.");
 	return false;
@@ -216,7 +216,7 @@ ReaderImpl::gen_process(MvnModule* parent_module,
     else {
       MsgMgr::put_msg(__FILE__, __LINE__,
 		      expr->file_region(),
-		      kMsgError,
+		      MsgType::Error,
 		      "MVN_VL",
 		      "Illegal expression type.");
       return false;
@@ -228,7 +228,7 @@ ReaderImpl::gen_process(MvnModule* parent_module,
     if ( has_normal_event ) {
       MsgMgr::put_msg(__FILE__, __LINE__,
 		      control->file_region(),
-		      kMsgError,
+		      MsgType::Error,
 		      "MVN_VL",
 		      "edge-type events and normal events are "
 		      "mutual exclusive.");
@@ -274,7 +274,7 @@ ReaderImpl::gen_process(MvnModule* parent_module,
 	  if ( pol != event_node_array[i].second ) {
 	    MsgMgr::put_msg(__FILE__, __LINE__,
 			    cond->file_region(),
-			    kMsgError,
+			    MsgType::Error,
 			    "MVN_VL",
 			    "Polarity mismatch.");
 	    return false;
@@ -298,7 +298,7 @@ ReaderImpl::gen_process(MvnModule* parent_module,
     if ( event_list.size() != ev_num - 1 ) {
       MsgMgr::put_msg(__FILE__, __LINE__,
 		      stmt->body_stmt()->file_region(),
-		      kMsgError,
+		      MsgType::Error,
 		      "MVN_VL",
 		      "Too few 'if' branch against the event list.");
       return false;
@@ -700,7 +700,7 @@ ReaderImpl::gen_priminst(MvnModule* parent_module,
   case kVpiCombPrim:
     MsgMgr::put_msg(__FILE__, __LINE__,
 		    prim->file_region(),
-		    kMsgError,
+		    MsgType::Error,
 		    "MVN_VL",
 		    "Combinational UDP should not be used.");
     return;
@@ -708,7 +708,7 @@ ReaderImpl::gen_priminst(MvnModule* parent_module,
   case kVpiSeqPrim:
     MsgMgr::put_msg(__FILE__, __LINE__,
 		    prim->file_region(),
-		    kMsgError,
+		    MsgType::Error,
 		    "MVN_VL",
 		    "Sequential UDP should not be used.");
     return;
@@ -716,7 +716,7 @@ ReaderImpl::gen_priminst(MvnModule* parent_module,
   default:
     MsgMgr::put_msg(__FILE__, __LINE__,
 		    prim->file_region(),
-		    kMsgError,
+		    MsgType::Error,
 		    "MVN_VL",
 		    "Illegal primitive type.");
     return;
