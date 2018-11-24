@@ -144,7 +144,7 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief ID番号を得る．
-  ymuint
+  int
   id() const;
 
   /// @brief 親のモジュールを得る．
@@ -158,17 +158,17 @@ public:
 
   /// @brief 入力ピン数を得る．
   virtual
-  ymuint
+  int
   input_num() const = 0;
 
   /// @brief 入力ピンを得る．
   /// @param[in] pos 位置 ( 0 <= pos < input_num() )
   virtual
   const MvnInputPin*
-  input(ymuint pos) const = 0;
+  input(int pos) const = 0;
 
   /// @brief 出力のビット幅を得る．
-  ymuint
+  int
   bit_width() const;
 
   /// @brief 出力に接続している入力ピンのリストを得る．
@@ -180,7 +180,7 @@ public:
   /// @retval 0 負極性(negedge)
   /// @note type() が kDff の時のみ意味を持つ．
   virtual
-  ymuint
+  int
   clock_pol() const = 0;
 
   /// @brief 非同期セット信号の極性を得る．
@@ -189,31 +189,31 @@ public:
   /// @retval 0 負極性(negedge)
   /// @note type() が kDff の時のみ意味を持つ．
   virtual
-  ymuint
-  control_pol(ymuint pos) const = 0;
+  int
+  control_pol(int pos) const = 0;
 
   /// @brief 非同期セットの値を表す定数ノードを得る．
   /// @param[in] pos 位置 ( 0 <= pos < input_num() - 2 )
   virtual
   const MvnNode*
-  control_val(ymuint pos) const = 0;
+  control_val(int pos) const = 0;
 
   /// @brief ビット位置を得る．
   /// @note type() が kConstBitSelect の時のみ意味を持つ．
   virtual
-  ymuint
+  int
   bitpos() const = 0;
 
   /// @brief 範囲指定の MSB を得る．
   /// @note type() が kConstPartSelect の時のみ意味を持つ．
   virtual
-  ymuint
+  int
   msb() const = 0;
 
   /// @brief 範囲指定の LSB を得る．
   /// @note type() が kConstPartSelect の時のみ意味を持つ．
   virtual
-  ymuint
+  int
   lsb() const = 0;
 
   /// @brief 定数値を得る．
@@ -230,12 +230,28 @@ public:
   void
   xmask(vector<ymuint32>& val) const = 0;
 
-  /// @brief セルを得る．
+  /// @brief セル番号を得る．
   /// @note type() が kCell の時のみ意味を持つ．
+  ///
+  /// デフォルトの実装では -1 を返す．
+  virtual
+  int
+  cell_id() const = 0;
+
+  /// @brief セルの出力ピン番号を返す．
+  /// @note type() が kCell の時のみ意味を持つ．
+  /// @note デフォルトの実装では 0 を返す．
+  virtual
+  int
+  cell_opin_pos() const = 0;
+
+  /// @brief 多出力セルノードの場合の代表ノードを返す．
+  /// @note type() が kCell の時のみ意味を持つ．
+  /// @note 1出力セルノードの時には自分自身を返す．
   /// @note デフォルトの実装では nullptr を返す．
   virtual
-  const ClibCell*
-  cell() const = 0;
+  const MvnNode*
+  cell_node() const = 0;
 
 
 protected:
@@ -247,7 +263,7 @@ protected:
   /// @param[in] pos 位置 ( 0 <= pos < input_num() )
   virtual
   MvnInputPin*
-  _input(ymuint pos) = 0;
+  _input(int pos) = 0;
 
 
 private:
@@ -256,7 +272,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // ID番号
-  ymuint32 mId;
+  int mId;
 
   // 親のモジュール
   MvnModule* mParent;
@@ -265,7 +281,7 @@ private:
   list<MvnNode*>::iterator mListIter;
 
   // 出力のビット幅
-  ymuint32 mBitWidth;
+  int mBitWidth;
 
   // ファンアウト先の入力ピンのリスト
   list<MvnInputPin*> mDstPinList;
@@ -279,7 +295,7 @@ private:
 
 // @brief ID番号を得る．
 inline
-ymuint
+int
 MvnNode::id() const
 {
   return mId;
@@ -295,7 +311,7 @@ MvnNode::parent() const
 
 // @brief ビット幅を得る．
 inline
-ymuint
+int
 MvnNode::bit_width() const
 {
   return mBitWidth;

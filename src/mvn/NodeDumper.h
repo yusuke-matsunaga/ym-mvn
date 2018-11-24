@@ -56,7 +56,6 @@ public:
   UnaryOpDumper(const char* opr_str);
 
   /// @brief デストラクタ
-  virtual
   ~UnaryOpDumper();
 
 
@@ -68,10 +67,9 @@ public:
   /// @brief ノードの内容を出力する．
   /// @param[in] s 出力先のストリーム
   /// @param[in] node 対象のノード
-  virtual
   void
   operator()(ostream& s,
-	     const MvnNode* node);
+	     const MvnNode* node) override;
 
 
 private:
@@ -101,7 +99,6 @@ public:
 		 bool need_paren = false);
 
   /// @brief デストラクタ
-  virtual
   ~BinaryOpDumper();
 
 
@@ -113,10 +110,9 @@ public:
   /// @brief ノードの内容を出力する．
   /// @param[in] s 出力先のストリーム
   /// @param[in] node 対象のノード
-  virtual
   void
   operator()(ostream& s,
-	     const MvnNode* node);
+	     const MvnNode* node) override;
 
 
 private:
@@ -148,7 +144,6 @@ public:
 		  const char* opr_str2);
 
   /// @brief デストラクタ
-  virtual
   ~TernaryOpDumper();
 
 
@@ -160,10 +155,9 @@ public:
   /// @brief ノードの内容を出力する．
   /// @param[in] s 出力先のストリーム
   /// @param[in] node 対象のノード
-  virtual
   void
   operator()(ostream& s,
-	     const MvnNode* node);
+	     const MvnNode* node) override;
 
 
 private:
@@ -194,7 +188,6 @@ public:
   NaryOpDumper(const char* opr_str);
 
   /// @brief デストラクタ
-  virtual
   ~NaryOpDumper();
 
 
@@ -206,10 +199,9 @@ public:
   /// @brief ノードの内容を出力する．
   /// @param[in] s 出力先のストリーム
   /// @param[in] node 対象のノード
-  virtual
   void
   operator()(ostream& s,
-	     const MvnNode* node);
+	     const MvnNode* node) override;
 
 
 private:
@@ -236,7 +228,6 @@ public:
   ConcatDumper();
 
   /// @brief デストラクタ
-  virtual
   ~ConcatDumper();
 
 
@@ -248,10 +239,9 @@ public:
   /// @brief ノードの内容を出力する．
   /// @param[in] s 出力先のストリーム
   /// @param[in] node 対象のノード
-  virtual
   void
   operator()(ostream& s,
-	     const MvnNode* node);
+	     const MvnNode* node) override;
 
 };
 
@@ -269,7 +259,6 @@ public:
   CaseEqDumper();
 
   /// @brief デストラクタ
-  virtual
   ~CaseEqDumper();
 
 
@@ -281,10 +270,9 @@ public:
   /// @brief ノードの内容を出力する．
   /// @param[in] s 出力先のストリーム
   /// @param[in] node 対象のノード
-  virtual
   void
   operator()(ostream& s,
-	     const MvnNode* node);
+	     const MvnNode* node) override;
 
 };
 
@@ -302,7 +290,6 @@ public:
   ConstBitSelectDumper();
 
   /// @brief デストラクタ
-  virtual
   ~ConstBitSelectDumper();
 
 
@@ -314,10 +301,9 @@ public:
   /// @brief ノードの内容を出力する．
   /// @param[in] s 出力先のストリーム
   /// @param[in] node 対象のノード
-  virtual
   void
   operator()(ostream& s,
-	     const MvnNode* node);
+	     const MvnNode* node) override;
 
 };
 
@@ -335,7 +321,6 @@ public:
   ConstPartSelectDumper();
 
   /// @brief デストラクタ
-  virtual
   ~ConstPartSelectDumper();
 
 
@@ -347,10 +332,9 @@ public:
   /// @brief ノードの内容を出力する．
   /// @param[in] s 出力先のストリーム
   /// @param[in] node 対象のノード
-  virtual
   void
   operator()(ostream& s,
-	     const MvnNode* node);
+	     const MvnNode* node) override;
 
 };
 
@@ -368,7 +352,6 @@ public:
   BitSelectDumper();
 
   /// @brief デストラクタ
-  virtual
   ~BitSelectDumper();
 
 
@@ -380,10 +363,9 @@ public:
   /// @brief ノードの内容を出力する．
   /// @param[in] s 出力先のストリーム
   /// @param[in] node 対象のノード
-  virtual
   void
   operator()(ostream& s,
-	     const MvnNode* node);
+	     const MvnNode* node) override;
 
 };
 
@@ -401,7 +383,6 @@ public:
   PartSelectDumper();
 
   /// @brief デストラクタ
-  virtual
   ~PartSelectDumper();
 
 
@@ -413,10 +394,9 @@ public:
   /// @brief ノードの内容を出力する．
   /// @param[in] s 出力先のストリーム
   /// @param[in] node 対象のノード
-  virtual
   void
   operator()(ostream& s,
-	     const MvnNode* node);
+	     const MvnNode* node) override;
 
 };
 
@@ -434,7 +414,6 @@ public:
   ConstDumper();
 
   /// @brief デストラクタ
-  virtual
   ~ConstDumper();
 
 
@@ -446,10 +425,9 @@ public:
   /// @brief ノードの内容を出力する．
   /// @param[in] s 出力先のストリーム
   /// @param[in] node 対象のノード
-  virtual
   void
   operator()(ostream& s,
-	     const MvnNode* node);
+	     const MvnNode* node) override;
 
 };
 

@@ -35,7 +35,7 @@ MvnPortRef::MvnPortRef(const MvnNode* node)
 // @param[in] node ノード
 // @param[in] bitpos ビット位置
 MvnPortRef::MvnPortRef(const MvnNode* node,
-		       ymuint bitpos)
+		       int bitpos)
 {
   mNode = node;
   mMsb = (bitpos << 1) | 1U;
@@ -47,8 +47,8 @@ MvnPortRef::MvnPortRef(const MvnNode* node,
 // @param[in] msb 範囲指定の MSB
 // @param[in] lsb 範囲指定の LSB
 MvnPortRef::MvnPortRef(const MvnNode* node,
-		       ymuint msb,
-		       ymuint lsb)
+		       int msb,
+		       int lsb)
 {
   mNode = node;
   mMsb = (msb << 1);
@@ -61,7 +61,7 @@ MvnPortRef::~MvnPortRef()
 }
 
 // @brief この実体のビット幅を返す．
-ymuint
+int
 MvnPortRef::bit_width() const
 {
   if ( has_bitselect() ) {
@@ -109,7 +109,7 @@ MvnPort::MvnPort(const vector<MvnPortRef>& portref_list,
 
   mPortRefNum = portref_list.size();
   mPortRefArray = new MvnPortRef[mPortRefNum];
-  for (ymuint i = 0; i < mPortRefNum; ++ i) {
+  for ( int i = 0; i < mPortRefNum; ++ i ) {
     mPortRefArray[i] = portref_list[i];
   }
 }
@@ -121,11 +121,11 @@ MvnPort::~MvnPort()
 }
 
 // @brief ビット幅を得る．
-ymuint
+int
 MvnPort::bit_width() const
 {
-  ymuint ans = 0;
-  for (ymuint i = 0; i < mPortRefNum; ++ i) {
+  int ans = 0;
+  for ( int i = 0; i < mPortRefNum; ++ i ) {
     MvnPortRef& pr = mPortRefArray[i];
     ans += pr.bit_width();
   }

@@ -75,7 +75,7 @@ public:
   /// @retval false 生成中にエラーが起こった．
   bool
   gen_network(MvnMgr& mgr,
-	      const ClibCellLibrary* library,
+	      const ClibCellLibrary& library,
 	      MvnVlMap& node_map);
 
 

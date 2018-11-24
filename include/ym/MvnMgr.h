@@ -12,7 +12,7 @@
 #include "ym/mvn.h"
 #include "ym/MvnNode.h"
 #include "ym/ItvlMgr.h"
-#include "ym/clib.h"
+#include "ym/ClibCellLibrary.h"
 
 
 BEGIN_NAMESPACE_YM_MVN
@@ -29,7 +29,8 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief コンストラクタ
-  MvnMgr();
+  /// @param[in] library セルライブラリ
+  MvnMgr(const ClibCellLibrary& library = ClibCellLibrary());
 
   /// @brief デストラクタ
   ~MvnMgr();
@@ -40,16 +41,20 @@ public:
   // 情報を取得する関数
   //////////////////////////////////////////////////////////////////////
 
+  /// @brief 関連付けられたセルライブラリを返す．
+  ClibCellLibrary
+  library() const;
+
   /// @brief トップレベルモジュールのリストを得る．
   /// @param[out] module_list モジュールを格納するリスト
   /// @return 要素数を返す．
   /// @note この関数はトップモジュール数ではなく全モジュール数に比例した
   /// 実行時間を要する．
-  ymuint
-  topmodule_list(list<const MvnModule*>& module_list) const;
+  int
+  topmodule_list(vector<const MvnModule*>& module_list) const;
 
   /// @brief モジュール番号の最大値+1を得る．
-  ymuint
+  int
   max_module_id() const;
 
   /// @brief モジュールIDをキーにしてモジュールにアクセスする．
@@ -57,30 +62,30 @@ public:
   /// @return 該当するモジュールを返す．
   /// @note 該当するモジュールがない場合は nullptr を返す．
   const MvnModule*
-  module(ymuint id) const;
+  module(int id) const;
 
   /// @brief モジュールIDをキーにしてモジュールにアクセスする．
   /// @param[in] id モジュールID ( 0 <= id < max_module_id() )
   /// @return 該当するモジュールを返す．
   /// @note 該当するモジュールがない場合は nullptr を返す．
   MvnModule*
-  _module(ymuint id);
+  _module(int id);
 
   /// @brief ノードの ID番号の最大値 + 1 を返す．
-  ymuint
+  int
   max_node_id() const;
 
   /// @brief ノードを得る．
   /// @param[in] id ID番号 ( 0 <= id < max_node_id() )
   /// @note nullptr が返されることもある．
   const MvnNode*
-  node(ymuint id) const;
+  node(int id) const;
 
   /// @brief ノードを得る．
   /// @param[in] id ID番号 ( 0 <= id < max_node_id() )
   /// @note nullptr が返されることもある．
   MvnNode*
-  _node(ymuint id);
+  _node(int id);
 
 
 public:
@@ -98,10 +103,10 @@ public:
   /// @note 入出力ノードのビット幅は1で初期化される．
   MvnModule*
   new_module(const char* name,
-	     ymuint np,
-	     ymuint ni,
-	     ymuint no,
-	     ymuint nio);
+	     int np,
+	     int ni,
+	     int no,
+	     int nio);
 
   /// @brief モジュールを生成する．
   /// @param[in] name 名前
@@ -112,10 +117,10 @@ public:
   /// @return 生成したモジュールを返す．
   MvnModule*
   new_module(const char* name,
-	     ymuint np,
-	     const vector<ymuint>& ibitwidth_array,
-	     const vector<ymuint>& obitwidth_array,
-	     const vector<ymuint>& iobitwidth_array);
+	     int np,
+	     const vector<int>& ibitwidth_array,
+	     const vector<int>& obitwidth_array,
+	     const vector<int>& iobitwidth_array);
 
   /// @brief モジュールを削除する．
   /// @param[in] module 対象のモジュール
@@ -130,7 +135,7 @@ public:
   /// @param[in] name 名前
   void
   init_port(MvnModule* module,
-	    ymuint pos,
+	    int pos,
 	    const vector<MvnPortRef>& portref_list = vector<MvnPortRef>(),
 	    const char* name = nullptr);
 
@@ -142,8 +147,8 @@ public:
   /// @param[in] node 対応する入出力ノード
   void
   set_port_ref(MvnModule* module,
-	       ymuint pos,
-	       ymuint port_ref_pos,
+	       int pos,
+	       int port_ref_pos,
 	       MvnNode* node);
 
   /// @brief ポート参照式の内容を設定する(ビット指定形式)．
@@ -154,10 +159,10 @@ public:
   /// @param[in] index ビット指定位置
   void
   set_port_ref(MvnModule* module,
-	       ymuint pos,
-	       ymuint port_ref_pos,
+	       int pos,
+	       int port_ref_pos,
 	       MvnNode* node,
-	       ymuint index);
+	       int index);
 
   /// @brief ポート参照式の内容を設定する(範囲指定形式)．
   /// @param[in] module 対象のモジュール
@@ -168,11 +173,11 @@ public:
   /// @param[in] lsb 範囲指定の LSB
   void
   set_port_ref(MvnModule* module,
-	       ymuint pos,
-	       ymuint port_ref_pos,
+	       int pos,
+	       int port_ref_pos,
 	       MvnNode* node,
-	       ymuint msb,
-	       ymuint lsb);
+	       int msb,
+	       int lsb);
 #endif
 
   /// @brief 冗長な through ノードを取り除く
@@ -190,21 +195,21 @@ public:
   /// @param[in] bit_width ビット幅
   MvnNode*
   new_input(MvnModule* module,
-	    ymuint bit_width);
+	    int bit_width);
 
   /// @brief 出力ノードを生成する．
   /// @param[in] module ノードが属するモジュール
   /// @param[in] bit_width ビット幅
   MvnNode*
   new_output(MvnModule* module,
-	     ymuint bit_width);
+	     int bit_width);
 
   /// @brief 入出力ノードを生成する．
   /// @param[in] module ノードが属するモジュール
   /// @param[in] bit_width ビット幅
   MvnNode*
   new_inout(MvnModule* module,
-	    ymuint bit_width);
+	    int bit_width);
 
   /// @brief フリップフロップノードを生成する．
   /// @param[in] module ノードが属するモジュール
@@ -215,17 +220,17 @@ public:
   /// @note pol_array の要素数が非同期セット信号数となる．
   MvnNode*
   new_dff(MvnModule* module,
-	  ymuint clock_pol,
-	  const vector<ymuint>& pol_array,
+	  int clock_pol,
+	  const vector<int>& pol_array,
 	  const vector<MvnNode*>& val_array,
-	  ymuint bit_width = 1);
+	  int bit_width = 1);
 
   /// @brief ラッチノードを生成する．
   /// @param[in] module ノードが属するモジュール
   /// @param[in] bit_width ビット幅
   MvnNode*
   new_latch(MvnModule* module,
-	    ymuint bit_width = 1);
+	    int bit_width = 1);
 
   /// @brief through ノードを生成する．
   /// @param[in] module ノードが属するモジュール
@@ -233,7 +238,7 @@ public:
   /// @return 生成したノードを返す．
   MvnNode*
   new_through(MvnModule* module,
-	      ymuint bit_width = 1);
+	      int bit_width = 1);
 
   /// @brief not ノードを生成する．
   /// @param[in] module ノードが属するモジュール
@@ -241,7 +246,7 @@ public:
   /// @return 生成したノードを返す．
   MvnNode*
   new_not(MvnModule* module,
-	  ymuint bit_width = 1);
+	  int bit_width = 1);
 
   /// @brief and ノードを生成する．
   /// @param[in] module ノードが属するモジュール
@@ -250,8 +255,8 @@ public:
   /// @return 生成したノードを返す．
   MvnNode*
   new_and(MvnModule* module,
-	  ymuint input_num,
-	  ymuint bit_width = 1);
+	  int input_num,
+	  int bit_width = 1);
 
   /// @brief or ノードを生成する．
   /// @param[in] module ノードが属するモジュール
@@ -260,8 +265,8 @@ public:
   /// @return 生成したノードを返す．
   MvnNode*
   new_or(MvnModule* module,
-	 ymuint input_num,
-	 ymuint bit_width = 1);
+	 int input_num,
+	 int bit_width = 1);
 
   /// @brief xor ノードを生成する．
   /// @param[in] module ノードが属するモジュール
@@ -270,8 +275,8 @@ public:
   /// @return 生成したノードを返す．
   MvnNode*
   new_xor(MvnModule* module,
-	  ymuint input_num,
-	  ymuint bit_width = 1);
+	  int input_num,
+	  int bit_width = 1);
 
   /// @brief reduction and ノードを生成する．
   /// @param[in] module ノードが属するモジュール
@@ -279,7 +284,7 @@ public:
   /// @return 生成したノードを返す．
   MvnNode*
   new_rand(MvnModule* module,
-	   ymuint bit_width);
+	   int bit_width);
 
   /// @brief reduction or ノードを生成する．
   /// @param[in] module ノードが属するモジュール
@@ -287,7 +292,7 @@ public:
   /// @return 生成したノードを返す．
   MvnNode*
   new_ror(MvnModule* module,
-	  ymuint bit_width);
+	  int bit_width);
 
   /// @brief reduction xor ノードを生成する．
   /// @param[in] module ノードが属するモジュール
@@ -295,7 +300,7 @@ public:
   /// @return 生成したノードを返す．
   MvnNode*
   new_rxor(MvnModule* module,
-	   ymuint bit_width);
+	   int bit_width);
 
   /// @brief equal ノードを生成する．
   /// @param[in] module ノードが属するモジュール
@@ -303,7 +308,7 @@ public:
   /// @return 生成したノードを返す．
   MvnNode*
   new_equal(MvnModule* module,
-	    ymuint bit_width);
+	    int bit_width);
 
   /// @brief case 文用の equal ノードを生成する．
   /// @param[in] module ノードが属するモジュール
@@ -314,7 +319,7 @@ public:
   /// @note 残りの入力は caseitem expression
   MvnNode*
   new_caseeq(MvnModule* module,
-	     ymuint bit_width,
+	     int bit_width,
 	     const vector<ymuint32>& xmask);
 
   /// @brief less than ノードを生成する．
@@ -323,7 +328,7 @@ public:
   /// @return 生成したノードを返す．
   MvnNode*
   new_lt(MvnModule* module,
-	 ymuint bit_width);
+	 int bit_width);
 
   /// @brief shift left logical ノードを生成する．
   /// @param[in] module ノードが属するモジュール
@@ -333,9 +338,9 @@ public:
   /// @return 生成したノードを返す．
   MvnNode*
   new_sll(MvnModule* module,
-	  ymuint bit_width1,
-	  ymuint bit_width2,
-	  ymuint bit_width3);
+	  int bit_width1,
+	  int bit_width2,
+	  int bit_width3);
 
   /// @brief shift right logical ノードを生成する．
   /// @param[in] module ノードが属するモジュール
@@ -345,9 +350,9 @@ public:
   /// @return 生成したノードを返す．
   MvnNode*
   new_srl(MvnModule* module,
-	  ymuint bit_width1,
-	  ymuint bit_width2,
-	  ymuint bit_width3);
+	  int bit_width1,
+	  int bit_width2,
+	  int bit_width3);
 
   /// @brief shift left arithmetic ノードを生成する．
   /// @param[in] module ノードが属するモジュール
@@ -357,9 +362,9 @@ public:
   /// @return 生成したノードを返す．
   MvnNode*
   new_sla(MvnModule* module,
-	  ymuint bit_width1,
-	  ymuint bit_width2,
-	  ymuint bit_width3);
+	  int bit_width1,
+	  int bit_width2,
+	  int bit_width3);
 
   /// @brief shift right arithmetic ノードを生成する．
   /// @param[in] module ノードが属するモジュール
@@ -369,9 +374,9 @@ public:
   /// @return 生成したノードを返す．
   MvnNode*
   new_sra(MvnModule* module,
-	  ymuint bit_width1,
-	  ymuint bit_width2,
-	  ymuint bit_width3);
+	  int bit_width1,
+	  int bit_width2,
+	  int bit_width3);
 
   /// @brief cmpl ノードを生成する．
   /// @param[in] module ノードが属するモジュール
@@ -380,7 +385,7 @@ public:
   /// @note 2の補数を計算する．
   MvnNode*
   new_cmpl(MvnModule* module,
-	   ymuint bit_width);
+	   int bit_width);
 
   /// @brief add ノードを生成する．
   /// @param[in] module ノードが属するモジュール
@@ -390,9 +395,9 @@ public:
   /// @return 生成したノードを返す．
   MvnNode*
   new_add(MvnModule* module,
-	  ymuint bit_width1,
-	  ymuint bit_width2,
-	  ymuint bit_width3);
+	  int bit_width1,
+	  int bit_width2,
+	  int bit_width3);
 
   /// @brief sub ノードを生成する．
   /// @param[in] module ノードが属するモジュール
@@ -402,9 +407,9 @@ public:
   /// @return 生成したノードを返す．
   MvnNode*
   new_sub(MvnModule* module,
-	  ymuint bit_width1,
-	  ymuint bit_width2,
-	  ymuint bit_width3);
+	  int bit_width1,
+	  int bit_width2,
+	  int bit_width3);
 
   /// @brief mult ノードを生成する．
   /// @param[in] module ノードが属するモジュール
@@ -414,9 +419,9 @@ public:
   /// @return 生成したノードを返す．
   MvnNode*
   new_mult(MvnModule* module,
-	  ymuint bit_width1,
-	  ymuint bit_width2,
-	  ymuint bit_width3);
+	  int bit_width1,
+	  int bit_width2,
+	  int bit_width3);
 
   /// @brief div ノードを生成する．
   /// @param[in] module ノードが属するモジュール
@@ -426,9 +431,9 @@ public:
   /// @return 生成したノードを返す．
   MvnNode*
   new_div(MvnModule* module,
-	  ymuint bit_width1,
-	  ymuint bit_width2,
-	  ymuint bit_width3);
+	  int bit_width1,
+	  int bit_width2,
+	  int bit_width3);
 
   /// @brief modulo ノードを生成する．
   /// @param[in] module ノードが属するモジュール
@@ -438,9 +443,9 @@ public:
   /// @return 生成したノードを返す．
   MvnNode*
   new_mod(MvnModule* module,
-	  ymuint bit_width1,
-	  ymuint bit_width2,
-	  ymuint bit_width3);
+	  int bit_width1,
+	  int bit_width2,
+	  int bit_width3);
 
   /// @brief power ノードを生成する．
   /// @param[in] module ノードが属するモジュール
@@ -450,9 +455,9 @@ public:
   /// @return 生成したノードを返す．
   MvnNode*
   new_pow(MvnModule* module,
-	  ymuint bit_width1,
-	  ymuint bit_width2,
-	  ymuint bit_width3);
+	  int bit_width1,
+	  int bit_width2,
+	  int bit_width3);
 
   /// @brief condition ノードを生成する．
   /// @param[in] module ノードが属するモジュール
@@ -460,7 +465,7 @@ public:
   /// @return 生成したノードを返す．
   MvnNode*
   new_ite(MvnModule* module,
-	  ymuint bit_width);
+	  int bit_width);
 
   /// @brief concatenate ノードを生成する．
   /// @param[in] module ノードが属するモジュール
@@ -469,7 +474,7 @@ public:
   /// @note 出力のビット幅は入力のビット幅の和となる．
   MvnNode*
   new_concat(MvnModule* module,
-	     const vector<ymuint>& ibitwidth_array);
+	     const vector<int>& ibitwidth_array);
 
   /// @brief bit-selectノードを生成する．
   /// @param[in] module ノードが属するモジュール
@@ -478,8 +483,8 @@ public:
   /// @return 生成したノードを返す．
   MvnNode*
   new_constbitselect(MvnModule* module,
-		     ymuint bitpos,
-		     ymuint bit_width);
+		     int bitpos,
+		     int bit_width);
 
   /// @brief part-select ノードを生成する．
   /// @param[in] module ノードが属するモジュール
@@ -489,9 +494,9 @@ public:
   /// @return 生成したノードを返す．
   MvnNode*
   new_constpartselect(MvnModule* module,
-		      ymuint msb,
-		      ymuint lsb,
-		      ymuint bit_width);
+		      int msb,
+		      int lsb,
+		      int bit_width);
 
   /// @brief 可変 bit-selectノードを生成する．
   /// @param[in] module ノードが属するモジュール
@@ -500,8 +505,8 @@ public:
   /// @return 生成したノードを返す．
   MvnNode*
   new_bitselect(MvnModule* module,
-		ymuint bit_width1,
-		ymuint bit_width2);
+		int bit_width1,
+		int bit_width2);
 
   /// @brief 可変 part-select ノードを生成する．
   /// @param[in] module ノードが属するモジュール
@@ -511,9 +516,9 @@ public:
   /// @return 生成したノードを返す．
   MvnNode*
   new_partselect(MvnModule* module,
-		 ymuint bit_width1,
-		 ymuint bit_width2,
-		 ymuint bit_width3);
+		 int bit_width1,
+		 int bit_width2,
+		 int bit_width3);
 
   /// @brief constant ノードを生成する．
   /// @param[in] module ノードが属するモジュール
@@ -521,15 +526,15 @@ public:
   /// @param[in] val 値
   MvnNode*
   new_const(MvnModule* module,
-	    ymuint bit_width,
+	    int bit_width,
 	    const vector<ymuint32>& val);
 
   /// @brief セルノードを生成する．
   /// @param[in] module ノードが属するモジュール
-  /// @param[in] cell セル
+  /// @param[in] cell_id セル番号
   MvnNode*
   new_cell(MvnModule* module,
-	   const ClibCell* cell);
+	   int cell_id);
 
   /// @brief ノードを削除する．
   /// @param[in] node 対象のノード
@@ -558,9 +563,9 @@ public:
   ///  - ピンのビット幅が異なっていた．
   bool
   connect(MvnNode* src_node,
-	  ymuint src_pin_pos,
+	  int src_pin_pos,
 	  MvnNode* dst_node,
-	  ymuint dst_pin_pos);
+	  int dst_pin_pos);
 
   /// @brief 接続を取り除く
   /// @param[in] src_node 入力元のノード
@@ -570,9 +575,9 @@ public:
   /// @note 現在の実装はあまり効率が良くない．
   void
   disconnect(MvnNode* src_node,
-	     ymuint src_pin_pos,
+	     int src_pin_pos,
 	     MvnNode* dst_node,
-	     ymuint dst_pin_pos);
+	     int dst_pin_pos);
 
 
 private:
@@ -585,14 +590,14 @@ private:
   /// @param[in] bitpos 抜き出すビット位置
   MvnNode*
   select_from_concat(MvnNode* src_node,
-		     ymuint bitpos);
+		     int bitpos);
 
   /// @brief 部分指定子からビットを抜き出す．
   /// @param[in] src_node 部分指定ノード
   /// @param[in] bitpos 抜き出すビット位置
   MvnNode*
   select_from_partselect(MvnNode* src_node,
-			 ymuint bitpos);
+			 int bitpos);
 
   /// @brief 接続を切り替える．
   /// @param[in] old_node 元のノード
@@ -601,9 +606,9 @@ private:
   /// @param[in] new_pin 新しいピン番号
   void
   reconnect(MvnNode* old_node,
-	    ymuint old_pin_pos,
+	    int old_pin_pos,
 	    MvnNode* new_node,
-	    ymuint new_pin_pos);
+	    int new_pin_pos);
 
   /// @brief 多入力論理演算ノードを生成する．
   /// @param[in] module ノードが属するモジュール
@@ -613,8 +618,8 @@ private:
   MvnNode*
   new_log_op(MvnModule* module,
 	     MvnNode::tType type,
-	     ymuint input_num,
-	     ymuint bit_width);
+	     int input_num,
+	     int bit_width);
 
   /// @brief 1入力演算ノードを生成する．
   /// @param[in] module ノードが属するモジュール
@@ -624,8 +629,8 @@ private:
   MvnNode*
   new_unary_op(MvnModule* module,
 	       MvnNode::tType type,
-	       ymuint ibit_width1,
-	       ymuint obit_width);
+	       int ibit_width1,
+	       int obit_width);
 
   /// @brief 2入力演算ノードを生成する．
   /// @param[in] module ノードが属するモジュール
@@ -636,9 +641,9 @@ private:
   MvnNode*
   new_binary_op(MvnModule* module,
 		MvnNode::tType type,
-		ymuint ibit_width1,
-		ymuint ibit_width2,
-		ymuint obit_width);
+		int ibit_width1,
+		int ibit_width2,
+		int obit_width);
 
   /// @brief 3入力演算ノードを生成する．
   /// @param[in] module ノードが属するモジュール
@@ -650,10 +655,10 @@ private:
   MvnNode*
   new_ternary_op(MvnModule* module,
 		 MvnNode::tType type,
-		 ymuint ibit_width1,
-		 ymuint ibit_width2,
-		 ymuint ibit_width3,
-		 ymuint obit_width);
+		 int ibit_width1,
+		 int ibit_width2,
+		 int ibit_width3,
+		 int obit_width);
 
   /// @brief 多入力演算ノードを生成する．
   /// @param[in] module ノードが属するモジュール
@@ -663,8 +668,8 @@ private:
   MvnNode*
   new_nary_op(MvnModule* module,
 	      MvnNode::tType type,
-	      const vector<ymuint>& ibit_width_array,
-	      ymuint obit_width);
+	      const vector<int>& ibit_width_array,
+	      int obit_width);
 
   /// @brief ノードを登録する．
   /// @param[in] node 対象のノード
@@ -681,6 +686,9 @@ private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
+
+  // セルライブラリ
+  ClibCellLibrary mLibrary;
 
   // モジュールを納めた配列
   // ID番号をキーにしている．

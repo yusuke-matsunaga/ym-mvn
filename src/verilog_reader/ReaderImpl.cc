@@ -83,7 +83,7 @@ ReaderImpl::read(const string& filename,
 // @retval false 生成中にエラーが起こった．
 bool
 ReaderImpl::gen_network(MvnMgr& mgr,
-			const ClibCellLibrary* cell_library,
+			const ClibCellLibrary& cell_library,
 			MvnVlMap& node_map)
 {
   if ( MsgMgr::error_num() > 0 ) {
@@ -131,19 +131,17 @@ ReaderImpl::gen_network(MvnMgr& mgr,
   }
 
   // 結線を行う．
-  ymuint n = mMvnMgr->max_node_id();
-  for (ymuint i = 0; i < n; ++ i) {
+  int n = mMvnMgr->max_node_id();
+  for ( int i = 0; i < n; ++ i ) {
     MvnNode* node = mMvnMgr->_node(i);
     if ( node == nullptr ) continue;
     const vector<Driver>& dlist = driver_list(node);
     if ( dlist.empty() ) continue;
-    ymuint bw = node->input(0)->bit_width();
+    int bw = node->input(0)->bit_width();
     vector<Driver> tmp(bw);
-    for (vector<Driver>::const_iterator p = dlist.begin();
-	 p != dlist.end(); ++ p) {
-      const Driver& driver = *p;
+    for ( const auto& driver: dlist ) {
       if ( driver.is_simple() ) {
-	for (ymuint i = 0; i < bw; ++ i) {
+	for ( int i = 0; i < bw; ++ i ) {
 	  if ( tmp[i].rhs_node() != nullptr ) {
 	    error_drivers(node, tmp[i], driver);
 	  }
@@ -151,16 +149,16 @@ ReaderImpl::gen_network(MvnMgr& mgr,
 	}
       }
       else if ( driver.has_bitselect() ) {
-	ymuint index = driver.index();
+	int index = driver.index();
 	if ( tmp[index].rhs_node() != nullptr ) {
 	  error_drivers(node, tmp[index], driver);
 	}
 	tmp[index] = driver;
       }
       else {
-	ymuint msb = driver.msb();
-	ymuint lsb = driver.lsb();
-	for (ymuint i = lsb; i <= msb; ++ i) {
+	int msb = driver.msb();
+	int lsb = driver.lsb();
+	for ( int i = lsb; i <= msb; ++ i ) {
 	  if ( tmp[i].rhs_node() != nullptr ) {
 	    error_drivers(node, tmp[i], driver);
 	  }
@@ -170,7 +168,7 @@ ReaderImpl::gen_network(MvnMgr& mgr,
     }
 
     // 明示的なドライバがない場合の処理
-    for (ymuint i = 0; i < bw; ++ i) {
+    for ( int i = 0; i < bw; ++ i ) {
       if ( tmp[i].rhs_node() == nullptr ) {
 	//MsgMgr::put_msg(__FILE__, __LINE__,
 #warning "TODO: warning メッセージを出すようにする．"
@@ -188,8 +186,8 @@ ReaderImpl::gen_network(MvnMgr& mgr,
     Driver prev;
     vector<Driver> tmp2;
     tmp2.reserve(bw);
-    for (ymuint i = 0; i < bw; ++ i) {
-      ymuint idx = bw - i - 1;
+    for ( int i = 0; i < bw; ++ i ) {
+      int idx = bw - i - 1;
       const Driver& driver = tmp[idx];
       if ( driver != prev ) {
 	tmp2.push_back(driver);
@@ -198,15 +196,15 @@ ReaderImpl::gen_network(MvnMgr& mgr,
       }
     }
 
-    ymuint nd = tmp2.size();
+    int nd = tmp2.size();
     if ( nd == 1 ) {
       const Driver& driver = tmp2[0];
       MvnNode* src_node = driver.rhs_node();
       mMvnMgr->connect(src_node, 0, node, 0);
     }
     else {
-      vector<ymuint> bw_array(nd);
-      for (ymuint i = 0; i < nd; ++ i) {
+      vector<int> bw_array(nd);
+      for ( int i = 0; i < nd; ++ i ) {
 	const Driver& driver = tmp2[i];
 	ASSERT_COND( driver.rhs_node() != nullptr );
 	if ( driver.has_bitselect() ) {
@@ -221,7 +219,7 @@ ReaderImpl::gen_network(MvnMgr& mgr,
       }
       MvnNode* node1 = mMvnMgr->new_concat(module0, bw_array);
       mMvnMgr->connect(node1, 0, node, 0);
-      for (ymuint i = 0; i < nd; ++ i) {
+      for ( int i = 0; i < nd; ++ i ) {
 	const Driver& driver = tmp2[i];
 	mMvnMgr->connect(driver.rhs_node(), 0, node1, i);
       }
@@ -230,7 +228,7 @@ ReaderImpl::gen_network(MvnMgr& mgr,
 
   // 冗長な through ノードを取り除く
   {
-    for (ymuint i = 0; i < n; ++ i) {
+    for ( int i = 0; i < n; ++ i ) {
       MvnNode* node = mMvnMgr->_node(i);
       if ( node != nullptr && node->type() == MvnNode::kThrough ) {
 	const MvnNode* src_node = node->input(0)->src_node();
@@ -255,12 +253,12 @@ MvnModule*
 ReaderImpl::gen_module(const VlModule* vl_module)
 {
   // ポート数，入出力のビット幅を調べる．
-  ymuint np = vl_module->port_num();
-  ymuint nio_all = vl_module->io_num();
-  ymuint ni = 0;
-  ymuint no = 0;
-  ymuint nio = 0;
-  for (ymuint i = 0; i < nio_all; ++ i) {
+  int np = vl_module->port_num();
+  int nio_all = vl_module->io_num();
+  int ni = 0;
+  int no = 0;
+  int nio = 0;
+  for ( int i = 0; i < nio_all; ++ i ) {
     const VlIODecl* io = vl_module->io(i);
     switch ( io->direction() ) {
     case kVlInput:  ++ ni; break;
@@ -275,13 +273,13 @@ ReaderImpl::gen_module(const VlModule* vl_module)
       return nullptr;
     }
   }
-  vector<ymuint> ibw_array(ni);
-  vector<ymuint> obw_array(no);
-  vector<ymuint> iobw_array(nio);
+  vector<int> ibw_array(ni);
+  vector<int> obw_array(no);
+  vector<int> iobw_array(nio);
   ni = 0;
   no = 0;
   nio = 0;
-  for (ymuint i = 0; i < nio_all; ++ i) {
+  for ( int i = 0; i < nio_all; ++ i ) {
     const VlIODecl* io = vl_module->io(i);
     switch ( io->direction() ) {
     case kVlInput:  ibw_array[ni] = io->bit_size(); ++ ni; break;
@@ -295,10 +293,10 @@ ReaderImpl::gen_module(const VlModule* vl_module)
 					  ibw_array, obw_array, iobw_array);
 
   // 入出力ノードの対応表を作る．
-  ymuint i1 = 0;
-  ymuint i2 = 0;
-  ymuint i3 = 0;
-  for (ymuint i = 0; i < nio_all; ++ i) {
+  int i1 = 0;
+  int i2 = 0;
+  int i3 = 0;
+  for ( int i = 0; i < nio_all; ++ i ) {
     const VlIODecl* io = vl_module->io(i);
     const VlDecl* decl = io->decl();
     MvnNode* node = nullptr;
@@ -338,14 +336,14 @@ ReaderImpl::gen_module(const VlModule* vl_module)
   }
 
   // ポートの接続を行う．
-  for (ymuint i = 0; i < np; ++ i) {
+  for ( int i = 0; i < np; ++ i ) {
     const VlPort* port = vl_module->port(i);
     const VlExpr* expr = port->low_conn();
     if ( expr->is_operation() ) {
       ASSERT_COND( expr->op_type() == kVlConcatOp );
-      ymuint n = expr->operand_num();
+      int n = expr->operand_num();
       vector<MvnPortRef> portref_list(n);
-      for (ymuint j = 0; j < n; ++ j) {
+      for ( int j = 0; j < n; ++ j ) {
 	portref_list[j] = gen_portref(expr->operand(j));
       }
       mMvnMgr->init_port(module, i, portref_list, port->name());
@@ -372,11 +370,9 @@ ReaderImpl::gen_decl(MvnModule* module,
   {
     vector<const VlDecl*> net_list;
     if ( mVlMgr.find_decl_list(vl_scope, vpiNet, net_list) ) {
-      for (vector<const VlDecl*>::iterator p = net_list.begin();
-	   p != net_list.end(); ++ p) {
-	const VlDecl* vl_decl = *p;
+      for ( auto vl_decl: net_list ) {
 	// 仮の through ノードに対応させる．
-	ymuint bw = vl_decl->bit_size();
+	int bw = vl_decl->bit_size();
 	MvnNode* node = mMvnMgr->new_through(module, bw);
 	reg_node(vl_decl, node);
 
@@ -398,13 +394,11 @@ ReaderImpl::gen_decl(MvnModule* module,
   {
     vector<const VlDeclArray*> netarray_list;
     if ( mVlMgr.find_declarray_list(vl_scope, vpiNetArray, netarray_list) ) {
-      for (vector<const VlDeclArray*>::iterator p = netarray_list.begin();
-	   p != netarray_list.end(); ++ p) {
-	const VlDeclArray* vl_decl = *p;
-	ymuint array_size = vl_decl->array_size();
-	for (ymuint i = 0; i < array_size; ++ i) {
+      for ( auto vl_decl: netarray_list ) {
+	int array_size = vl_decl->array_size();
+	for ( int i = 0; i < array_size; ++ i ) {
 	  // 仮の through ノードに対応させる．
-	  ymuint bw = vl_decl->bit_size();
+	  int bw = vl_decl->bit_size();
 	  MvnNode* node = mMvnMgr->new_through(module, bw);
 	  reg_node(vl_decl, i, node);
 	}
@@ -416,12 +410,9 @@ ReaderImpl::gen_decl(MvnModule* module,
   {
     vector<const VlDecl*> reg_list;
     if ( mVlMgr.find_decl_list(vl_scope, vpiReg, reg_list) ) {
-      for (vector<const VlDecl*>::iterator p = reg_list.begin();
-	   p != reg_list.end(); ++ p) {
-	const VlDecl* vl_decl = *p;
-
+      for ( auto vl_decl: reg_list ) {
 	// 仮の through ノードに対応させる．
-	ymuint bw = vl_decl->bit_size();
+	int bw = vl_decl->bit_size();
 	MvnNode* node = mMvnMgr->new_through(module, bw);
 	reg_node(vl_decl, node);
 	(void) mDeclHash.get_id(vl_decl);
@@ -444,14 +435,12 @@ ReaderImpl::gen_decl(MvnModule* module,
   {
     vector<const VlDeclArray*> regarray_list;
     if ( mVlMgr.find_declarray_list(vl_scope, vpiRegArray, regarray_list) ) {
-      for (vector<const VlDeclArray*>::iterator p = regarray_list.begin();
-	   p != regarray_list.end(); ++ p) {
-	const VlDeclArray* vl_decl = *p;
-	ymuint array_size = vl_decl->array_size();
+      for ( auto vl_decl: regarray_list ) {
+	int array_size = vl_decl->array_size();
 	(void) mDeclHash.get_id(vl_decl, 0);
-	for (ymuint i = 0; i < array_size; ++ i) {
+	for ( int i = 0; i < array_size; ++ i ) {
 	  // 仮の through ノードに対応させる．
-	  ymuint bw = vl_decl->bit_size();
+	  int bw = vl_decl->bit_size();
 	  MvnNode* node = mMvnMgr->new_through(module, bw);
 	  reg_node(vl_decl, i, node);
 	}
@@ -463,10 +452,8 @@ ReaderImpl::gen_decl(MvnModule* module,
   {
     vector<const VlNamedObj*> scope_list;
     if ( mVlMgr.find_internalscope_list(vl_scope, scope_list) ) {
-      for (vector<const VlNamedObj*>::iterator p = scope_list.begin();
-	   p != scope_list.end(); ++ p) {
-	const VlNamedObj* vl_scope1 = *p;
-	bool stat = gen_decl(module, vl_scope1);
+      for ( auto vl_scope: scope_list ) {
+	bool stat = gen_decl(module, vl_scope);
 	if ( !stat ) {
 	  return false;
 	}
@@ -501,7 +488,7 @@ ReaderImpl::gen_portref(const VlExpr* expr)
     ASSERT_COND( node != nullptr );
     ASSERT_COND( expr->is_constant_select() );
     ASSERT_COND( expr->declarray_dimension() == 0 );
-    ymuint bitpos = expr->index_val();
+    int bitpos = expr->index_val();
     return MvnPortRef(node, bitpos);
   }
 
@@ -509,8 +496,8 @@ ReaderImpl::gen_portref(const VlExpr* expr)
     ASSERT_COND( node != nullptr );
     ASSERT_COND( expr->is_constant_select() );
     ASSERT_COND( expr->declarray_dimension() == 0 );
-    ymuint msb = expr->left_range_val();
-    ymuint lsb = expr->right_range_val();
+    int msb = expr->left_range_val();
+    int lsb = expr->right_range_val();
     return MvnPortRef(node, msb, lsb);
   }
 
@@ -534,7 +521,7 @@ ReaderImpl::connect_lhs(MvnNode* dst_node,
     ASSERT_COND( expr->is_constant_select() );
     const VlDeclBase* decl = expr->decl_base();
     ASSERT_COND( decl != nullptr );
-    ymuint offset;
+    int offset;
     if ( !decl->calc_bit_offset(expr->index_val(), offset) ) {
       MsgMgr::put_msg(__FILE__, __LINE__,
 		      expr->file_region(),
@@ -549,7 +536,7 @@ ReaderImpl::connect_lhs(MvnNode* dst_node,
     ASSERT_COND( expr->is_constant_select() );
     const VlDeclBase* decl = expr->decl_base();
     ASSERT_COND( decl != nullptr );
-    ymuint msb;
+    int msb;
     if ( !decl->calc_bit_offset(expr->left_range_val(), msb) ) {
       MsgMgr::put_msg(__FILE__, __LINE__,
 		      expr->file_region(),
@@ -558,7 +545,7 @@ ReaderImpl::connect_lhs(MvnNode* dst_node,
 		      "Left index is out of range.");
       return;
     }
-    ymuint lsb;
+    int lsb;
     if ( !decl->calc_bit_offset(expr->right_range_val(), lsb) ) {
       MsgMgr::put_msg(__FILE__, __LINE__,
 		      expr->file_region(),
@@ -601,7 +588,7 @@ ReaderImpl::reg_ionode(const VlDecl* decl,
 // @param[in] node 登録するノード
 void
 ReaderImpl::reg_node(const VlDeclArray* decl,
-		     ymuint offset,
+		     int offset,
 		     MvnNode* node)
 {
   mGlobalEnv.add(decl, offset, node);
@@ -638,7 +625,7 @@ vector<Driver>&
 ReaderImpl::driver_list(MvnNode* node)
 {
   ASSERT_COND( node != nullptr );
-  ymuint id = node->id();
+  int id = node->id();
   while ( mDriverList.size() <= id ) {
     mDriverList.push_back(vector<Driver>());
   }

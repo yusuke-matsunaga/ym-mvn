@@ -43,7 +43,7 @@ MvnConst::const_value(vector<ymuint32>& val) const
 // @param[in] val 値
 MvnNode*
 MvnMgr::new_const(MvnModule* module,
-		  ymuint bit_width,
+		  int bit_width,
 		  const vector<ymuint32>& val)
 {
   MvnNode* node = new MvnConst(module, val);

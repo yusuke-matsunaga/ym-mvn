@@ -64,7 +64,7 @@ public:
   /// @retval false 生成中にエラーが起こった．
   bool
   gen_network(MvnMgr& mgr,
-	      const ClibCellLibrary* cell_library,
+	      const ClibCellLibrary& cell_library,
 	      MvnVlMap& node_map);
 
 
@@ -177,7 +177,7 @@ private:
 	       const VlStmt* stmt,
 	       MvnNode* expr,
 	       const Xmask& xmask,
-	       ymuint pos,
+	       int pos,
 	       ProcEnv& env,
 	       EnvMerger& merge);
 
@@ -209,7 +209,7 @@ private:
   parse_cond(const VlExpr* cond,
 	     const Env& env,
 	     MvnNode*& node,
-	     ymuint& pol);
+	     int& pol);
 
   /// @brief parse_cond() の下請け関数
   /// @param[in] opr_primary 識別子を表す式
@@ -223,10 +223,10 @@ private:
   parse_cond_sub(const VlExpr* opr_primary,
 		 const VlExpr* opr_const,
 		 const Env& env,
-		 ymuint pol0,
-		 ymuint pol1,
+		 int pol0,
+		 int pol1,
 		 MvnNode*& node,
-		 ymuint& pol);
+		 int& pol);
 
   /// @brief 式に対応したノードの木を作る．
   /// @param[in] parent_module 親のモジュール
@@ -310,8 +310,8 @@ private:
   MvnNode*
   splice_rhs(MvnModule* parent_module,
 	     MvnNode* rhs_node,
-	     ymuint offset,
-	     ymuint bit_width);
+	     int offset,
+	     int bit_width);
 
   /// @brief 左辺式に接続する．
   /// @param[in] dst_node 左辺に対応するノード
@@ -344,7 +344,7 @@ private:
   /// @param[in] node 登録するノード
   void
   reg_node(const VlDeclArray* decl,
-	   ymuint offset,
+	   int offset,
 	   MvnNode* node);
 
   /// @brief ドライバーを登録する．

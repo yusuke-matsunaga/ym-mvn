@@ -21,11 +21,11 @@ BEGIN_NAMESPACE_YM_MVN
 
 // @brief コンストラクタ
 // @param[in] module 親のモジュール
-// @param[in] cell セル
+// @param[in] cell_id セル番号
 MvnCellNode::MvnCellNode(MvnModule* module,
-			 const ClibCell* cell) :
+			 int cell_id) :
   MvnNodeBase(module, MvnNode::kCell, 0),
-  mCell(cell)
+  mCellId(cell_id)
 {
 }
 
@@ -34,17 +34,17 @@ MvnCellNode::~MvnCellNode()
 {
 }
 
-// @brief セルを得る．
+// @brief セル番号を得る．
 // @note type() が kCell の時のみ意味を持つ．
-const ClibCell*
-MvnCellNode::cell() const
+int
+MvnCellNode::cell_id() const
 {
-  return mCell;
+  return mCellId;
 }
 
 // @brief セルの出力ピン番号を返す．
 // @note type() が kCell の時のみ意味を持つ．
-ymuint
+int
 MvnCellNode::cell_opin_pos() const
 {
   return 0;
@@ -70,7 +70,7 @@ MvnCellNode::cell_node() const
 // @param[in] opos 出力ピン番号
 MvnExtCellNode::MvnExtCellNode(MvnModule* module,
 			       MvnNode* cell_node,
-			       ymuint opos) :
+			       int opos) :
   MvnNodeBase(module, MvnNode::kCell, 0),
   mCellNode(cell_node),
   mOpos(opos)
@@ -82,17 +82,17 @@ MvnExtCellNode::~MvnExtCellNode()
 {
 }
 
-// @brief セルを得る．
+// @brief セル番号を得る．
 // @note type() が kCell の時のみ意味を持つ．
-const ClibCell*
-MvnExtCellNode::cell() const
+int
+MvnExtCellNode::cell_id() const
 {
-  return mCellNode->cell();
+  return mCellNode->cell_id();
 }
 
 // @brief セルの出力ピン番号を返す．
 // @note type() が kCell の時のみ意味を持つ．
-ymuint
+int
 MvnExtCellNode::cell_opin_pos() const
 {
   return mOpos;
@@ -110,18 +110,19 @@ MvnExtCellNode::cell_node() const
 
 // @brief セルノードを生成する．
 // @param[in] module ノードが属するモジュール
-// @param[in] cell セル
+// @param[in] cell_id セル番号
 MvnNode*
 MvnMgr::new_cell(MvnModule* module,
-		 const ClibCell* cell)
+		 int cell_id)
 {
-  ymuint ni = 0;
-  ymuint no = 0;
-  ymuint np = cell->pin_num();
-
+#if 0
+  int ni = 0;
+  int no = 0;
+  int np = cell->pin_num();
+#endif
 #if 0 // 2018/03/01 わけわからいのでコメントアウトした
   vector<ymuint32> pin_pos(np);
-  for (ymuint i = 0; i < np; ++ i) {
+  for ( int i = 0; i < np; ++ i ) {
     const ClibCellPin* pin = cell->pin(i);
     if ( pin->is_input() ) {
       pin_pos[i] = (ni << 1);
@@ -141,12 +142,14 @@ MvnMgr::new_cell(MvnModule* module,
   }
 #endif
 
-  MvnCellNode* node = new MvnCellNode(module, cell);
+  MvnCellNode* node = new MvnCellNode(module, cell_id);
   reg_node(node);
 
-  for (ymuint i = 0; i < ni; ++ i) {
+#if 0
+  for ( int i = 0; i < ni; ++ i ) {
     node->_input(i)->mBitWidth = 1;
   }
+#endif
   node->mBitWidth = 1;
 
   return node;

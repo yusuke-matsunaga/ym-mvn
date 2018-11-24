@@ -48,15 +48,15 @@ public:
   /// @param[in] node ノード
   /// @param[in] bitpos ビット位置
   MvnPortRef(const MvnNode* node,
-	     ymuint bitpos);
+	     int bitpos);
 
   /// @brief 範囲指定のポート要素用のコンストラクタ
   /// @param[in] node ノード
   /// @param[in] msb 範囲指定の MSB
   /// @param[in] lsb 範囲指定の LSB
   MvnPortRef(const MvnNode* node,
-	     ymuint msb,
-	     ymuint lsb);
+	     int msb,
+	     int lsb);
 
   /// @brief デストラクタ
   ~MvnPortRef();
@@ -86,22 +86,22 @@ public:
   has_partselect() const;
 
   /// @brief この実体のビット幅を返す．
-  ymuint
+  int
   bit_width() const;
 
   /// @brief ビット指定位置を返す．
   /// @note has_bitselect() == true の時のみ意味を持つ．
-  ymuint
+  int
   bitpos() const;
 
   /// @brief 範囲指定の MSB を返す．
   /// @note has_partselect() == true の時のみ意味を持つ．
-  ymuint
+  int
   msb() const;
 
   /// @brief 範囲指定の LSB を返す．
   /// @note has_partselect() == true の時のみ意味を持つ．
-  ymuint
+  int
   lsb() const;
 
   /// @}
@@ -166,17 +166,17 @@ public:
   name() const;
 
   /// @brief ビット幅を得る．
-  ymuint
+  int
   bit_width() const;
 
   /// @brief port_ref 数を得る．
-  ymuint
+  int
   port_ref_num() const;
 
   /// @brief port_ref を得る．
   /// @param[in] pos 位置 ( 0 <= pos < port_ref_num() )
   const MvnPortRef&
-  port_ref(ymuint pos) const;
+  port_ref(int pos) const;
 
   /// @}
 
@@ -190,7 +190,7 @@ private:
   string mName;
 
   // portref の数
-  ymuint32 mPortRefNum;
+  int mPortRefNum;
 
   // portref の配列
   MvnPortRef* mPortRefArray;
@@ -239,7 +239,7 @@ MvnPortRef::has_partselect() const
 // @brief ビット指定位置を返す．
 // @note has_bitselect() == true の時のみ意味を持つ．
 inline
-ymuint
+int
 MvnPortRef::bitpos() const
 {
   // 実は msb() のエイリアス
@@ -249,7 +249,7 @@ MvnPortRef::bitpos() const
 // @brief 範囲指定の MSB を返す．
 // @note has_partselect() == true の時のみ意味を持つ．
 inline
-ymuint
+int
 MvnPortRef::msb() const
 {
   return mMsb >> 1;
@@ -258,7 +258,7 @@ MvnPortRef::msb() const
 // @brief 範囲指定の LSB を返す．
 // @note has_partselect() == true の時のみ意味を持つ．
 inline
-ymuint
+int
 MvnPortRef::lsb() const
 {
   return mLsb >> 1;
@@ -275,7 +275,7 @@ MvnPort::name() const
 
 // @brief port_ref 数を得る．
 inline
-ymuint
+int
 MvnPort::port_ref_num() const
 {
   return mPortRefNum;
@@ -285,7 +285,7 @@ MvnPort::port_ref_num() const
 // @param[in] pos 位置 ( 0 <= pos < port_ref_num() )
 inline
 const MvnPortRef&
-MvnPort::port_ref(ymuint pos) const
+MvnPort::port_ref(int pos) const
 {
   return mPortRefArray[pos];
 }

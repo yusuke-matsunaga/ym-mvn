@@ -17,7 +17,7 @@ BEGIN_NAMESPACE_YM_MVN
 // @param[in] module 親のモジュール
 // @param[in] bitpos ビット位置
 MvnConstBitSelect::MvnConstBitSelect(MvnModule* module,
-				     ymuint bitpos) :
+				     int bitpos) :
   MvnNodeBase(module, MvnNode::kConstBitSelect, 1),
   mBitPos(bitpos)
 {
@@ -31,7 +31,7 @@ MvnConstBitSelect::~MvnConstBitSelect()
 // @brief ビット位置を得る．
 // @note type() が kConstBitSelect の時のみ意味を持つ．
 // @note デフォルトの実装では 0 を返す．
-ymuint
+int
 MvnConstBitSelect::bitpos() const
 {
   return mBitPos;
@@ -44,8 +44,8 @@ MvnConstBitSelect::bitpos() const
 // @return 生成したノードを返す．
 MvnNode*
 MvnMgr::new_constbitselect(MvnModule* module,
-			   ymuint bitpos,
-			   ymuint bit_width)
+			   int bitpos,
+			   int bit_width)
 {
   MvnNode* node = new MvnConstBitSelect(module, bitpos);
   reg_node(node);

@@ -18,8 +18,8 @@ BEGIN_NAMESPACE_YM_MVN
 // @param[in] msb 範囲指定の MSB
 // @param[in] lsb 範囲指定の LSB
 MvnConstPartSelect::MvnConstPartSelect(MvnModule* module,
-				       ymuint msb,
-				       ymuint lsb) :
+				       int msb,
+				       int lsb) :
   MvnNodeBase(module, MvnNode::kConstPartSelect, 1),
   mMsb(msb),
   mLsb(lsb)
@@ -34,7 +34,7 @@ MvnConstPartSelect::~MvnConstPartSelect()
 // @brief 範囲指定の MSB を得る．
 // @note type() が kConstPartSelect の時のみ意味を持つ．
 // @note デフォルトの実装では 0 を返す．
-ymuint
+int
 MvnConstPartSelect::msb() const
 {
   return mMsb;
@@ -43,7 +43,7 @@ MvnConstPartSelect::msb() const
 // @brief 範囲指定の LSB を得る．
 // @note type() が kConstPartSelect の時のみ意味を持つ．
 // @note デフォルトの実装では 0 を返す．
-ymuint
+int
 MvnConstPartSelect::lsb() const
 {
   return mLsb;
@@ -57,9 +57,9 @@ MvnConstPartSelect::lsb() const
 // @return 生成したノードを返す．
 MvnNode*
 MvnMgr::new_constpartselect(MvnModule* module,
-			    ymuint msb,
-			    ymuint lsb,
-			    ymuint bit_width)
+			    int msb,
+			    int lsb,
+			    int bit_width)
 {
   MvnNode* node = new MvnConstPartSelect(module, msb, lsb);
   reg_node(node);

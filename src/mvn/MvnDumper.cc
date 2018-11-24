@@ -60,7 +60,8 @@ dump_inputpin(ostream& s,
 // MvnNode の内容を出力する．
 void
 dump_node(ostream& s,
-	  const MvnNode* node)
+	  const MvnNode* node,
+	  const MvnMgr& mgr)
 {
   s << node_idstr(node) << " : ";
   switch ( node->type() ) {
@@ -84,11 +85,11 @@ dump_node(ostream& s,
       s << "CaseEq[";
       vector<ymuint32> xmask;
       node->xmask(xmask);
-      ymuint bw = node->input(0)->bit_width();
-      for (ymuint i = 0; i < bw; ++ i) {
-	ymuint bitpos = bw - i - 1;
-	ymuint blk = bitpos / 32;
-	ymuint sft = bitpos % 32;
+      int bw = node->input(0)->bit_width();
+      for ( int i = 0; i < bw; ++ i ) {
+	int bitpos = bw - i - 1;
+	int blk = bitpos / 32;
+	int sft = bitpos % 32;
 	if ( xmask[blk] & (1U << sft) ) {
 	  s << "-";
 	}
@@ -130,9 +131,9 @@ dump_node(ostream& s,
       s << "Const(";
       vector<ymuint32> val;
       node->const_value(val);
-      ymuint n = val.size();
+      int n = val.size();
       s << hex;
-      for (ymuint i = 0; i < n; ++ i) {
+      for ( int i = 0; i < n; ++ i ) {
 	s << " " << val[n - i - 1];
       }
       s << dec << ")";
@@ -140,7 +141,8 @@ dump_node(ostream& s,
     break;
   case MvnNode::kCell:
     {
-      s << "Cell(" << node->cell()->name() << ")";
+      const ClibCell& cell = mgr.library().cell(node->cell_id());
+      s << "Cell(" << cell.name() << ")";
     }
     break;
   default:
@@ -161,9 +163,9 @@ dump_node(ostream& s,
       s << "negedge";
     }
     s << endl;
-    ymuint ni = node->input_num();
-    ymuint nc = ni - 2;
-    for (ymuint i = 0; i < nc; ++ i) {
+    int ni = node->input_num();
+    int nc = ni - 2;
+    for ( int i = 0; i < nc; ++ i ) {
       const MvnInputPin* cpin = node->input(i + 2);
       ostringstream buf;
       buf << "Control#" << i;
@@ -185,8 +187,8 @@ dump_node(ostream& s,
     #warning "TODO: 未完"
   }
   else {
-    ymuint ni = node->input_num();
-    for (ymuint i = 0; i < ni; ++ i) {
+    int ni = node->input_num();
+    for ( int i = 0; i < ni; ++ i ) {
       const MvnInputPin* pin = node->input(i);
       dump_inputpin(s, pin);
     }
@@ -226,8 +228,8 @@ void
 MvnDumper::operator()(ostream& s,
 		      const MvnMgr& mgr)
 {
-  ymuint n = mgr.max_module_id();
-  for (ymuint i = 0; i < n; ++ i) {
+  int n = mgr.max_module_id();
+  for ( int i = 0; i < n; ++ i ) {
     const MvnModule* module = mgr.module(i);
     if ( module == nullptr ) continue;
 
@@ -241,12 +243,12 @@ MvnDumper::operator()(ostream& s,
       s << "  toplevel module" << endl;
     }
 
-    ymuint np = module->port_num();
-    for (ymuint j = 0; j < np; ++ j) {
+    int np = module->port_num();
+    for ( int j = 0; j < np; ++ j ) {
       const MvnPort* port = module->port(j);
       s << "  Port#" << j << "(" << port->name() << ")" << endl;
-      ymuint n = port->port_ref_num();
-      for (ymuint k = 0; k < n; ++ k) {
+      int n = port->port_ref_num();
+      for ( int k = 0; k < n; ++ k ) {
 	const MvnPortRef& port_ref = port->port_ref(k);
 	s << "    " << node_idstr(port_ref.node());
 	if ( port_ref.has_bitselect() ) {
@@ -259,22 +261,20 @@ MvnDumper::operator()(ostream& s,
       }
     }
 
-    ymuint ni = module->input_num();
-    for (ymuint j = 0; j < ni; ++ j) {
-      dump_node(s, module->input(j));
+    int ni = module->input_num();
+    for ( int j = 0; j < ni; ++ j ) {
+      dump_node(s, module->input(j), mgr);
     }
-    ymuint no = module->output_num();
-    for (ymuint j = 0;j < no; ++ j) {
-      dump_node(s, module->output(j));
+    int no = module->output_num();
+    for ( int j = 0;j < no; ++ j ) {
+      dump_node(s, module->output(j), mgr);
     }
-    ymuint nio = module->inout_num();
-    for (ymuint j = 0; j < nio; ++ j) {
-      dump_node(s, module->inout(j));
+    int nio = module->inout_num();
+    for ( int j = 0; j < nio; ++ j ) {
+      dump_node(s, module->inout(j), mgr);
     }
-    for (list<MvnNode*>::const_iterator p = module->nodes_begin();
-	 p != module->nodes_end(); ++ p) {
-      MvnNode* node = *p;
-      dump_node(s, node);
+    for ( MvnNode* node: module->node_list() ) {
+      dump_node(s, node, mgr);
     }
 
     s << endl;

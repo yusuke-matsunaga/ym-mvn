@@ -30,12 +30,11 @@ private:
 
   /// @brief コンストラクタ
   /// @param[in] module 親のモジュール
-  /// @param[in] cell セル
+  /// @param[in] cell_id セル番号
   MvnCellNode(MvnModule* module,
-	      const ClibCell* cell);
+	      int cell_id);
 
   /// @brief デストラクタ
-  virtual
   ~MvnCellNode();
 
 
@@ -44,24 +43,21 @@ public:
   // 情報を参照するための関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief セルを得る．
+  /// @brief セル番号を得る．
   /// @note type() が kCell の時のみ意味を持つ．
-  virtual
-  const ClibCell*
-  cell() const;
+  int
+  cell_id() const override;
 
   /// @brief セルの出力ピン番号を返す．
   /// @note type() が kCell の時のみ意味を持つ．
-  virtual
-  ymuint
-  cell_opin_pos() const;
+  int
+  cell_opin_pos() const override;
 
   /// @brief 多出力セルノードの場合の代表ノードを返す．
   /// @note type() が kCell の時のみ意味を持つ．
   /// @note 1出力セルノードの時には自分自身を返す．
-  virtual
   const MvnNode*
-  cell_node() const;
+  cell_node() const override;
 
 
 private:
@@ -69,8 +65,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // セル
-  const ClibCell* mCell;
+  // セル番号
+  int mCellId;
 
 };
 
@@ -95,10 +91,9 @@ private:
   /// @param[in] opos 出力ピン番号
   MvnExtCellNode(MvnModule* module,
 		 MvnNode* cell_node,
-		 ymuint opos);
+		 int opos);
 
   /// @brief デストラクタ
-  virtual
   ~MvnExtCellNode();
 
 
@@ -107,24 +102,21 @@ public:
   // 情報を参照するための関数
   //////////////////////////////////////////////////////////////////////
 
-  /// @brief セルを得る．
+  /// @brief セル番号を得る．
   /// @note type() が kCell の時のみ意味を持つ．
-  virtual
-  const ClibCell*
-  cell() const;
+  int
+  cell_id() const override;
 
   /// @brief セルの出力ピン番号を返す．
   /// @note type() が kCell の時のみ意味を持つ．
-  virtual
-  ymuint
-  cell_opin_pos() const;
+  int
+  cell_opin_pos() const override;
 
   /// @brief 多出力セルノードの場合の代表ノードを返す．
   /// @note type() が kCell の時のみ意味を持つ．
   /// @note 1出力セルノードの時には自分自身を返す．
-  virtual
   const MvnNode*
-  cell_node() const;
+  cell_node() const override;
 
 
 private:

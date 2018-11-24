@@ -54,7 +54,7 @@ bool
 MvnVerilogReader::gen_network(MvnMgr& mgr,
 			      MvnVlMap& node_map)
 {
-  return mImpl->gen_network(mgr, nullptr, node_map);
+  return mImpl->gen_network(mgr, ClibCellLibrary(), node_map);
 }
 
 // @brief 今まで読み込んだ情報からネットワークを生成する．
@@ -65,7 +65,7 @@ MvnVerilogReader::gen_network(MvnMgr& mgr,
 // @retval false 生成中にエラーが起こった．
 bool
 MvnVerilogReader::gen_network(MvnMgr& mgr,
-			      const ClibCellLibrary* library,
+			      const ClibCellLibrary& library,
 			      MvnVlMap& node_map)
 {
   return mImpl->gen_network(mgr, library, node_map);

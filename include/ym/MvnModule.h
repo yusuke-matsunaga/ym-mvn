@@ -32,7 +32,7 @@ public:
   /// @{
 
   /// @brief ID番号を得る．
-  ymuint
+  int
   id() const;
 
   /// @brief 名前を得る．
@@ -45,43 +45,43 @@ public:
   parent() const;
 
   /// @brief ポート数を得る．
-  ymuint
+  int
   port_num() const;
 
   /// @brief ポートを得る．
   /// @param[in] pos 位置 ( 0 <= pos < port_num() )
   const MvnPort*
-  port(ymuint pos) const;
+  port(int pos) const;
 
   /// @brief 入力ノード数を得る．
-  ymuint
+  int
   input_num() const;
 
   /// @brief 入力ノードを得る．
   /// @param[in] pos 位置 ( 0 <= pos < input_num() )
   MvnNode*
-  input(ymuint pos) const;
+  input(int pos) const;
 
   /// @brief 出力ノード数を得る．
-  ymuint
+  int
   output_num() const;
 
   /// @brief 出力ノードを得る．
   /// @param[in] pos 位置 ( 0 <= pos < output_num() )
   MvnNode*
-  output(ymuint pos) const;
+  output(int pos) const;
 
   /// @brief 入出力ノード数を得る．
-  ymuint
+  int
   inout_num() const;
 
   /// @brief 入出力ノードを得る．
   /// @param[in] pos 位置 ( 0 <= pos < inout_num() )
   MvnNode*
-  inout(ymuint pos) const;
+  inout(int pos) const;
 
   /// @brief 内部ノードの数を得る．
-  ymuint
+  int
   node_num() const;
 
   /// @brief 内部ノードのリストを得る．
@@ -111,10 +111,10 @@ private:
   /// @param[in] no 出力ノード数
   /// @param[in] nio 入出力ノード数
   MvnModule(const char* name,
-	    ymuint np,
-	    ymuint ni,
-	    ymuint no,
-	    ymuint nio);
+	    int np,
+	    int ni,
+	    int no,
+	    int nio);
 
   /// @brief デストラクタ
   ~MvnModule();
@@ -126,7 +126,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // ID番号
-  ymuint mId;
+  int mId;
 
   // 名前
   string mName;
@@ -158,7 +158,7 @@ private:
 
 // @brief ID番号を得る．
 inline
-ymuint
+int
 MvnModule::id() const
 {
   return mId;
@@ -183,7 +183,7 @@ MvnModule::parent() const
 
 // @brief ポート数を得る．
 inline
-ymuint
+int
 MvnModule::port_num() const
 {
   return mPortArray.size();
@@ -193,14 +193,14 @@ MvnModule::port_num() const
 // @param[in] pos 位置 ( 0 <= pos < port_num() )
 inline
 const MvnPort*
-MvnModule::port(ymuint pos) const
+MvnModule::port(int pos) const
 {
   return mPortArray[pos];
 }
 
 // @brief 入力ノード数を得る．
 inline
-ymuint
+int
 MvnModule::input_num() const
 {
   return mInputArray.size();
@@ -210,14 +210,14 @@ MvnModule::input_num() const
 // @param[in] pos 位置 ( 0 <= pos < input_num() )
 inline
 MvnNode*
-MvnModule::input(ymuint pos) const
+MvnModule::input(int pos) const
 {
   return mInputArray[pos];
 }
 
 // @brief 出力ノード数を得る．
 inline
-ymuint
+int
 MvnModule::output_num() const
 {
   return mOutputArray.size();
@@ -227,14 +227,14 @@ MvnModule::output_num() const
 // @param[in] pos 位置 ( 0 <= pos < output_num() )
 inline
 MvnNode*
-MvnModule::output(ymuint pos) const
+MvnModule::output(int pos) const
 {
   return mOutputArray[pos];
 }
 
 // @brief 入出力ノード数を得る．
 inline
-ymuint
+int
 MvnModule::inout_num() const
 {
   return mInoutArray.size();
@@ -244,14 +244,14 @@ MvnModule::inout_num() const
 // @param[in] pos 位置 ( 0 <= pos < inout_num() )
 inline
 MvnNode*
-MvnModule::inout(ymuint pos) const
+MvnModule::inout(int pos) const
 {
   return mInoutArray[pos];
 }
 
 // @brief 内部ノードの数を得る．
 inline
-ymuint
+int
 MvnModule::node_num() const
 {
   return mNodeList.size();

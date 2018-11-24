@@ -44,13 +44,12 @@ MvnCaseEq::xmask(vector<ymuint32>& val) const
 // @param[in] xmask Xマスク値
 MvnNode*
 MvnMgr::new_caseeq(MvnModule* module,
-		   ymuint bit_width,
+		   int bit_width,
 		   const vector<ymuint32>& xmask)
 {
   bool has_x = false;
-  for (vector<ymuint32>::const_iterator p = xmask.begin();
-       p != xmask.end(); ++ p) {
-    if ( *p ) {
+  for ( auto mask1: xmask ) {
+    if ( mask1 ) {
       has_x = true;
       break;
     }

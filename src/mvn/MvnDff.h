@@ -38,12 +38,11 @@ private:
   ///  - 1 : 正極性(posedge)
   ///  - 0 : 負極性(negedge)
   MvnDff(MvnModule* module,
-	 ymuint clock_pol,
-	 const vector<ymuint>& pol_array,
+	 int clock_pol,
+	 const vector<int>& pol_array,
 	 const vector<MvnNode*>& val_array);
 
   /// @brief デストラクタ
-  virtual
   ~MvnDff();
 
 
@@ -57,9 +56,8 @@ public:
   /// @retval 0 負極性(negedge)
   /// @note type() が kDff の時のみ意味を持つ．
   /// @note デフォルトの実装では 0 を返す．
-  virtual
-  ymuint
-  clock_pol() const;
+  int
+  clock_pol() const override;
 
   /// @brief 非同期セット信号の極性を得る．
   /// @param[in] pos 位置 ( 0 <= pos < input_num() - 2 )
@@ -67,16 +65,14 @@ public:
   /// @retval 0 負極性(negedge)
   /// @note type() が kDff の時のみ意味を持つ．
   /// @note デフォルトの実装では 0 を返す．
-  virtual
-  ymuint
-  control_pol(ymuint pos) const;
+  int
+  control_pol(int pos) const override;
 
   /// @brief 非同期セットの値を表す定数ノードを得る．
   /// @param[in] pos 位置 ( 0 <= pos < input_num() - 2 )
   /// @note デフォルトの実装では nullptr を返す．
-  virtual
   const MvnNode*
-  control_val(ymuint pos) const;
+  control_val(int pos) const override;
 
 
 private:

@@ -19,10 +19,10 @@ BEGIN_NAMESPACE_YM_MVN
 // @param[in] no 出力ノード数
 // @param[in] nio 入出力ノード数
 MvnModule::MvnModule(const char* name,
-		     ymuint np,
-		     ymuint ni,
-		     ymuint no,
-		     ymuint nio) :
+		     int np,
+		     int ni,
+		     int no,
+		     int nio) :
   mName(name),
   mParent(nullptr),
   mPortArray(np),
