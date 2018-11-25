@@ -28,6 +28,7 @@
 #include "ym/vl/VlExpr.h"
 #include "ym/ClibCell.h"
 #include "ym/ClibCellPin.h"
+#include "ym/ClibObjList.h"
 #include "ym/MsgMgr.h"
 
 
@@ -558,6 +559,7 @@ ReaderImpl::gen_cellinst(MvnModule* parent_module,
   int nio = cell.inout_num();
 #endif
   MvnNode* onode = mMvnMgr->new_cell(parent_module, cell_id);
+  const ClibCell& cell = mMvnMgr->library().cell(cell_id);
   int pos = 0;
   for ( auto& pin: cell.pin_list() ) {
     const VlPrimTerm* term = prim->prim_term(pos); ++ pos;

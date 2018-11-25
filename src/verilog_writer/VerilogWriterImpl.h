@@ -68,7 +68,8 @@ private:
 
   void
   dump_node(ostream& s,
-	    const MvnNode* node);
+	    const MvnNode* node,
+	    const MvnMgr& mgr);
 
   void
   dump_uop(ostream& s,
