@@ -54,7 +54,7 @@ public:
   bool
   read(const string& filename,
        const SearchPathList& searchpath = SearchPathList(),
-       const list<VlLineWatcher*> watcher_list = list<VlLineWatcher*>());
+       const vector<VlLineWatcher*> watcher_list = vector<VlLineWatcher*>());
 
   /// @brief 今まで読み込んだ情報からネットワークを生成する．
   /// @param[in] mgr ネットワーク生成用のマネージャ

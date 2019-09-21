@@ -41,7 +41,7 @@ MvnVerilogReader::clear()
 bool
 MvnVerilogReader::read(const string& filename,
 		       const SearchPathList& searchpath,
-		       const list<VlLineWatcher*> watcher_list)
+		       const vector<VlLineWatcher*> watcher_list)
 {
   return mImpl->read(filename, searchpath, watcher_list);
 }

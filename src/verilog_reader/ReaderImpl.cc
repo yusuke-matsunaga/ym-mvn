@@ -72,7 +72,7 @@ ReaderImpl::clear()
 bool
 ReaderImpl::read(const string& filename,
 		 const SearchPathList& searchpath,
-		 const list<VlLineWatcher*> watcher_list)
+		 const vector<VlLineWatcher*> watcher_list)
 {
   return mVlMgr.read_file(filename, searchpath, watcher_list);
 }
@@ -105,11 +105,8 @@ ReaderImpl::gen_network(MvnMgr& mgr,
   mDriverList.clear();
 
   MvnModule* module0 = nullptr;
-  list<const VlModule*> tmp_list(mVlMgr.topmodule_list());
-  for (list<const VlModule*>::const_iterator p = tmp_list.begin();
-       p != tmp_list.end(); ++ p) {
-    const VlModule* vl_module = *p;
-
+  const auto& tmp_list(mVlMgr.topmodule_list());
+  for ( auto& vl_module: tmp_list ) {
     if ( vl_module->is_cell_instance() ) continue;
 
     // module を実体化
