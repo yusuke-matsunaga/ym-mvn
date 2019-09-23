@@ -47,15 +47,15 @@ ReaderImpl::gen_stmt(MvnModule* module,
   }
 
   switch ( stmt->type() ) {
-  case kVpiAssignment:
+  case VpiObjType::Assignment:
     gen_assign(module, stmt, env);
     break;
 
-  case kVpiBegin:
-  case kVpiNamedBegin:
+  case VpiObjType::Begin:
+  case VpiObjType::NamedBegin:
     {
-      int n = stmt->child_stmt_num();
-      for ( int i = 0; i < n; ++ i ) {
+      SizeType n = stmt->child_stmt_num();
+      for ( SizeType i = 0; i < n; ++ i ) {
 	const VlStmt* stmt1 = stmt->child_stmt(i);
 	bool stat = gen_stmt(module, stmt1, env, merge);
 	if ( !stat ) {
@@ -65,7 +65,7 @@ ReaderImpl::gen_stmt(MvnModule* module,
     }
     break;
 
-  case kVpiIf:
+  case VpiObjType::If:
     {
       const VlExpr* cond = stmt->expr();
       MvnNode* cond_node = gen_expr(module, cond, env);
@@ -78,7 +78,7 @@ ReaderImpl::gen_stmt(MvnModule* module,
     }
     break;
 
-  case kVpiIfElse:
+  case VpiObjType::IfElse:
     {
       const VlExpr* cond = stmt->expr();
       MvnNode* cond_node = gen_expr(module, cond, env);
@@ -96,7 +96,7 @@ ReaderImpl::gen_stmt(MvnModule* module,
     }
     break;
 
-  case kVpiCase:
+  case VpiObjType::Case:
     {
       const VlExpr* expr = stmt->expr();
       Xmask xmask;
@@ -147,15 +147,15 @@ ReaderImpl::gen_caseitem(MvnModule* module,
 			 ProcEnv& env,
 			 EnvMerger& merge)
 {
-  int n = stmt->caseitem_num();
+  SizeType n = stmt->caseitem_num();
   if ( pos == n ) {
     return true;
   }
 
   // pos 番めの条件を作る．
-  tVpiCaseType case_type = stmt->case_type();
+  VpiCaseType case_type = stmt->case_type();
   const VlCaseItem* caseitem = stmt->caseitem(pos);
-  int ne = caseitem->expr_num();
+  SizeType ne = caseitem->expr_num();
   if ( ne == 0 ) {
     // default caseitem
     ASSERT_COND( pos == n - 1 );
@@ -165,9 +165,9 @@ ReaderImpl::gen_caseitem(MvnModule* module,
 
   vector<MvnNode*> cond_list;
   cond_list.reserve(ne);
-  for ( int i = 0; i < ne; ++ i ) {
+  for ( SizeType i = 0; i < ne; ++ i ) {
     const VlExpr* label_expr = caseitem->expr(i);
-    int bw = label_expr->bit_size();
+    SizeType bw = label_expr->bit_size();
     Xmask label_xmask;
     MvnNode* label = gen_expr(module, label_expr, case_type,
 			      env, label_xmask);
@@ -197,7 +197,8 @@ ReaderImpl::gen_caseitem(MvnModule* module,
       cond_list.push_back(cond);
     }
   }
-  int ni = cond_list.size();
+
+  SizeType ni = cond_list.size();
   if ( ni == 0 ) {
     // この caseitem に合致する条件はない．
     gen_caseitem(module, stmt, expr, xmask, pos + 1, env, merge);
@@ -210,7 +211,7 @@ ReaderImpl::gen_caseitem(MvnModule* module,
   }
   else {
     all_cond = mMvnMgr->new_or(module, ni);
-    for ( int i = 0; i < ni; ++ i ) {
+    for ( SizeType i = 0; i < ni; ++ i ) {
       mMvnMgr->connect(cond_list[i], 0, all_cond, i);
     }
   }
@@ -238,16 +239,16 @@ ReaderImpl::gen_assign(MvnModule* module,
 
   MvnNode* rhs_node = gen_rhs(module, lhs, rhs, env);
 
-  int n = lhs->lhs_elem_num();
-  int offset = 0;
-  for ( int i = 0; i < n; ++ i ) {
+  SizeType n = lhs->lhs_elem_num();
+  SizeType offset = 0;
+  for ( SizeType i = 0; i < n; ++ i ) {
     const VlExpr* lhs1 = lhs->lhs_elem(i);
     const VlDecl* lhs_decl = lhs1->decl_obj();
     const VlDeclArray* lhs_declarray = lhs1->declarray_obj();
     const VlDeclBase* lhs_declbase = lhs1->decl_base();
-    int bw = lhs_declbase->bit_size();
+    SizeType bw = lhs_declbase->bit_size();
     AssignInfo old_dst;
-    int lhs_offset = 0;
+    SizeType lhs_offset = 0;
     if ( lhs_decl ) {
       old_dst = env.get_info(lhs_decl);
     }
@@ -288,7 +289,7 @@ ReaderImpl::gen_assign(MvnModule* module,
 			  "Index is out of range");
 	  return;
 	}
-	vector<int> bw_array;
+	vector<SizeType> bw_array;
 	bw_array.reserve(3);
 	if ( offset < bw - 1 ) {
 	  bw_array.push_back(bw - offset - 1);
@@ -349,7 +350,7 @@ ReaderImpl::gen_assign(MvnModule* module,
 	}
 	int lbw = msb - lsb + 1;
 	MvnNode* src_node = splice_rhs(module, rhs_node, offset, lbw);
-	vector<int> bw_array;
+	vector<SizeType> bw_array;
 	bw_array.reserve(3);
 	if ( msb < bw - 1 ) {
 	  bw_array.push_back(bw - msb - 1);

@@ -118,9 +118,9 @@ public:
   MvnModule*
   new_module(const char* name,
 	     int np,
-	     const vector<int>& ibitwidth_array,
-	     const vector<int>& obitwidth_array,
-	     const vector<int>& iobitwidth_array);
+	     const vector<SizeType>& ibitwidth_array,
+	     const vector<SizeType>& obitwidth_array,
+	     const vector<SizeType>& iobitwidth_array);
 
   /// @brief モジュールを削除する．
   /// @param[in] module 対象のモジュール
@@ -474,7 +474,7 @@ public:
   /// @note 出力のビット幅は入力のビット幅の和となる．
   MvnNode*
   new_concat(MvnModule* module,
-	     const vector<int>& ibitwidth_array);
+	     const vector<SizeType>& ibitwidth_array);
 
   /// @brief bit-selectノードを生成する．
   /// @param[in] module ノードが属するモジュール
@@ -668,7 +668,7 @@ private:
   MvnNode*
   new_nary_op(MvnModule* module,
 	      MvnNode::tType type,
-	      const vector<int>& ibit_width_array,
+	      const vector<SizeType>& ibit_width_array,
 	      int obit_width);
 
   /// @brief ノードを登録する．

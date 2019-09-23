@@ -125,9 +125,9 @@ MvnMgr::new_module(const char* name,
 		   int no,
 		   int nio)
 {
-  vector<int> ibitwidth_array(ni, 1);
-  vector<int> obitwidth_array(no, 1);
-  vector<int> iobitwidth_array(nio, 1);
+  vector<SizeType> ibitwidth_array(ni, 1);
+  vector<SizeType> obitwidth_array(no, 1);
+  vector<SizeType> iobitwidth_array(nio, 1);
   return new_module(name, np,
 		    ibitwidth_array, obitwidth_array, iobitwidth_array);
 }
@@ -142,9 +142,9 @@ MvnMgr::new_module(const char* name,
 MvnModule*
 MvnMgr::new_module(const char* name,
 		   int np,
-		   const vector<int>& ibitwidth_array,
-		   const vector<int>& obitwidth_array,
-		   const vector<int>& iobitwidth_array)
+		   const vector<SizeType>& ibitwidth_array,
+		   const vector<SizeType>& obitwidth_array,
+		   const vector<SizeType>& iobitwidth_array)
 {
   int tmp = mModuleItvlMgr.avail_num();
   if ( tmp == -1 ) {

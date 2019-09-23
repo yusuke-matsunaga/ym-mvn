@@ -603,11 +603,11 @@ MvnMgr::new_ite(MvnModule* module,
 // @note 出力のビット幅は入力のビット幅の和となる．
 MvnNode*
 MvnMgr::new_concat(MvnModule* module,
-		   const vector<int>& ibitwidth_array)
+		   const vector<SizeType>& ibitwidth_array)
 {
-  int ni = ibitwidth_array.size();
-  int obitwidth = 0;
-  for ( int i = 0; i < ni; ++ i ) {
+  SizeType ni = ibitwidth_array.size();
+  SizeType obitwidth = 0;
+  for ( SizeType i = 0; i < ni; ++ i ) {
     obitwidth += ibitwidth_array[i];
   }
   return new_nary_op(module, MvnNode::kConcat, ibitwidth_array, obitwidth);
@@ -624,7 +624,7 @@ MvnMgr::new_log_op(MvnModule* module,
 		   int input_num,
 		   int bit_width)
 {
-  vector<int> ibitwidth_array(input_num);
+  vector<SizeType> ibitwidth_array(input_num);
   for ( int i = 0; i < input_num; ++ i ) {
     ibitwidth_array[i] = bit_width;
   }
@@ -708,14 +708,14 @@ MvnMgr::new_ternary_op(MvnModule* module,
 MvnNode*
 MvnMgr::new_nary_op(MvnModule* module,
 		    MvnNode::tType type,
-		    const vector<int>& ibit_width_array,
+		    const vector<SizeType>& ibit_width_array,
 		    int obit_width)
 {
-  int ni = ibit_width_array.size();
+  SizeType ni = ibit_width_array.size();
   MvnNode* node = new MvnNodeBase(module, type, ni);
   reg_node(node);
 
-  for ( int i = 0; i < ni; ++ i ) {
+  for ( SizeType i = 0; i < ni; ++ i ) {
     node->_input(i)->mBitWidth = ibit_width_array[i];
   }
   node->mBitWidth = obit_width;

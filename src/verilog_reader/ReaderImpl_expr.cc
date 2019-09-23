@@ -37,7 +37,7 @@ ReaderImpl::gen_expr(MvnModule* parent_module,
 		     const Env& env)
 {
   Xmask dummy;
-  MvnNode* node = gen_expr(parent_module, expr, kVpiCaseExact, env, dummy);
+  MvnNode* node = gen_expr(parent_module, expr, VpiCaseType::Exact, env, dummy);
   return node;
 }
 
@@ -50,7 +50,7 @@ ReaderImpl::gen_expr(MvnModule* parent_module,
 MvnNode*
 ReaderImpl::gen_expr(MvnModule* parent_module,
 		     const VlExpr* expr,
-		     tVpiCaseType case_type,
+		     VpiCaseType case_type,
 		     const Env& env,
 		     Xmask& xmask)
 {
@@ -152,17 +152,17 @@ ReaderImpl::gen_expr(MvnModule* parent_module,
 MvnNode*
 ReaderImpl::gen_const(MvnModule* parent_module,
 		      const VlExpr* expr,
-		      tVpiCaseType case_type,
+		      VpiCaseType case_type,
 		      Xmask& xmask)
 {
   VlValue value = expr->constant_value();
   ASSERT_COND( expr->value_type().is_bitvector_type() );
   BitVector bv = value.bitvector_value();
-  int bit_size = bv.size();
-  int blk_size = (bit_size + 31) / 32;
+  SizeType bit_size = bv.size();
+  SizeType blk_size = (bit_size + 31) / 32;
   vector<ymuint32> val(blk_size);
   xmask.set_bit_width(bit_size);
-  for ( int i = 0; i < bit_size; ++ i ) {
+  for ( SizeType i = 0; i < bit_size; ++ i ) {
     VlScalarVal v = bv.value(i);
     if ( v.is_one() ) {
       int blk = i / 32;
@@ -173,7 +173,7 @@ ReaderImpl::gen_const(MvnModule* parent_module,
       ; // なにもしない．
     }
     else if ( v.is_x() ) {
-      if ( case_type == kVpiCaseX ) {
+      if ( case_type == VpiCaseType::X ) {
 	xmask.set_bit(i);
       }
       else {
@@ -181,7 +181,7 @@ ReaderImpl::gen_const(MvnModule* parent_module,
       }
     }
     else if ( v.is_z() ) {
-      if ( case_type == kVpiCaseX || case_type == kVpiCaseZ ) {
+      if ( case_type == VpiCaseType::X || case_type == VpiCaseType::Z ) {
 	xmask.set_bit(i);
       }
       else {
@@ -204,15 +204,15 @@ ReaderImpl::gen_const(MvnModule* parent_module,
 MvnNode*
 ReaderImpl::gen_opr(MvnModule* parent_module,
 		    const VlExpr* expr,
-		    tVpiCaseType case_type,
+		    VpiCaseType case_type,
 		    const Env& env)
 {
-  int out_bw = expr->bit_size();
+  SizeType out_bw = expr->bit_size();
 
-  tVlOpType op_type = expr->op_type();
-  int n = expr->operand_num();
+  VpiOpType op_type = expr->op_type();
+  SizeType n = expr->operand_num();
   vector<MvnNode*> operand_array(n);
-  for ( int i = 0; i < n; ++ i ) {
+  for ( SizeType i = 0; i < n; ++ i ) {
     Xmask xmask1;
     MvnNode* node1 = gen_expr(parent_module, expr->operand(i), case_type,
 			      env, xmask1);
@@ -229,57 +229,57 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
   }
 
   switch ( op_type ) {
-  case kVlNullOp:
+  case VpiOpType::Null:
     return operand_array[0];
 
-  case kVlMinusOp:
+  case VpiOpType::Minus:
     {
-      int bw = operand_array[0]->bit_width();
+      SizeType bw = operand_array[0]->bit_width();
       ASSERT_COND( bw == out_bw );
       MvnNode* node = mMvnMgr->new_cmpl(parent_module, out_bw);
       mMvnMgr->connect(operand_array[0], 0, node, 0);
       return node;
     }
 
-  case kVlNotOp:
+  case VpiOpType::Not:
     {
       ASSERT_COND( out_bw == 1 );
-      int bw = operand_array[0]->bit_width();
+      SizeType bw = operand_array[0]->bit_width();
       ASSERT_COND( bw == 1 );
       MvnNode* node = mMvnMgr->new_not(parent_module, 1);
       mMvnMgr->connect(operand_array[0], 0, node, 0);
       return node;
     }
 
-  case kVlBitNegOp:
+  case VpiOpType::BitNeg:
     {
-      int bw = operand_array[0]->bit_width();
+      SizeType bw = operand_array[0]->bit_width();
       ASSERT_COND( bw == out_bw );
       MvnNode* node = mMvnMgr->new_not(parent_module, out_bw);
       mMvnMgr->connect(operand_array[0], 0, node, 0);
       return node;
     }
 
-  case kVlPlusOp:
+  case VpiOpType::Plus:
     {
-      int bw = operand_array[0]->bit_width();
+      SizeType bw = operand_array[0]->bit_width();
       ASSERT_COND( bw == out_bw );
       return operand_array[0];
     }
 
-  case kVlUnaryAndOp:
+  case VpiOpType::UnaryAnd:
     {
       ASSERT_COND( out_bw == 1  );
-      int bw = operand_array[0]->bit_width();
+      SizeType bw = operand_array[0]->bit_width();
       MvnNode* node = mMvnMgr->new_rand(parent_module, bw);
       mMvnMgr->connect(operand_array[0], 0, node, 0);
       return node;
     }
 
-  case kVlUnaryNandOp:
+  case VpiOpType::UnaryNand:
     {
       ASSERT_COND( out_bw == 1  );
-      int bw = operand_array[0]->bit_width();
+      SizeType bw = operand_array[0]->bit_width();
       MvnNode* node = mMvnMgr->new_rand(parent_module, bw);
       mMvnMgr->connect(operand_array[0], 0, node, 0);
       MvnNode* node1 = mMvnMgr->new_not(parent_module, 1);
@@ -287,19 +287,19 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
       return node1;
     }
 
-  case kVlUnaryOrOp:
+  case VpiOpType::UnaryOr:
     {
       ASSERT_COND( out_bw == 1  );
-      int bw = operand_array[0]->bit_width();
+      SizeType bw = operand_array[0]->bit_width();
       MvnNode* node = mMvnMgr->new_ror(parent_module, bw);
       mMvnMgr->connect(operand_array[0], 0, node, 0);
       return node;
     }
 
-  case kVlUnaryNorOp:
+  case VpiOpType::UnaryNor:
     {
       ASSERT_COND( out_bw == 1  );
-      int bw = operand_array[0]->bit_width();
+      SizeType bw = operand_array[0]->bit_width();
       MvnNode* node = mMvnMgr->new_ror(parent_module, bw);
       mMvnMgr->connect(operand_array[0], 0, node, 0);
       MvnNode* node1 = mMvnMgr->new_not(parent_module, 1);
@@ -307,19 +307,19 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
       return node1;
     }
 
-  case kVlUnaryXorOp:
+  case VpiOpType::UnaryXor:
     {
       ASSERT_COND( out_bw == 1  );
-      int bw = operand_array[0]->bit_width();
+      SizeType bw = operand_array[0]->bit_width();
       MvnNode* node = mMvnMgr->new_rxor(parent_module, bw);
       mMvnMgr->connect(operand_array[0], 0, node, 0);
       return node;
     }
 
-  case kVlUnaryXNorOp:
+  case VpiOpType::UnaryXNor:
     {
       ASSERT_COND( out_bw == 1  );
-      int bw = operand_array[0]->bit_width();
+      SizeType bw = operand_array[0]->bit_width();
       MvnNode* node = mMvnMgr->new_rxor(parent_module, bw);
       mMvnMgr->connect(operand_array[0], 0, node, 0);
       MvnNode* node1 = mMvnMgr->new_not(parent_module, 1);
@@ -327,12 +327,12 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
       return node1;
     }
 
-  case kVlPosedgeOp:
-  case kVlNegedgeOp:
+  case VpiOpType::Posedge:
+  case VpiOpType::Negedge:
     ASSERT_NOT_REACHED;
     break;
 
-  case kVlAddOp:
+  case VpiOpType::Add:
     {
       ASSERT_COND( operand_array[0]->bit_width() == out_bw );
       ASSERT_COND( operand_array[1]->bit_width() == out_bw );
@@ -342,7 +342,7 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
       return node;
     }
 
-  case kVlSubOp:
+  case VpiOpType::Sub:
     {
       ASSERT_COND( operand_array[0]->bit_width() == out_bw );
       ASSERT_COND( operand_array[1]->bit_width() == out_bw );
@@ -352,7 +352,7 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
       return node;
     }
 
-  case kVlMultOp:
+  case VpiOpType::Mult:
     {
       ASSERT_COND( operand_array[0]->bit_width() == out_bw );
       ASSERT_COND( operand_array[1]->bit_width() == out_bw );
@@ -362,7 +362,7 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
       return node;
     }
 
-  case kVlDivOp:
+  case VpiOpType::Div:
     {
       ASSERT_COND( operand_array[0]->bit_width() == out_bw );
       ASSERT_COND( operand_array[1]->bit_width() == out_bw );
@@ -372,7 +372,7 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
       return node;
     }
 
-  case kVlModOp:
+  case VpiOpType::Mod:
     {
       ASSERT_COND( operand_array[0]->bit_width() == out_bw );
       ASSERT_COND( operand_array[1]->bit_width() == out_bw );
@@ -382,62 +382,62 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
       return node;
     }
 
-  case kVlPowerOp:
+  case VpiOpType::Power:
     {
-      int bw1 = operand_array[0]->bit_width();
-      int bw2 = operand_array[1]->bit_width();
-      int bw3 = out_bw;
+      SizeType bw1 = operand_array[0]->bit_width();
+      SizeType bw2 = operand_array[1]->bit_width();
+      SizeType bw3 = out_bw;
       MvnNode* node = mMvnMgr->new_pow(parent_module, bw1, bw2, bw3);
       mMvnMgr->connect(operand_array[0], 0, node, 0);
       mMvnMgr->connect(operand_array[1], 0, node, 1);
       return node;
     }
 
-  case kVlLShiftOp:
+  case VpiOpType::LShift:
     {
-      int bw1 = operand_array[0]->bit_width();
-      int bw2 = operand_array[1]->bit_width();
-      int bw3 = out_bw;
+      SizeType bw1 = operand_array[0]->bit_width();
+      SizeType bw2 = operand_array[1]->bit_width();
+      SizeType bw3 = out_bw;
       MvnNode* node = mMvnMgr->new_sll(parent_module, bw1, bw2, bw3);
       mMvnMgr->connect(operand_array[0], 0, node, 0);
       mMvnMgr->connect(operand_array[1], 0, node, 1);
       return node;
     }
 
-  case kVlRShiftOp:
+  case VpiOpType::RShift:
     {
-      int bw1 = operand_array[0]->bit_width();
-      int bw2 = operand_array[1]->bit_width();
-      int bw3 = out_bw;
+      SizeType bw1 = operand_array[0]->bit_width();
+      SizeType bw2 = operand_array[1]->bit_width();
+      SizeType bw3 = out_bw;
       MvnNode* node = mMvnMgr->new_srl(parent_module, bw1, bw2, bw3);
       mMvnMgr->connect(operand_array[0], 0, node, 0);
       mMvnMgr->connect(operand_array[1], 0, node, 1);
       return node;
     }
 
-  case kVlArithLShiftOp:
+  case VpiOpType::ArithLShift:
     {
-      int bw1 = operand_array[0]->bit_width();
-      int bw2 = operand_array[1]->bit_width();
-      int bw3 = out_bw;
+      SizeType bw1 = operand_array[0]->bit_width();
+      SizeType bw2 = operand_array[1]->bit_width();
+      SizeType bw3 = out_bw;
       MvnNode* node = mMvnMgr->new_sla(parent_module, bw1, bw2, bw3);
       mMvnMgr->connect(operand_array[0], 0, node, 0);
       mMvnMgr->connect(operand_array[1], 0, node, 1);
       return node;
     }
 
-  case kVlArithRShiftOp:
+  case VpiOpType::ArithRShift:
     {
-      int bw1 = operand_array[0]->bit_width();
-      int bw2 = operand_array[1]->bit_width();
-      int bw3 = out_bw;
+      SizeType bw1 = operand_array[0]->bit_width();
+      SizeType bw2 = operand_array[1]->bit_width();
+      SizeType bw3 = out_bw;
       MvnNode* node = mMvnMgr->new_sra(parent_module, bw1, bw2, bw3);
       mMvnMgr->connect(operand_array[0], 0, node, 0);
       mMvnMgr->connect(operand_array[1], 0, node, 1);
       return node;
     }
 
-  case kVlBitAndOp:
+  case VpiOpType::BitAnd:
     {
       ASSERT_COND( operand_array[0]->bit_width() == out_bw );
       ASSERT_COND( operand_array[1]->bit_width() == out_bw );
@@ -447,7 +447,7 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
       return node;
     }
 
-  case kVlBitOrOp:
+  case VpiOpType::BitOr:
     {
       ASSERT_COND( operand_array[0]->bit_width() == out_bw );
       ASSERT_COND( operand_array[1]->bit_width() == out_bw );
@@ -457,7 +457,7 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
       return node;
     }
 
-  case kVlBitXNorOp:
+  case VpiOpType::BitXNor:
     {
       ASSERT_COND( operand_array[0]->bit_width() == out_bw );
       ASSERT_COND( operand_array[1]->bit_width() == out_bw );
@@ -469,7 +469,7 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
       return node1;
     }
 
-  case kVlBitXorOp:
+  case VpiOpType::BitXor:
     {
       ASSERT_COND( operand_array[0]->bit_width() == out_bw );
       ASSERT_COND( operand_array[1]->bit_width() == out_bw );
@@ -479,7 +479,7 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
       return node;
     }
 
-  case kVlLogAndOp:
+  case VpiOpType::LogAnd:
     {
       MvnNode* node = mMvnMgr->new_and(parent_module, 2, 1);
       mMvnMgr->connect(operand_array[0], 0, node, 0);
@@ -487,7 +487,7 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
       return node;
     }
 
-  case kVlLogOrOp:
+  case VpiOpType::LogOr:
     {
       MvnNode* node = mMvnMgr->new_or(parent_module, 2, 1);
       mMvnMgr->connect(operand_array[0], 0, node, 0);
@@ -495,15 +495,15 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
       return node;
     }
 
-  case kVlCaseEqOp:
-  case kVlCaseNeqOp:
+  case VpiOpType::CaseEq:
+  case VpiOpType::CaseNeq:
     ASSERT_NOT_REACHED;
     break;
 
-  case kVlEqOp:
+  case VpiOpType::Eq:
     {
-      int bw1 = operand_array[0]->bit_width();
-      int bw2 = operand_array[1]->bit_width();
+      SizeType bw1 = operand_array[0]->bit_width();
+      SizeType bw2 = operand_array[1]->bit_width();
       ASSERT_COND( bw1 == bw2 );
       MvnNode* node = mMvnMgr->new_equal(parent_module, bw1);
       mMvnMgr->connect(operand_array[0], 0, node, 0);
@@ -511,10 +511,10 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
       return node;
     }
 
-  case kVlNeqOp:
+  case VpiOpType::Neq:
     {
-      int bw1 = operand_array[0]->bit_width();
-      int bw2 = operand_array[1]->bit_width();
+      SizeType bw1 = operand_array[0]->bit_width();
+      SizeType bw2 = operand_array[1]->bit_width();
       ASSERT_COND( bw1 == bw2 );
       MvnNode* node = mMvnMgr->new_equal(parent_module, bw1);
       mMvnMgr->connect(operand_array[0], 0, node, 0);
@@ -524,10 +524,10 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
       return node1;
     }
 
-  case kVlLtOp:
+  case VpiOpType::Lt:
     {
-      int bw1 = operand_array[0]->bit_width();
-      int bw2 = operand_array[1]->bit_width();
+      SizeType bw1 = operand_array[0]->bit_width();
+      SizeType bw2 = operand_array[1]->bit_width();
       ASSERT_COND( bw1 == bw2 );
       MvnNode* node = mMvnMgr->new_lt(parent_module, bw1);
       mMvnMgr->connect(operand_array[0], 0, node, 0);
@@ -535,10 +535,10 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
       return node;
     }
 
-  case kVlGeOp:
+  case VpiOpType::Ge:
     {
-      int bw1 = operand_array[0]->bit_width();
-      int bw2 = operand_array[1]->bit_width();
+      SizeType bw1 = operand_array[0]->bit_width();
+      SizeType bw2 = operand_array[1]->bit_width();
       ASSERT_COND( bw1 == bw2 );
       MvnNode* node = mMvnMgr->new_lt(parent_module, bw1);
       mMvnMgr->connect(operand_array[0], 0, node, 0);
@@ -548,10 +548,10 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
       return node1;
     }
 
-  case kVlGtOp:
+  case VpiOpType::Gt:
     {
-      int bw1 = operand_array[0]->bit_width();
-      int bw2 = operand_array[1]->bit_width();
+      SizeType bw1 = operand_array[0]->bit_width();
+      SizeType bw2 = operand_array[1]->bit_width();
       ASSERT_COND( bw1 == bw2 );
       MvnNode* node = mMvnMgr->new_lt(parent_module, bw1);
       mMvnMgr->connect(operand_array[1], 0, node, 0);
@@ -559,10 +559,10 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
       return node;
     }
 
-  case kVlLeOp:
+  case VpiOpType::Le:
     {
-      int bw1 = operand_array[0]->bit_width();
-      int bw2 = operand_array[1]->bit_width();
+      SizeType bw1 = operand_array[0]->bit_width();
+      SizeType bw2 = operand_array[1]->bit_width();
       ASSERT_COND( bw1 == bw2 );
       MvnNode* node = mMvnMgr->new_lt(parent_module, bw1);
       mMvnMgr->connect(operand_array[1], 0, node, 0);
@@ -572,10 +572,10 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
       return node1;
     }
 
-  case kVlConditionOp:
+  case VpiOpType::Condition:
     {
-      int bw1 = operand_array[1]->bit_width();
-      int bw2 = operand_array[2]->bit_width();
+      SizeType bw1 = operand_array[1]->bit_width();
+      SizeType bw2 = operand_array[2]->bit_width();
       ASSERT_COND( bw1 == out_bw );
       ASSERT_COND( bw2 == out_bw );
       MvnNode* node = mMvnMgr->new_ite(parent_module, out_bw);
@@ -585,38 +585,38 @@ ReaderImpl::gen_opr(MvnModule* parent_module,
       return node;
     }
 
-  case kVlMinTypMaxOp:
+  case VpiOpType::MinTypMax:
     ASSERT_NOT_REACHED;
     break;
 
-  case kVlConcatOp:
+  case VpiOpType::Concat:
     {
-      vector<int> bw_array(n);
-      for ( int i = 0; i < n; ++ i ) {
+      vector<SizeType> bw_array(n);
+      for ( SizeType i = 0; i < n; ++ i ) {
 	bw_array[i] = operand_array[i]->bit_width();
       }
       MvnNode* node = mMvnMgr->new_concat(parent_module, bw_array);
-      for ( int i = 0; i < n; ++ i ) {
+      for ( SizeType i = 0; i < n; ++ i ) {
 	mMvnMgr->connect(operand_array[i], 0, node, i);
       }
       return node;
     }
 
-  case kVlMultiConcatOp:
+  case VpiOpType::MultiConcat:
     {
-      int r = expr->rep_num();
-      int n1 = n - 1;
-      vector<int> bw_array(n1 * r);
-      for ( int j = 0; j < r; ++ j ) {
-	int base = j * n1;
-	for ( int i = 0; i < n1; ++ i ) {
+      SizeType r = expr->rep_num();
+      SizeType n1 = n - 1;
+      vector<SizeType> bw_array(n1 * r);
+      for ( SizeType j = 0; j < r; ++ j ) {
+	SizeType base = j * n1;
+	for ( SizeType i = 0; i < n1; ++ i ) {
 	  bw_array[base + i] = operand_array[i + 1]->bit_width();
 	}
       }
       MvnNode* node = mMvnMgr->new_concat(parent_module, bw_array);
-      for ( int j = 0; j < r; ++ j ) {
-	int base = j * n1;
-	for ( int i = 0; i < n1; ++ i ) {
+      for ( SizeType j = 0; j < r; ++ j ) {
+	SizeType base = j * n1;
+	for ( SizeType i = 0; i < n1; ++ i ) {
 	  mMvnMgr->connect(operand_array[i + 1], 0, node, base + i);
 	}
       }
@@ -728,17 +728,17 @@ ReaderImpl::coerce_expr(MvnModule* parent_module,
 			MvnNode* src_node,
 			VlValueType value_type)
 {
-  int bit_width = value_type.size();
-  int src_bw = src_node->bit_width();
+  SizeType bit_width = value_type.size();
+  SizeType src_bw = src_node->bit_width();
   MvnNode* node = src_node;
   if ( bit_width > src_bw ) {
     // 左辺のビット幅が大きいとき
     // 上位ビットをパディングする．
-    int np = bit_width - src_bw;
+    SizeType np = bit_width - src_bw;
     if ( value_type.is_signed() ) {
       // 符号付きの場合は再上位ビットをコピーする．
-      vector<int> ibw_array(np + 1);
-      for ( int i = 0; i < np; ++ i ) {
+      vector<SizeType> ibw_array(np + 1);
+      for ( SizeType i = 0; i < np; ++ i ) {
 	ibw_array[i] = 1;
       }
       ibw_array[np] = src_bw;
@@ -746,18 +746,18 @@ ReaderImpl::coerce_expr(MvnModule* parent_module,
       MvnNode* msb_node = mMvnMgr->new_constbitselect(parent_module,
 						      src_bw - 1, src_bw);
       mMvnMgr->connect(src_node, 0, msb_node, 0);
-      for ( int i = 0; i < np; ++ i ) {
+      for ( SizeType i = 0; i < np; ++ i ) {
 	mMvnMgr->connect(msb_node, 0, node, i);
       }
       mMvnMgr->connect(src_node, 0, node, np);
     }
     else {
       // 符号なしの場合は0を入れる．
-      vector<int> ibw_array({np, src_bw});
+      vector<SizeType> ibw_array({np, src_bw});
       node = mMvnMgr->new_concat(parent_module, ibw_array);
-      int nblk = (np + 31) / 32;
+      SizeType nblk = (np + 31) / 32;
       vector<ymuint32> val(nblk);
-      for ( int i = 0; i < nblk; ++ i ) {
+      for ( SizeType i = 0; i < nblk; ++ i ) {
 	val[i] = 0U;
       }
       MvnNode* zero = mMvnMgr->new_const(parent_module, np, val);
@@ -789,7 +789,7 @@ ReaderImpl::splice_rhs(MvnModule* parent_module,
 		       int offset,
 		       int bit_width)
 {
-  int src_bw = rhs_node->bit_width();
+  SizeType src_bw = rhs_node->bit_width();
   ASSERT_COND( offset + bit_width <= src_bw );
 
   MvnNode* src_node = nullptr;

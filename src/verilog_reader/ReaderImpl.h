@@ -246,7 +246,7 @@ private:
   MvnNode*
   gen_expr(MvnModule* parent_module,
 	   const VlExpr* expr,
-	   tVpiCaseType case_type,
+	   VpiCaseType case_type,
 	   const Env& env,
 	   Xmask& xmask);
 
@@ -258,7 +258,7 @@ private:
   MvnNode*
   gen_const(MvnModule* parent_module,
 	    const VlExpr* expr,
-	    tVpiCaseType case_type,
+	    VpiCaseType case_type,
 	    Xmask& xmask);
 
   /// @brief 演算に対応したノードの木を作る．
@@ -269,7 +269,7 @@ private:
   MvnNode*
   gen_opr(MvnModule* parent_module,
 	  const VlExpr* expr,
-	  tVpiCaseType case_type,
+	  VpiCaseType case_type,
 	  const Env& env);
 
   /// @brief 宣言要素への参照に対応するノードを作る．

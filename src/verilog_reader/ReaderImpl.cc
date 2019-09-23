@@ -134,11 +134,11 @@ ReaderImpl::gen_network(MvnMgr& mgr,
     if ( node == nullptr ) continue;
     const vector<Driver>& dlist = driver_list(node);
     if ( dlist.empty() ) continue;
-    int bw = node->input(0)->bit_width();
+    SizeType bw = node->input(0)->bit_width();
     vector<Driver> tmp(bw);
     for ( const auto& driver: dlist ) {
       if ( driver.is_simple() ) {
-	for ( int i = 0; i < bw; ++ i ) {
+	for ( SizeType i = 0; i < bw; ++ i ) {
 	  if ( tmp[i].rhs_node() != nullptr ) {
 	    error_drivers(node, tmp[i], driver);
 	  }
@@ -200,8 +200,8 @@ ReaderImpl::gen_network(MvnMgr& mgr,
       mMvnMgr->connect(src_node, 0, node, 0);
     }
     else {
-      vector<int> bw_array(nd);
-      for ( int i = 0; i < nd; ++ i ) {
+      vector<SizeType> bw_array(nd);
+      for ( SizeType i = 0; i < nd; ++ i ) {
 	const Driver& driver = tmp2[i];
 	ASSERT_COND( driver.rhs_node() != nullptr );
 	if ( driver.has_bitselect() ) {
@@ -225,7 +225,7 @@ ReaderImpl::gen_network(MvnMgr& mgr,
 
   // 冗長な through ノードを取り除く
   {
-    for ( int i = 0; i < n; ++ i ) {
+    for ( SizeType i = 0; i < n; ++ i ) {
       MvnNode* node = mMvnMgr->_node(i);
       if ( node != nullptr && node->type() == MvnNode::kThrough ) {
 	const MvnNode* src_node = node->input(0)->src_node();
@@ -258,9 +258,9 @@ ReaderImpl::gen_module(const VlModule* vl_module)
   for ( int i = 0; i < nio_all; ++ i ) {
     const VlIODecl* io = vl_module->io(i);
     switch ( io->direction() ) {
-    case kVlInput:  ++ ni; break;
-    case kVlOutput: ++ no; break;
-    case kVlInout:  ++ nio; break;
+    case VpiDir::Input:  ++ ni; break;
+    case VpiDir::Output: ++ no; break;
+    case VpiDir::Inout:  ++ nio; break;
     default:
       MsgMgr::put_msg(__FILE__, __LINE__,
 		      io->file_region(),
@@ -270,18 +270,18 @@ ReaderImpl::gen_module(const VlModule* vl_module)
       return nullptr;
     }
   }
-  vector<int> ibw_array(ni);
-  vector<int> obw_array(no);
-  vector<int> iobw_array(nio);
+  vector<SizeType> ibw_array(ni);
+  vector<SizeType> obw_array(no);
+  vector<SizeType> iobw_array(nio);
   ni = 0;
   no = 0;
   nio = 0;
   for ( int i = 0; i < nio_all; ++ i ) {
     const VlIODecl* io = vl_module->io(i);
     switch ( io->direction() ) {
-    case kVlInput:  ibw_array[ni] = io->bit_size(); ++ ni; break;
-    case kVlOutput: obw_array[no] = io->bit_size(); ++ no; break;
-    case kVlInout:  iobw_array[nio] = io->bit_size(); ++ nio; break;
+    case VpiDir::Input:  ibw_array[ni]   = io->bit_size(); ++ ni; break;
+    case VpiDir::Output: obw_array[no]   = io->bit_size(); ++ no; break;
+    case VpiDir::Inout:  iobw_array[nio] = io->bit_size(); ++ nio; break;
     default: break;
     }
   }
@@ -298,17 +298,17 @@ ReaderImpl::gen_module(const VlModule* vl_module)
     const VlDecl* decl = io->decl();
     MvnNode* node = nullptr;
     switch ( io->direction() ) {
-    case kVlInput:
+    case VpiDir::Input:
       node = module->input(i1);
       ++ i1;
       break;
 
-    case kVlOutput:
+    case VpiDir::Output:
       node = module->output(i2);
       ++ i2;
       break;
 
-    case kVlInout:
+    case VpiDir::Inout:
       node = module->inout(i3);
       ++ i3;
       break;
@@ -337,7 +337,7 @@ ReaderImpl::gen_module(const VlModule* vl_module)
     const VlPort* port = vl_module->port(i);
     const VlExpr* expr = port->low_conn();
     if ( expr->is_operation() ) {
-      ASSERT_COND( expr->op_type() == kVlConcatOp );
+      ASSERT_COND( expr->op_type() == VpiOpType::Concat );
       int n = expr->operand_num();
       vector<MvnPortRef> portref_list(n);
       for ( int j = 0; j < n; ++ j ) {
