@@ -5,7 +5,7 @@
 /// @brief MapRec のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2014, 2019 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -59,7 +59,7 @@ public:
   /// @brief 宣言要素のオフセットを返す．(配列要素版)
   /// @note is_array_elem(id) == false の時は 0 が返される．
   virtual
-  ymuint
+  int
   get_array_offset() const = 0;
 
 };
@@ -81,7 +81,6 @@ private:
   SingleMapRec(const VlDecl* decl);
 
   /// @brief デストラクタ
-  virtual
   ~SingleMapRec();
 
 
@@ -92,26 +91,26 @@ public:
 
   /// @brief 宣言要素が単一要素の時に true を返す．
   bool
-  is_single_elem() const;
+  is_single_elem() const override;
 
   /// @brief 宣言要素が配列要素の時に true を返す．
   bool
-  is_array_elem() const;
+  is_array_elem() const override;
 
   /// @brief 宣言要素を返す．(単一要素版)
   /// @note is_single_elem() == false の時は nullptr が返される．
   const VlDecl*
-  get_single_elem() const;
+  get_single_elem() const override;
 
   /// @brief 宣言要素を返す．(配列要素版)
   /// @note is_array_elem(id) == false の時は nullptr が返される．
   const VlDeclArray*
-  get_array_elem() const;
+  get_array_elem() const override;
 
   /// @brief 宣言要素のオフセットを返す．(配列要素版)
   /// @note is_array_elem(id) == false の時は 0 が返される．
-  ymuint
-  get_array_offset() const;
+  int
+  get_array_offset() const override;
 
 
 private:
@@ -140,10 +139,9 @@ private:
   /// @param[in] declarray 配列要素
   /// @param[in] offset オフセット
   ArrayMapRec(const VlDeclArray* declarray,
-	      ymuint offset);
+	      int offset);
 
   /// @brief デストラクタ
-  virtual
   ~ArrayMapRec();
 
 
@@ -154,26 +152,26 @@ public:
 
   /// @brief 宣言要素が単一要素の時に true を返す．
   bool
-  is_single_elem() const;
+  is_single_elem() const override;
 
   /// @brief 宣言要素が配列要素の時に true を返す．
   bool
-  is_array_elem() const;
+  is_array_elem() const override;
 
   /// @brief 宣言要素を返す．(単一要素版)
   /// @note is_single_elem() == false の時は nullptr が返される．
   const VlDecl*
-  get_single_elem() const;
+  get_single_elem() const override;
 
   /// @brief 宣言要素を返す．(配列要素版)
   /// @note is_array_elem(id) == false の時は nullptr が返される．
   const VlDeclArray*
-  get_array_elem() const;
+  get_array_elem() const override;
 
   /// @brief 宣言要素のオフセットを返す．(配列要素版)
   /// @note is_array_elem(id) == false の時は 0 が返される．
-  ymuint
-  get_array_offset() const;
+  int
+  get_array_offset() const override;
 
 
 private:
@@ -185,7 +183,7 @@ private:
   const VlDeclArray* mDeclArray;
 
   // オフセット
-  ymuint mOffset;
+  int mOffset;
 
 };
 

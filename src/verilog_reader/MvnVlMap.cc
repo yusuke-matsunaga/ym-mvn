@@ -18,18 +18,16 @@ BEGIN_NAMESPACE_YM_MVN
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-MvnVlMap::MvnVlMap() :
-  mAlloc(4096)
+MvnVlMap::MvnVlMap()
 {
 }
 
 // @brief コピーコンストラクタ
 MvnVlMap::MvnVlMap(const MvnVlMap& src) :
-  mAlloc(4096),
   mArray(src.mArray.size())
 {
-  ymuint n = src.mArray.size();
-  for (ymuint i = 0; i < n; ++ i) {
+  int n = src.mArray.size();
+  for ( int i = 0; i < n; ++ i ) {
     const MapRec* src_rec = src.mArray[i];
     if ( src_rec ) {
       if ( src_rec->is_single_elem() ) {
@@ -48,9 +46,9 @@ MvnVlMap::operator=(const MvnVlMap& src)
 {
   if ( &src != this) {
     clear();
-    ymuint n = src.mArray.size();
+    int n = src.mArray.size();
     mArray.resize(n, nullptr);
-    for (ymuint i = 0; i < n; ++ i) {
+    for ( int i = 0; i < n; ++ i ) {
       const MapRec* src_rec = src.mArray[i];
       if ( src_rec ) {
 	if ( src_rec->is_single_elem() ) {
@@ -68,26 +66,27 @@ MvnVlMap::operator=(const MvnVlMap& src)
 // @brief デストラクタ
 MvnVlMap::~MvnVlMap()
 {
-  // mAlloc が全てのメモリを解放してくれる．
+  clear();
 }
 
 // @brief 内容をクリアする．
 void
 MvnVlMap::clear()
 {
+  for ( auto rec: mArray ) {
+    delete rec;
+  }
   mArray.clear();
-  mAlloc.destroy();
 }
 
 // @brief 単一の宣言要素を登録する．
 // @param[in] id MvNode の ID番号
 // @param[in] decl 宣言要素
 void
-MvnVlMap::reg_node(ymuint id,
-		  const VlDecl* decl)
+MvnVlMap::reg_node(int id,
+		   const VlDecl* decl)
 {
-  void* p = mAlloc.get_memory(sizeof(SingleMapRec));
-  MapRec* rec = new (p) SingleMapRec(decl);
+  auto rec = new SingleMapRec(decl);
   put(id, rec);
 }
 
@@ -96,19 +95,18 @@ MvnVlMap::reg_node(ymuint id,
 // @param[in] declarray 配列宣言要素
 // @param[in] offset オフセット
 void
-MvnVlMap::reg_node(ymuint id,
-		  const VlDeclArray* declarray,
-		  ymuint offset)
+MvnVlMap::reg_node(int id,
+		   const VlDeclArray* declarray,
+		   int offset)
 {
-  void* p = mAlloc.get_memory(sizeof(ArrayMapRec));
-  MapRec* rec = new (p) ArrayMapRec(declarray, offset);
+  auto rec = new ArrayMapRec(declarray, offset);
   put(id, rec);
 }
 
 // @brief src_id の内容を dst_id にコピーする．
 void
-MvnVlMap::copy(ymuint src_id,
-	       ymuint dst_id)
+MvnVlMap::copy(int src_id,
+	       int dst_id)
 {
   put(dst_id, get(src_id));
 }
@@ -116,9 +114,9 @@ MvnVlMap::copy(ymuint src_id,
 // @brief id に対応する宣言要素が単一要素の時に true を返す．
 // @param[in] id MvNode の ID番号
 bool
-MvnVlMap::is_single_elem(ymuint id) const
+MvnVlMap::is_single_elem(int id) const
 {
-  MapRec* rec = get(id);
+  auto rec = get(id);
   if ( rec == nullptr ) {
     return false;
   }
@@ -128,9 +126,9 @@ MvnVlMap::is_single_elem(ymuint id) const
 // @brief id に対応する宣言要素が配列要素の時に true を返す．
 // @param[in] id MvNode の ID番号
 bool
-MvnVlMap::is_array_elem(ymuint id) const
+MvnVlMap::is_array_elem(int id) const
 {
-  MapRec* rec = get(id);
+  auto rec = get(id);
   if ( rec == nullptr ) {
     return false;
   }
@@ -141,9 +139,9 @@ MvnVlMap::is_array_elem(ymuint id) const
 // @param[in] id MvNode の ID番号
 // @note is_single_elem(id) == false の時は nullptr が返される．
 const VlDecl*
-MvnVlMap::get_single_elem(ymuint id) const
+MvnVlMap::get_single_elem(int id) const
 {
-  MapRec* rec = get(id);
+  auto rec = get(id);
   if ( rec == nullptr ) {
     return nullptr;
   }
@@ -154,9 +152,9 @@ MvnVlMap::get_single_elem(ymuint id) const
 // @param[in] id MvNode の ID番号
 // @note is_array_elem(id) == false の時は nullptr が返される．
 const VlDeclArray*
-MvnVlMap::get_array_elem(ymuint id) const
+MvnVlMap::get_array_elem(int id) const
 {
-  MapRec* rec = get(id);
+  auto rec = get(id);
   if ( rec == nullptr ) {
     return nullptr;
   }
@@ -166,10 +164,10 @@ MvnVlMap::get_array_elem(ymuint id) const
 // @brief id に対応する宣言要素のオフセットを返す．(配列要素版)
 // @param[in] id MvNode の ID番号
 // @note is_array_elem(id) == false の時は 0 が返される．
-ymuint
-MvnVlMap::get_array_offset(ymuint id) const
+int
+MvnVlMap::get_array_offset(int id) const
 {
-  MapRec* rec = get(id);
+  auto rec = get(id);
   if ( rec == nullptr ) {
     return 0;
   }
@@ -180,7 +178,7 @@ MvnVlMap::get_array_offset(ymuint id) const
 // @param[in] id ID番号
 // @param[in] elem 設定する要素
 void
-MvnVlMap::put(ymuint id,
+MvnVlMap::put(int id,
 	      MapRec* elem)
 {
   if ( mArray.size() <= id ) {
@@ -193,7 +191,7 @@ MvnVlMap::put(ymuint id,
 // @param[in] id ID番号
 // @note id が範囲外の時は nullptr が返される．
 MapRec*
-MvnVlMap::get(ymuint id) const
+MvnVlMap::get(int id) const
 {
   if ( mArray.size() <= id ) {
     return nullptr;
@@ -250,7 +248,7 @@ SingleMapRec::get_array_elem() const
 
 // @brief 宣言要素のオフセットを返す．(配列要素版)
 // @note is_array_elem(id) == false の時は 0 が返される．
-ymuint
+int
 SingleMapRec::get_array_offset() const
 {
   return 0;
@@ -265,7 +263,7 @@ SingleMapRec::get_array_offset() const
 // @param[in] declarray 配列要素
 // @param[in] offset オフセット
 ArrayMapRec::ArrayMapRec(const VlDeclArray* declarray,
-			 ymuint offset) :
+			 int offset) :
   mDeclArray(declarray),
   mOffset(offset)
 {
@@ -308,7 +306,7 @@ ArrayMapRec::get_array_elem() const
 
 // @brief 宣言要素のオフセットを返す．(配列要素版)
 // @note is_array_elem(id) == false の時は 0 が返される．
-ymuint
+int
 ArrayMapRec::get_array_offset() const
 {
   return mOffset;

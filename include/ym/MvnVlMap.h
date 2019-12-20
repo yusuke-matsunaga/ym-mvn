@@ -5,23 +5,13 @@
 /// @brief MvnVlMap のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2014, 2016 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2014, 2016, 2019 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ym/mvn.h"
 #include "ym/vl/VlFwd.h"
-#include "ym/SimpleAlloc.h"
 
-
-//namespace nsYm {
-//  namespace nsVerilog  {
-//    class VlDecl;
-//    class VlDeclArray;
-//  }
-//  using nsVerilog::VlDecl;
-//  using nsVerilog::VlDeclArray;
-//}
 
 BEGIN_NAMESPACE_YM_MVN
 
@@ -62,7 +52,7 @@ public:
   /// @param[in] id MvNode の ID番号
   /// @param[in] decl 宣言要素
   void
-  reg_node(ymuint id,
+  reg_node(int id,
 	   const VlDecl* decl);
 
   /// @brief 配列の宣言要素を登録する．
@@ -70,14 +60,14 @@ public:
   /// @param[in] declarray 配列宣言要素
   /// @param[in] offset オフセット
   void
-  reg_node(ymuint id,
+  reg_node(int id,
 	   const VlDeclArray* declarray,
-	   ymuint offset);
+	   int offset);
 
   /// @brief src_id の内容を dst_id にコピーする．
   void
-  copy(ymuint src_id,
-       ymuint dst_id);
+  copy(int src_id,
+       int dst_id);
 
 
 public:
@@ -88,30 +78,30 @@ public:
   /// @brief id に対応する宣言要素が単一要素の時に true を返す．
   /// @param[in] id MvNode の ID番号
   bool
-  is_single_elem(ymuint id) const;
+  is_single_elem(int id) const;
 
   /// @brief id に対応する宣言要素が配列要素の時に true を返す．
   /// @param[in] id MvNode の ID番号
   bool
-  is_array_elem(ymuint id) const;
+  is_array_elem(int id) const;
 
   /// @brief id に対応する宣言要素を返す．(単一要素版)
   /// @param[in] id MvNode の ID番号
   /// @note is_single_elem(id) == false の時は nullptr が返される．
   const VlDecl*
-  get_single_elem(ymuint id) const;
+  get_single_elem(int id) const;
 
   /// @brief id に対応する宣言要素を返す．(配列要素版)
   /// @param[in] id MvNode の ID番号
   /// @note is_array_elem(id) == false の時は nullptr が返される．
   const VlDeclArray*
-  get_array_elem(ymuint id) const;
+  get_array_elem(int id) const;
 
   /// @brief id に対応する宣言要素のオフセットを返す．(配列要素版)
   /// @param[in] id MvNode の ID番号
   /// @note is_array_elem(id) == false の時は 0 が返される．
-  ymuint
-  get_array_offset(ymuint id) const;
+  int
+  get_array_offset(int id) const;
 
 
 private:
@@ -123,23 +113,20 @@ private:
   /// @param[in] id ID番号
   /// @param[in] elem 設定する要素
   void
-  put(ymuint id,
+  put(int id,
       MapRec* elem);
 
   /// @brief 要素を取り出す．
   /// @param[in] id ID番号
   /// @note id が範囲外の時は nullptr が返される．
   MapRec*
-  get(ymuint id) const;
+  get(int id) const;
 
 
 private:
   //////////////////////////////////////////////////////////////////////
   // データメンバ
   //////////////////////////////////////////////////////////////////////
-
-  // MapRec のメモリ確保用オブジェクト
-  SimpleAlloc mAlloc;
 
   // MvNode の ID 番号をキーとして VlDecl/VlDeclArray を保持する配列
   vector<MapRec*> mArray;

@@ -266,7 +266,7 @@ ReaderImpl::gen_process(MvnModule* parent_module,
 	    return false;
 	  }
 	  found = true;
-	  AsyncControl* ctrl = new AsyncControl(mGlobalEnv);
+	  AsyncControl* ctrl = new AsyncControl{mGlobalEnv};
 	  ctrl->mNode = node;
 	  ctrl->mPol = pol;
 	  EnvMerger2 merger(mMvnMgr, mGlobalEnv);

@@ -23,31 +23,19 @@ BEGIN_NAMESPACE_YM_MVN_VERILOG
 //////////////////////////////////////////////////////////////////////
 struct AssignInfo
 {
-  /// @brief コンストラクタ
-  /// @param[in] rhs 代入の右辺
-  /// @param[in] cond 代入条件
-  /// @param[in] block blocking 代入の時に true とするフラグ
-  explicit
-  AssignInfo(MvnNode* rhs = nullptr,
-	     MvnNode* cond = nullptr,
-	     bool block = false) :
-    mRhs(rhs),
-    mCond(cond),
-    mBlock(block),
-    mRefFlag(false) { }
 
   /// @brief 代入の右辺式を表すノード
-  MvnNode* mRhs;
+  MvnNode* mRhs{nullptr};
 
   /// @brief 代入条件を表すノード
   /// ただし常に代入する時は nullptr
-  MvnNode* mCond;
+  MvnNode* mCond{nullptr};
 
   /// @brief blocking 代入を表すフラグ
-  bool mBlock;
+  bool mBlock{false};
 
   /// @brief 参照されたことを表すフラグ
-  bool mRefFlag;
+  bool mRefFlag{false};
 
 };
 
@@ -80,7 +68,7 @@ public:
   clear();
 
   /// @brief ID番号の最大値+1を返す．
-  ymuint
+  int
   max_id() const;
 
   /// @brief 登録する(単一要素の場合)
@@ -97,7 +85,7 @@ public:
   /// @param[in] block blocking 代入の時に true とするフラグ
   void
   add(const VlDeclArray* decl,
-      ymuint offset,
+      int offset,
       MvnNode* node);
 
   /// @brief 対応するノードを取り出す．
@@ -117,16 +105,16 @@ public:
   virtual
   MvnNode*
   get(const VlDeclArray* decl,
-      ymuint offset) const;
+      int offset) const;
 
   /// @brief ID番号に対応するノードを登録する．
   void
-  add_by_id(ymuint id,
+  add_by_id(int id,
 	    MvnNode* node);
 
   /// @brief ID番号に対応するノードを取り出す．
   MvnNode*
-  get_from_id(ymuint id) const;
+  get_from_id(int id) const;
 
   /// @brief DeclHash を得る．
   DeclHash&
@@ -175,7 +163,7 @@ public:
   clear();
 
   /// @brief ID番号の最大値+1を返す．
-  ymuint
+  int
   max_id() const;
 
   /// @brief 登録する(単一要素の場合)
@@ -196,7 +184,7 @@ public:
   virtual
   void
   add(const VlDeclArray* decl,
-      ymuint offset,
+      int offset,
       MvnNode* node,
       bool block);
 
@@ -217,7 +205,7 @@ public:
   virtual
   MvnNode*
   get(const VlDeclArray* decl,
-      ymuint offset) const;
+      int offset) const;
 
   /// @brief 対応するノードを取り出す．
   /// @param[in] decl 宣言要素
@@ -234,7 +222,7 @@ public:
   /// オフセットが範囲外の場合には nullptr を返す．
   AssignInfo
   get_info(const VlDeclArray* decl,
-	   ymuint offset) const;
+	   int offset) const;
 
   /// @brief ID番号に対応するノードを登録する．
   /// @param[in] id ID番号
@@ -242,14 +230,14 @@ public:
   /// @param[in] cond 代入条件
   /// @param[in] block blocking 代入の時に true とするフラグ
   void
-  add_by_id(ymuint id,
+  add_by_id(int id,
 	    MvnNode* node,
 	    MvnNode* cond,
 	    bool block);
 
   /// @brief ID番号に対応するノードを取り出す．
   AssignInfo
-  get_from_id(ymuint id) const;
+  get_from_id(int id) const;
 
 
 private:

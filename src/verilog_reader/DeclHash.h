@@ -5,13 +5,12 @@
 /// @brief DeclHash のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2014, 2019 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ym/mvn.h"
 #include "ym/vl/VlFwd.h"
-#include "ym/UnitAlloc.h"
 
 
 BEGIN_NAMESPACE_YM_MVN_VERILOG
@@ -25,10 +24,10 @@ class DeclHash
 public:
 
   /// @brief コンストラクタ
-  DeclHash();
+  DeclHash() = default;
 
   /// @brief デストラクタ
-  ~DeclHash();
+  ~DeclHash() = default;
 
 
 public:
@@ -40,65 +39,24 @@ public:
   /// @brief ID番号を得る．
   /// @param[in] decl 宣言要素
   /// @return ID番号
-  /// @note 登録されていなかった場合には新しい番号を割り当てる．
-  ymuint
+  ///
+  /// 登録されていなかった場合には新しい番号を割り当てる．
+  int
   get_id(const VlDecl* decl);
 
   /// @brief ID番号を得る．
   /// @param[in] decl 配列型宣言要素
   /// @param[in] offset オフセット
   /// @return ID番号
-  /// @note 登録されていなかった場合には新しい番号を割り当てる．
-  ymuint
+  ///
+  /// 登録されていなかった場合には新しい番号を割り当てる．
+  int
   get_id(const VlDeclArray* decl,
-	 ymuint offset);
+	 int offset);
 
   /// @brief ID番号の最大値 + 1を返す．
-  ymuint
+  int
   max_id() const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられるデータ構造
-  //////////////////////////////////////////////////////////////////////
-
-  struct Cell
-  {
-    // 宣言要素
-    const VlObj* mDecl;
-
-    // ID番号
-    ymuint32 mId;
-
-    // 次の要素を指すリンク
-    Cell* mLink;
-
-  };
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief Cell を登録する．
-  void
-  put_cell(const VlObj* decl,
-	   ymuint id);
-
-  /// @brief Cell を探す．
-  Cell*
-  find_cell(const VlObj* decl) const;
-
-  /// @brief テーブルの領域を確保する．
-  /// @param[in] size 必要なサイズ
-  void
-  alloc_table(ymuint size);
-
-  /// @brief ハッシュ値を計算する．
-  ymuint
-  hash_func(const VlObj* decl) const;
 
 
 private:
@@ -106,23 +64,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // Cell の確保用アロケータ
-  UnitAlloc mAlloc;
-
-  // ハッシュ表のサイズ
-  ymuint32 mSize;
-
-  // ハッシュ表
-  Cell** mTable;
-
-  // ハッシュ表を拡大するしきい値
-  ymuint32 mLimit;
-
-  // 要素数
-  ymuint32 mNum;
+  // ハッシュ表の本体
+  unordered_map<const VlObj*, int> mHash;
 
   // 次に割り当て可能な ID 番号
-  ymuint32 mNextId;
+  int mNextId{0};
 
 };
 

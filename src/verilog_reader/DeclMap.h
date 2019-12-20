@@ -11,7 +11,23 @@
 
 #include "ym/mvn.h"
 #include "ym/vl/VlFwd.h"
-#include "ym/UnitAlloc.h"
+
+
+BEGIN_NAMESPACE_STD
+
+template<>
+struct hash<pair<const nsYm::VlObj*, int>>
+{
+  SizeType
+  operator()(const pair<const nsYm::VlObj*, int>& src) const
+  {
+    auto obj = src.first;
+    auto offset = src.second;
+    return reinterpret_cast<ympuint>(obj) * (offset + 1) + offset;
+  }
+};
+
+END_NAMESPACE_STD
 
 
 BEGIN_NAMESPACE_YM_MVN_VERILOG
@@ -25,10 +41,10 @@ class DeclMap
 public:
 
   /// @brief コンストラクタ
-  DeclMap();
+  DeclMap() = default;
 
   /// @brief デストラクタ
-  ~DeclMap();
+  ~DeclMap() = default;
 
 
 public:
@@ -49,8 +65,8 @@ public:
   /// @param[in] offset
   /// @param[in] node 対応するノード
   void
-  add(const VlDecl* decl,
-      ymuint offset,
+  add(const VlDeclArray* decl,
+      int offset,
       MvnNode* node);
 
   /// @brief 対応するノードを取り出す．
@@ -67,57 +83,8 @@ public:
   /// @note 登録されていない場合と配列型でない場合，
   /// オフセットが範囲外の場合には nullptr を返す．
   MvnNode*
-  get(const VlDecl* decl,
-      ymuint offset) const;
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられるデータ構造
-  //////////////////////////////////////////////////////////////////////
-
-  struct Cell
-  {
-    // 宣言要素
-    const VlDecl* mDecl;
-
-    // オフセット
-    ymuint32 mOffset;
-
-    // 対応するノード
-    MvnNode* mNode;
-
-    // 次の要素を指すリンク
-    Cell* mLink;
-
-  };
-
-
-private:
-  //////////////////////////////////////////////////////////////////////
-  // 内部で用いられる関数
-  //////////////////////////////////////////////////////////////////////
-
-  /// @brief Cell を登録する．
-  void
-  put_cell(const VlDecl* decl,
-	   ymuint offset,
-	   MvnNode* node);
-
-  /// @brief Cell を探す．
-  Cell*
-  find_cell(const VlDecl* decl,
-	    ymuint offset) const;
-
-  /// @brief テーブルの領域を確保する．
-  /// @param[in] size 必要なサイズ
-  void
-  alloc_table(ymuint size);
-
-  /// @brief ハッシュ値を計算する．
-  ymuint
-  hash_func(const VlDecl* decl,
-	    ymuint offset) const;
+  get(const VlDeclArray* decl,
+      int offset) const;
 
 
 private:
@@ -125,20 +92,11 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // Cell の確保用アロケータ
-  UnitAlloc mAlloc;
-
-  // ハッシュ表のサイズ
-  ymuint32 mSize;
-
-  // ハッシュ表
-  Cell** mTable;
-
-  // ハッシュ表を拡大するしきい値
-  ymuint32 mLimit;
+  // ハッシュ表の本体
+  unordered_map<pair<const VlObj*, int>, MvnNode*> mHash;
 
   // 要素数
-  ymuint32 mNum;
+  int mNum{0};
 
 };
 
