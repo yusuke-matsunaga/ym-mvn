@@ -32,7 +32,7 @@ private:
   /// @param[in] module 親のモジュール
   /// @param[in] bitpos ビット位置
   MvnConstBitSelect(MvnModule* module,
-		    int bitpos);
+		    SizeType bitpos);
 
   /// @brief デストラクタ
   ~MvnConstBitSelect();
@@ -46,7 +46,7 @@ public:
   /// @brief ビット位置を得る．
   /// @note type() が kConstBitSelect の時のみ意味を持つ．
   /// @note デフォルトの実装では 0 を返す．
-  int
+  SizeType
   bitpos() const override;
 
 
@@ -56,7 +56,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // ビット位置
-  int mBitPos;
+  SizeType mBitPos;
 
 };
 

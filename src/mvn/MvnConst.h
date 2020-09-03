@@ -10,6 +10,7 @@
 
 
 #include "MvnNodeBase.h"
+#include "ym/MvnBvConst.h"
 
 
 BEGIN_NAMESPACE_YM_MVN
@@ -33,7 +34,7 @@ private:
   /// @param[in] module 親のモジュール
   /// @param[in] val 値
   MvnConst(MvnModule* module,
-	   const vector<ymuint32>& val);
+	   const MvnBvConst& val);
 
   /// @brief デストラクタ
   ~MvnConst();
@@ -45,11 +46,10 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 定数値を得る．
-  /// @param[out] val 値を格納するベクタ
+  /// @return 値を返す．
   /// @note type() が kConst の時のみ意味を持つ．
-  virtual
-  void
-  const_value(vector<ymuint32>& val) const;
+  MvnBvConst
+  const_value() const override;
 
 
 private:
@@ -58,7 +58,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 値
-  vector<ymuint32> mVal;
+  MvnBvConst mVal;
 
 };
 

@@ -27,14 +27,14 @@ DeclHash::clear()
 // @param[in] decl 宣言要素
 // @return ID番号
 // @note 登録されていなかった場合には新しい番号を割り当てる．
-int
+SizeType
 DeclHash::get_id(const VlDecl* decl)
 {
   if ( mHash.count(decl) > 0 )  {
     return mHash.at(decl);
   }
   else {
-    int id = mNextId;
+    SizeType id = mNextId;
     ++ mNextId;
     mHash.emplace(decl, id);
     return id;
@@ -46,11 +46,11 @@ DeclHash::get_id(const VlDecl* decl)
 // @param[in] offset オフセット
 // @return ID番号
 // @note 登録されていなかった場合には新しい番号を割り当てる．
-int
+SizeType
 DeclHash::get_id(const VlDeclArray* decl,
-		 int offset)
+		 SizeType offset)
 {
-  int base = 0;
+  SizeType base = 0;
   if ( mHash.count(decl) > 0 ) {
     base = mHash.at(decl);
   }
@@ -63,7 +63,7 @@ DeclHash::get_id(const VlDeclArray* decl,
 }
 
 // @brief ID番号の最大値 + 1を返す．
-int
+SizeType
 DeclHash::max_id() const
 {
   return mNextId;

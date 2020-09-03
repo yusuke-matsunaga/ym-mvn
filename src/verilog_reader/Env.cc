@@ -41,7 +41,7 @@ Env::clear()
 }
 
 // @brief ID番号の最大値+1を返す．
-int
+SizeType
 Env::max_id() const
 {
   return mDeclHash.max_id();
@@ -54,7 +54,7 @@ void
 Env::add(const VlDecl* decl,
 	 MvnNode* node)
 {
-  int id = mDeclHash.get_id(decl);
+  SizeType id = mDeclHash.get_id(decl);
   add_by_id(id, node);
 }
 
@@ -64,10 +64,10 @@ Env::add(const VlDecl* decl,
 // @param[in] node 対応するノード
 void
 Env::add(const VlDeclArray* decl,
-	 int offset,
+	 SizeType offset,
 	 MvnNode* node)
 {
-  int id = mDeclHash.get_id(decl, offset);
+  SizeType id = mDeclHash.get_id(decl, offset);
   add_by_id(id, node);
 }
 
@@ -78,7 +78,7 @@ Env::add(const VlDeclArray* decl,
 MvnNode*
 Env::get(const VlDecl* decl) const
 {
-  ymuint id = mDeclHash.get_id(decl);
+  SizeType id = mDeclHash.get_id(decl);
   return get_from_id(id);
 }
 
@@ -90,15 +90,15 @@ Env::get(const VlDecl* decl) const
 // オフセットが範囲外の場合には nullptr を返す．
 MvnNode*
 Env::get(const VlDeclArray* decl,
-	 int offset) const
+	 SizeType offset) const
 {
-  int id = mDeclHash.get_id(decl, offset);
+  SizeType id = mDeclHash.get_id(decl, offset);
   return get_from_id(id);
 }
 
 // @brief ID番号に対応するノードを登録する．
 void
-Env::add_by_id(int id,
+Env::add_by_id(SizeType id,
 	       MvnNode* node)
 {
   while ( mNodeArray.size() <= id ) {
@@ -109,7 +109,7 @@ Env::add_by_id(int id,
 
 // @brief ID番号に対応するノードを取り出す．
 MvnNode*
-Env::get_from_id(int id) const
+Env::get_from_id(SizeType id) const
 {
   if ( mNodeArray.size() <= id ) {
     return nullptr;

@@ -41,7 +41,7 @@ public:
   /// @return ID番号
   ///
   /// 登録されていなかった場合には新しい番号を割り当てる．
-  int
+  SizeType
   get_id(const VlDecl* decl);
 
   /// @brief ID番号を得る．
@@ -50,12 +50,12 @@ public:
   /// @return ID番号
   ///
   /// 登録されていなかった場合には新しい番号を割り当てる．
-  int
+  SizeType
   get_id(const VlDeclArray* decl,
-	 int offset);
+	 SizeType offset);
 
   /// @brief ID番号の最大値 + 1を返す．
-  int
+  SizeType
   max_id() const;
 
 
@@ -65,10 +65,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // ハッシュ表の本体
-  unordered_map<const VlObj*, int> mHash;
+  unordered_map<const VlObj*, SizeType> mHash;
 
   // 次に割り当て可能な ID 番号
-  int mNextId{0};
+  SizeType mNextId{0};
 
 };
 

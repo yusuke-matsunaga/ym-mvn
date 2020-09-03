@@ -5,7 +5,7 @@
 /// @brief MvnPort のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010, 2014, 2016 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2014, 2016, 2020 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -48,15 +48,15 @@ public:
   /// @param[in] node ノード
   /// @param[in] bitpos ビット位置
   MvnPortRef(const MvnNode* node,
-	     int bitpos);
+	     SizeType bitpos);
 
   /// @brief 範囲指定のポート要素用のコンストラクタ
   /// @param[in] node ノード
   /// @param[in] msb 範囲指定の MSB
   /// @param[in] lsb 範囲指定の LSB
   MvnPortRef(const MvnNode* node,
-	     int msb,
-	     int lsb);
+	     SizeType msb,
+	     SizeType lsb);
 
   /// @brief デストラクタ
   ~MvnPortRef();
@@ -86,22 +86,22 @@ public:
   has_partselect() const;
 
   /// @brief この実体のビット幅を返す．
-  int
+  SizeType
   bit_width() const;
 
   /// @brief ビット指定位置を返す．
   /// @note has_bitselect() == true の時のみ意味を持つ．
-  int
+  SizeType
   bitpos() const;
 
   /// @brief 範囲指定の MSB を返す．
   /// @note has_partselect() == true の時のみ意味を持つ．
-  int
+  SizeType
   msb() const;
 
   /// @brief 範囲指定の LSB を返す．
   /// @note has_partselect() == true の時のみ意味を持つ．
-  int
+  SizeType
   lsb() const;
 
   /// @}
@@ -117,11 +117,11 @@ private:
 
   // 範囲指定の MSB
   // ただし下位1ビットは範囲指定/ビット指定ありのフラグ
-  ymuint32 mMsb;
+  SizeType mMsb;
 
   // 範囲指定の LSB
   // ただし下位1ビットは範囲指定ありのフラグ
-  ymuint32 mLsb;
+  SizeType mLsb;
 
 };
 
@@ -149,7 +149,7 @@ public:
   /// 名前がない場合(name == nullptr)もありうる．
   /// name == "" の場合も考慮する．
   MvnPort(const vector<MvnPortRef>& portref_list = vector<MvnPortRef>(),
-	  const char* name = nullptr);
+	  const string& name = string());
 
   /// @brief デストラクタ
   ~MvnPort();
@@ -166,11 +166,11 @@ public:
   name() const;
 
   /// @brief ビット幅を得る．
-  int
+  SizeType
   bit_width() const;
 
   /// @brief port_ref 数を得る．
-  int
+  SizeType
   port_ref_num() const;
 
   /// @brief port_ref を得る．
@@ -190,7 +190,7 @@ private:
   string mName;
 
   // portref の数
-  int mPortRefNum;
+  SizeType mPortRefNum;
 
   // portref の配列
   MvnPortRef* mPortRefArray;
@@ -203,7 +203,7 @@ private:
 //////////////////////////////////////////////////////////////////////
 
 // @brief ノードを返す．
-// @note ノードのタイプは kInput か kOutput
+// @note ノードのタイプは INPUT, OUTPUT, INOUT のいずれか．
 inline
 const MvnNode*
 MvnPortRef::node() const
@@ -239,7 +239,7 @@ MvnPortRef::has_partselect() const
 // @brief ビット指定位置を返す．
 // @note has_bitselect() == true の時のみ意味を持つ．
 inline
-int
+SizeType
 MvnPortRef::bitpos() const
 {
   // 実は msb() のエイリアス
@@ -249,7 +249,7 @@ MvnPortRef::bitpos() const
 // @brief 範囲指定の MSB を返す．
 // @note has_partselect() == true の時のみ意味を持つ．
 inline
-int
+SizeType
 MvnPortRef::msb() const
 {
   return mMsb >> 1;
@@ -258,7 +258,7 @@ MvnPortRef::msb() const
 // @brief 範囲指定の LSB を返す．
 // @note has_partselect() == true の時のみ意味を持つ．
 inline
-int
+SizeType
 MvnPortRef::lsb() const
 {
   return mLsb >> 1;
@@ -275,7 +275,7 @@ MvnPort::name() const
 
 // @brief port_ref 数を得る．
 inline
-int
+SizeType
 MvnPort::port_ref_num() const
 {
   return mPortRefNum;
@@ -287,6 +287,8 @@ inline
 const MvnPortRef&
 MvnPort::port_ref(int pos) const
 {
+  ASSERT_COND( 0 <= pos && pos < port_ref_num() );
+
   return mPortRefArray[pos];
 }
 

@@ -5,12 +5,11 @@
 /// @brief MvnModule のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010, 2014 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2014, 2020 Yusuke Matsunaga
 /// All rights reserved.
 
 
 #include "ym/mvn.h"
-#include "ym/ItvlMgr.h"
 
 
 BEGIN_NAMESPACE_YM_MVN
@@ -45,7 +44,7 @@ public:
   parent() const;
 
   /// @brief ポート数を得る．
-  int
+  SizeType
   port_num() const;
 
   /// @brief ポートを得る．
@@ -54,7 +53,7 @@ public:
   port(int pos) const;
 
   /// @brief 入力ノード数を得る．
-  int
+  SizeType
   input_num() const;
 
   /// @brief 入力ノードを得る．
@@ -63,7 +62,7 @@ public:
   input(int pos) const;
 
   /// @brief 出力ノード数を得る．
-  int
+  SizeType
   output_num() const;
 
   /// @brief 出力ノードを得る．
@@ -72,7 +71,7 @@ public:
   output(int pos) const;
 
   /// @brief 入出力ノード数を得る．
-  int
+  SizeType
   inout_num() const;
 
   /// @brief 入出力ノードを得る．
@@ -81,20 +80,12 @@ public:
   inout(int pos) const;
 
   /// @brief 内部ノードの数を得る．
-  int
+  SizeType
   node_num() const;
 
   /// @brief 内部ノードのリストを得る．
-  const list<MvnNode*>&
+  const vector<MvnNode*>&
   node_list() const;
-
-  /// @brief 内部ノードのリストの先頭の反復子を得る．
-  list<MvnNode*>::const_iterator
-  nodes_begin() const;
-
-  /// @brief 内部ノードのリストの末尾の反復子を得る．
-  list<MvnNode*>::const_iterator
-  nodes_end() const;
 
   /// @}
 
@@ -110,11 +101,11 @@ private:
   /// @param[in] ni 入力ノード数
   /// @param[in] no 出力ノード数
   /// @param[in] nio 入出力ノード数
-  MvnModule(const char* name,
-	    int np,
-	    int ni,
-	    int no,
-	    int nio);
+  MvnModule(const string& name,
+	    SizeType np,
+	    SizeType ni,
+	    SizeType no,
+	    SizeType nio);
 
   /// @brief デストラクタ
   ~MvnModule();
@@ -147,7 +138,7 @@ private:
   vector<MvnNode*> mInoutArray;
 
   // 内部ノードのリスト
-  list<MvnNode*> mNodeList;
+  vector<MvnNode*> mNodeList;
 
 };
 
@@ -183,7 +174,7 @@ MvnModule::parent() const
 
 // @brief ポート数を得る．
 inline
-int
+SizeType
 MvnModule::port_num() const
 {
   return mPortArray.size();
@@ -200,7 +191,7 @@ MvnModule::port(int pos) const
 
 // @brief 入力ノード数を得る．
 inline
-int
+SizeType
 MvnModule::input_num() const
 {
   return mInputArray.size();
@@ -217,7 +208,7 @@ MvnModule::input(int pos) const
 
 // @brief 出力ノード数を得る．
 inline
-int
+SizeType
 MvnModule::output_num() const
 {
   return mOutputArray.size();
@@ -234,7 +225,7 @@ MvnModule::output(int pos) const
 
 // @brief 入出力ノード数を得る．
 inline
-int
+SizeType
 MvnModule::inout_num() const
 {
   return mInoutArray.size();
@@ -251,7 +242,7 @@ MvnModule::inout(int pos) const
 
 // @brief 内部ノードの数を得る．
 inline
-int
+SizeType
 MvnModule::node_num() const
 {
   return mNodeList.size();
@@ -259,26 +250,10 @@ MvnModule::node_num() const
 
 // @brief 内部ノードのリストを得る．
 inline
-const list<MvnNode*>&
+const vector<MvnNode*>&
 MvnModule::node_list() const
 {
   return mNodeList;
-}
-
-// @brief 内部ノードのリストの先頭の反復子を得る．
-inline
-list<MvnNode*>::const_iterator
-MvnModule::nodes_begin() const
-{
-  return mNodeList.begin();
-}
-
-// @brief 内部ノードのリストの末尾の反復子を得る．
-inline
-list<MvnNode*>::const_iterator
-MvnModule::nodes_end() const
-{
-  return mNodeList.end();
 }
 
 END_NAMESPACE_YM_MVN

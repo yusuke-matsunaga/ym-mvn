@@ -13,13 +13,12 @@
 #include "ym/MvnDumper.h"
 #include "ym/MvnVerilogWriter.h"
 
-#include "ym/CellLibrary.h"
-#include "ym/CellDotlibReader.h"
-#include "ym/CellMislibReader.h"
+#include "ym/ClibCellLibrary.h"
 
 #include "ym/PoptMainApp.h"
 #include "ym/MsgMgr.h"
 #include "ym/MsgHandler.h"
+#include "ym/StreamMsgHandler.h"
 
 
 int
@@ -43,8 +42,8 @@ main(int argc,
 
   popt.set_other_option_help("<file-name> ...");
 
-  tPoptStat stat = popt.parse_options(argc, argv, 0);
-  if ( stat == kPoptAbort ) {
+  PoptStat stat = popt.parse_options(argc, argv, 0);
+  if ( stat == PoptStat::Abort ) {
     return -1;
   }
 
@@ -52,16 +51,18 @@ main(int argc,
   vector<string> filename_list;
   ymuint n_files = popt.get_args(filename_list);
 
-  CellLibrary* cell_library = nullptr;
+  ClibCellLibrary cell_library;
   if ( popt_dotlib.is_specified() ) {
-    CellDotlibReader reader;
-    cell_library = CellLibrary::new_obj();
-    reader.read(popt_dotlib.val(), cell_library);
+    if ( !cell_library.read_liberty(popt_dotlib.val()) ) {
+      cerr << "Error: could not read " << popt_dotlib.val() << endl;
+      return -1;
+    }
   }
   else if ( popt_mislib.is_specified() ) {
-    CellMislibReader reader;
-    cell_library = CellLibrary::new_obj();
-    reader.read(popt_mislib.val(), cell_library);
+    if ( !cell_library.read_mislib(popt_mislib.val()) ) {
+      cerr << "Error: could not read " << popt_mislib.val() << endl;
+      return -1;
+    }
   }
 
   int mode = 0;
@@ -143,16 +144,14 @@ main(int argc,
   try {
 #endif
     MsgHandler* mh = new StreamMsgHandler(&cerr);
-    mh->set_mask(kMaskAll);
-    mh->delete_mask(kMsgInfo);
-    mh->delete_mask(kMsgDebug);
-    MsgMgr::reg_handler(mh);
+    mh->set_mask(kMsgMaskAll);
+    mh->delete_mask(MsgType::Info);
+    mh->delete_mask(MsgType::Debug);
+    MsgMgr::attach_handler(mh);
 
     MvnVerilogReader reader;
 
-    for (vector<string>::const_iterator p = filename_list.begin();
-	 p != filename_list.end(); ++ p) {
-      const string& name = *p;
+    for (auto& name: filename_list ) {
       cerr << "Reading " << name;
       cerr.flush();
       bool stat = reader.read(name);

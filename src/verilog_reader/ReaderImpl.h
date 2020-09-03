@@ -22,7 +22,6 @@
 BEGIN_NAMESPACE_YM_MVN_VERILOG
 
 class EnvMerger;
-class Xmask;
 
 //////////////////////////////////////////////////////////////////////
 /// @class ReaderImpl ReaderImpl.h "ReaderImpl.h"
@@ -93,7 +92,7 @@ private:
   /// @note 内部に下位のスコープを含む場合には再帰する．
   bool
   gen_decl(MvnModule* module,
-	   const VlNamedObj* vl_scope);
+	   const VlScope* vl_scope);
 
   /// @brief 要素を生成する．
   /// @param[in] module モジュール
@@ -103,7 +102,7 @@ private:
   /// @note 内部に下位のスコープを含む場合には再帰する．
   bool
   gen_item(MvnModule* module,
-	   const VlNamedObj* vl_scope);
+	   const VlScope* vl_scope);
 
   /// @brief ポート参照式の実体化を行う．
   /// @param[in] expr 対象の式
@@ -176,7 +175,7 @@ private:
   gen_caseitem(MvnModule* module,
 	       const VlStmt* stmt,
 	       MvnNode* expr,
-	       const Xmask& xmask,
+	       const MvnBvConst& xmask,
 	       int pos,
 	       ProcEnv& env,
 	       EnvMerger& merge);
@@ -209,24 +208,16 @@ private:
   parse_cond(const VlExpr* cond,
 	     const Env& env,
 	     MvnNode*& node,
-	     int& pol);
+	     MvnPolarity& pol);
 
   /// @brief parse_cond() の下請け関数
-  /// @param[in] opr_primary 識別子を表す式
   /// @param[in] opr_const 定数を表す式
-  /// @param[in] env 環境
-  /// @param[in] pol0 値が0の時の極性値
-  /// @param[in] pol1 値が1の時の極性値
-  /// @param[out] node 対応するノード
+  /// @param[in] eq 等価フラグ
   /// @param[out] pol 極性(1 が正極性，0　が負極性)
   bool
-  parse_cond_sub(const VlExpr* opr_primary,
-		 const VlExpr* opr_const,
-		 const Env& env,
-		 int pol0,
-		 int pol1,
-		 MvnNode*& node,
-		 int& pol);
+  parse_cond_sub(const VlExpr* opr_const,
+		 bool eq,
+		 MvnPolarity& pol);
 
   /// @brief 式に対応したノードの木を作る．
   /// @param[in] parent_module 親のモジュール
@@ -248,7 +239,7 @@ private:
 	   const VlExpr* expr,
 	   VpiCaseType case_type,
 	   const Env& env,
-	   Xmask& xmask);
+	   MvnBvConst& xmask);
 
   /// @brief 定数値に対応したノードを作る．
   /// @param[in] parent_module 親のモジュール
@@ -259,7 +250,7 @@ private:
   gen_const(MvnModule* parent_module,
 	    const VlExpr* expr,
 	    VpiCaseType case_type,
-	    Xmask& xmask);
+	    MvnBvConst& xmask);
 
   /// @brief 演算に対応したノードの木を作る．
   /// @param[in] parent_module 親のモジュール
@@ -290,6 +281,17 @@ private:
 	  const VlExpr* rhs,
 	  const Env& env);
 
+  /// @brief 関数呼び出しに対応するノードを作る．
+  /// @param[in] parent_module 親のモジュール
+  /// @param[in] expr 式
+  /// @param[in] case_type case 文の種類
+  /// @param[in] env 環境
+  MvnNode*
+  gen_funccall(MvnModule* parent_module,
+	       const VlExpr* expr,
+	       VpiCaseType case_type,
+	       const Env& env);
+
   /// @brief 式の型を補正する．
   /// @param[in] parent_module 親のモジュール
   /// @param[in] src_node 元のノード
@@ -310,8 +312,8 @@ private:
   MvnNode*
   splice_rhs(MvnModule* parent_module,
 	     MvnNode* rhs_node,
-	     int offset,
-	     int bit_width);
+	     SizeType offset,
+	     SizeType bit_width);
 
   /// @brief 左辺式に接続する．
   /// @param[in] dst_node 左辺に対応するノード

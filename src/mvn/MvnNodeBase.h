@@ -30,8 +30,8 @@ protected:
   /// @param[in] type 型
   /// @param[in] input_num 入力数
   MvnNodeBase(MvnModule* parent,
-	      tType type,
-	      int input_num);
+	      MvnNodeType type,
+	      SizeType input_num);
 
   /// @brief デストラクタ
   ~MvnNodeBase();
@@ -43,11 +43,11 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief ノードの種類を得る．
-  tType
+  MvnNodeType
   type() const override;
 
   /// @brief 入力ピン数を得る．
-  int
+  SizeType
   input_num() const override;
 
   /// @brief 入力ピンを得る．
@@ -56,59 +56,60 @@ public:
   input(int pos) const override;
 
   /// @brief クロック信号の極性を得る．
-  /// @retval 1 正極性(posedge)
-  /// @retval 0 負極性(negedge)
-  /// @note type() が kDff の時のみ意味を持つ．
-  /// @note デフォルトの実装では 0 を返す．
-  int
+  /// @retval MvnPolarity::Positive 正極性(posedge)
+  /// @retval MvnPolarity::Negative 負極性(negedge)
+  ///
+  /// デフォルトの実装では 0 を返す．
+  MvnPolarity
   clock_pol() const override;
 
   /// @brief 非同期セット信号の極性を得る．
   /// @param[in] pos 位置 ( 0 <= pos < input_num() - 2 )
-  /// @retval 1 正極性(posedge)
-  /// @retval 0 負極性(negedge)
-  /// @note type() が kDff の時のみ意味を持つ．
-  /// @note デフォルトの実装では 0 を返す．
-  int
+  /// @retval MvnPolarity::Positive 正極性(posedge)
+  /// @retval MvnPolarity::Negative 負極性(negedge)
+  ///
+  /// デフォルトの実装では 0 を返す．
+  MvnPolarity
   control_pol(int pos) const override;
 
   /// @brief 非同期セットの値を表す定数ノードを得る．
   /// @param[in] pos 位置 ( 0 <= pos < input_num() - 2 )
-  /// @note デフォルトの実装では nullptr を返す．
+  ///
+  /// デフォルトの実装では nullptr を返す．
   const MvnNode*
   control_val(int pos) const override;
 
   /// @brief ビット位置を得る．
-  /// @note type() が kConstBitSelect の時のみ意味を持つ．
+  ///
   /// @note デフォルトの実装では 0 を返す．
-  int
+  SizeType
   bitpos() const override;
 
   /// @brief 範囲指定の MSB を得る．
-  /// @note type() が kConstPartSelect の時のみ意味を持つ．
-  /// @note デフォルトの実装では 0 を返す．
-  int
+  ///
+  /// デフォルトの実装では 0 を返す．
+  SizeType
   msb() const override;
 
   /// @brief 範囲指定の LSB を得る．
-  /// @note type() が kConstPartSelect の時のみ意味を持つ．
-  /// @note デフォルトの実装では 0 を返す．
-  int
+  ///
+  /// デフォルトの実装では 0 を返す．
+  SizeType
   lsb() const override;
 
   /// @brief 定数値を得る．
-  /// @param[out] val 値を格納するベクタ
+  /// @return 値を返す．
   /// @note type() が kConst の時のみ意味を持つ．
   /// @note デフォルトの実装ではなにもしない．
-  void
-  const_value(vector<ymuint32>& val) const override;
+  MvnBvConst
+  const_value() const override;
 
   /// @brief Xマスクを得る．
-  /// @param[out] val 値を格納するベクタ
+  /// @return Xマスクを表す定数を返す．
   /// @note type() が kCaseEq の時のみ意味を持つ．
   /// @note デフォルトの実装ではなにもしない．
-  void
-  xmask(vector<ymuint32>& val) const override;
+  MvnBvConst
+  xmask() const override;
 
   /// @brief セル番号を得る．
   /// @note type() が kCell の時のみ意味を持つ．
@@ -148,10 +149,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 型
-  tType mType;
+  MvnNodeType mType;
 
   // 入力数
-  int mInputNum;
+  SizeType mInputNum;
 
   // 入力ピンの配列
   MvnInputPin* mInputArray;

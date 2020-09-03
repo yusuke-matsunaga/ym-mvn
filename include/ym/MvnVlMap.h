@@ -62,7 +62,7 @@ public:
   void
   reg_node(int id,
 	   const VlDeclArray* declarray,
-	   int offset);
+	   SizeType offset);
 
   /// @brief src_id の内容を dst_id にコピーする．
   void
@@ -100,7 +100,7 @@ public:
   /// @brief id に対応する宣言要素のオフセットを返す．(配列要素版)
   /// @param[in] id MvNode の ID番号
   /// @note is_array_elem(id) == false の時は 0 が返される．
-  int
+  SizeType
   get_array_offset(int id) const;
 
 

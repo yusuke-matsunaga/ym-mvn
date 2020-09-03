@@ -17,9 +17,9 @@ BEGIN_NAMESPACE_YM_MVN
 // @param[in] module 親のモジュール
 // @param[in] val 値
 MvnConst::MvnConst(MvnModule* module,
-		   const vector<ymuint32>& val) :
-  MvnNodeBase(module, MvnNode::kConst, 0),
-  mVal(val)
+		   const MvnBvConst& val) :
+  MvnNodeBase(module, MvnNodeType::CONST, 0),
+  mVal{val}
 {
 }
 
@@ -29,12 +29,11 @@ MvnConst::~MvnConst()
 }
 
 // @brief 定数値を得る．
-// @param[out] val 値を格納するベクタ
 // @note type() が kConst の時のみ意味を持つ．
-void
-MvnConst::const_value(vector<ymuint32>& val) const
+MvnBvConst
+MvnConst::const_value() const
 {
-  val = mVal;
+  return mVal;
 }
 
 // @brief constant ノードを生成する．
@@ -43,10 +42,10 @@ MvnConst::const_value(vector<ymuint32>& val) const
 // @param[in] val 値
 MvnNode*
 MvnMgr::new_const(MvnModule* module,
-		  int bit_width,
-		  const vector<ymuint32>& val)
+		  SizeType bit_width,
+		  const MvnBvConst& val)
 {
-  MvnNode* node = new MvnConst(module, val);
+  auto node = new MvnConst(module, val);
   reg_node(node);
 
   node->mBitWidth = bit_width;

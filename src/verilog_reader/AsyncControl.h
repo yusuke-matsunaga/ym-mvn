@@ -29,8 +29,8 @@ struct AsyncControl
   // コントロール信号
   MvnNode* mNode{nullptr};
 
-  // 極性 ( 1 が正極性, 0 が負極性 )
-  int mPol;
+  // 極性
+  MvnPolarity mPol;
 
 };
 

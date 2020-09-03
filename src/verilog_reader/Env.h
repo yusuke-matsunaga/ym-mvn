@@ -68,7 +68,7 @@ public:
   clear();
 
   /// @brief ID番号の最大値+1を返す．
-  int
+  SizeType
   max_id() const;
 
   /// @brief 登録する(単一要素の場合)
@@ -85,7 +85,7 @@ public:
   /// @param[in] block blocking 代入の時に true とするフラグ
   void
   add(const VlDeclArray* decl,
-      int offset,
+      SizeType offset,
       MvnNode* node);
 
   /// @brief 対応するノードを取り出す．
@@ -105,16 +105,16 @@ public:
   virtual
   MvnNode*
   get(const VlDeclArray* decl,
-      int offset) const;
+      SizeType offset) const;
 
   /// @brief ID番号に対応するノードを登録する．
   void
-  add_by_id(int id,
+  add_by_id(SizeType id,
 	    MvnNode* node);
 
   /// @brief ID番号に対応するノードを取り出す．
   MvnNode*
-  get_from_id(int id) const;
+  get_from_id(SizeType id) const;
 
   /// @brief DeclHash を得る．
   DeclHash&

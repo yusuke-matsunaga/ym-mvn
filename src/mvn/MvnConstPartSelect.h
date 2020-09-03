@@ -33,8 +33,8 @@ private:
   /// @param[in] msb 範囲指定の MSB
   /// @param[in] lsb 範囲指定の LSB
   MvnConstPartSelect(MvnModule* module,
-		     int msb,
-		     int lsb);
+		     SizeType msb,
+		     SizeType lsb);
 
   /// @brief デストラクタ
   ~MvnConstPartSelect();
@@ -47,14 +47,12 @@ public:
 
   /// @brief 範囲指定の MSB を得る．
   /// @note type() が kConstPartSelect の時のみ意味を持つ．
-  /// @note デフォルトの実装では 0 を返す．
-  int
+  SizeType
   msb() const override;
 
   /// @brief 範囲指定の LSB を得る．
   /// @note type() が kConstPartSelect の時のみ意味を持つ．
-  /// @note デフォルトの実装では 0 を返す．
-  int
+  SizeType
   lsb() const override;
 
 
@@ -64,10 +62,10 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // 範囲指定の MSB
-  int mMsb;
+  SizeType mMsb;
 
   // 範囲指定の LSB
-  int mLsb;
+  SizeType mLsb;
 
 };
 

@@ -9,6 +9,7 @@
 
 #include "MvnNodeBase.h"
 #include "ym/MvnMgr.h"
+#include "ym/MvnBvConst.h"
 
 
 BEGIN_NAMESPACE_YM_MVN
@@ -23,14 +24,14 @@ BEGIN_NAMESPACE_YM_MVN
 // @param[in] input_num 入力数
 // @param[in] output_num 出力数
 MvnNodeBase::MvnNodeBase(MvnModule* parent,
-			 tType type,
-			 int input_num) :
-  MvnNode(parent),
-  mType(type),
-  mInputNum(input_num),
-  mInputArray(new MvnInputPin[input_num])
+			 MvnNodeType type,
+			 SizeType input_num) :
+  MvnNode{parent},
+  mType{type},
+  mInputNum{input_num},
+  mInputArray{new MvnInputPin[input_num]}
 {
-  for ( int i = 0; i < input_num; ++ i ) {
+  for ( SizeType i = 0; i < input_num; ++ i ) {
     mInputArray[i].init(this, i);
   }
 }
@@ -38,17 +39,18 @@ MvnNodeBase::MvnNodeBase(MvnModule* parent,
 // @brief デストラクタ
 MvnNodeBase::~MvnNodeBase()
 {
+  delete [] mInputArray;
 }
 
 // @brief ノードの種類を得る．
-MvnNode::tType
+MvnNodeType
 MvnNodeBase::type() const
 {
   return mType;
 }
 
 // @brief 入力ピン数を得る．
-int
+SizeType
 MvnNodeBase::input_num() const
 {
   return mInputNum;
@@ -59,7 +61,7 @@ MvnNodeBase::input_num() const
 const MvnInputPin*
 MvnNodeBase::input(int pos) const
 {
-  ASSERT_COND( pos < mInputNum );
+  ASSERT_COND( 0 < pos && pos < mInputNum );
   return mInputArray + pos;
 }
 
@@ -73,26 +75,18 @@ MvnNodeBase::_input(int pos)
 }
 
 // @brief クロック信号の極性を得る．
-// @retval 1 正極性(posedge)
-// @retval 0 負極性(negedge)
-// @note type() が kDff の時のみ意味を持つ．
-// @note デフォルトの実装では 0 を返す．
-int
+MvnPolarity
 MvnNodeBase::clock_pol() const
 {
-  return 0;
+  return MvnPolarity::Positive;
 }
 
 // @brief 非同期セット信号の極性を得る．
 // @param[in] pos 位置 ( 0 <= pos < input_num() - 2 )
-// @retval 1 正極性(posedge)
-// @retval 0 負極性(negedge)
-// @note type() が kDff の時のみ意味を持つ．
-// @note デフォルトの実装では 0 を返す．
-int
+MvnPolarity
 MvnNodeBase::control_pol(int pos) const
 {
-  return 0;
+  return MvnPolarity::Positive;
 }
 
 // @brief 非同期セットの値を表す定数ノードを得る．
@@ -107,7 +101,7 @@ MvnNodeBase::control_val(int pos) const
 // @brief ビット位置を得る．
 // @note type() が kConstBitSelect の時のみ意味を持つ．
 // @note デフォルトの実装では 0 を返す．
-int
+SizeType
 MvnNodeBase::bitpos() const
 {
   return 0;
@@ -116,7 +110,7 @@ MvnNodeBase::bitpos() const
 // @brief 範囲指定の MSB を得る．
 // @note type() が kConstPartSelect の時のみ意味を持つ．
 // @note デフォルトの実装では 0 を返す．
-int
+SizeType
 MvnNodeBase::msb() const
 {
   return 0;
@@ -125,28 +119,30 @@ MvnNodeBase::msb() const
 // @brief 範囲指定の LSB を得る．
 // @note type() が kConstPartSelect の時のみ意味を持つ．
 // @note デフォルトの実装では 0 を返す．
-int
+SizeType
 MvnNodeBase::lsb() const
 {
   return 0;
 }
 
 // @brief 定数値を得る．
-// @param[out] val 値を格納するベクタ
-// @note type() が kConst の時のみ意味を持つ．
+// @return 値を返す．
+// @note type() が CONST の時のみ意味を持つ．
 // @note デフォルトの実装ではなにもしない．
-void
-MvnNodeBase::const_value(vector<ymuint32>& val) const
+MvnBvConst
+MvnNodeBase::const_value() const
 {
+  return MvnBvConst();
 }
 
 // @brief Xマスクを得る．
 // @param[out] val 値を格納するベクタ
 // @note type() が kEqX の時のみ意味を持つ．
 // @note デフォルトの実装ではなにもしない．
-void
-MvnNodeBase::xmask(vector<ymuint32>& val) const
+MvnBvConst
+MvnNodeBase::xmask() const
 {
+  return MvnBvConst();
 }
 
 // @brief セル番号を得る．
@@ -187,9 +183,9 @@ MvnNodeBase::cell_node() const
 // @param[in] bit_width ビット幅
 MvnNode*
 MvnMgr::new_input(MvnModule* module,
-		  int bit_width)
+		  SizeType bit_width)
 {
-  MvnNode* node = new MvnNodeBase(module, MvnNode::kInput, 0);
+  auto node{new MvnNodeBase(module, MvnNodeType::INPUT, 0)};
   reg_node(node);
   node->mBitWidth = bit_width;
   return node;
@@ -200,10 +196,10 @@ MvnMgr::new_input(MvnModule* module,
 // @param[in] bit_width ビット幅
 MvnNode*
 MvnMgr::new_output(MvnModule* module,
-		   int bit_width)
+		   SizeType bit_width)
 {
-  MvnNode* node = new_unary_op(module, MvnNode::kOutput,
-			       bit_width, bit_width);
+  auto node = new_unary_op(module, MvnNodeType::OUTPUT,
+			   bit_width, bit_width);
   return node;
 }
 
@@ -212,10 +208,10 @@ MvnMgr::new_output(MvnModule* module,
 // @param[in] bit_width ビット幅
 MvnNode*
 MvnMgr::new_inout(MvnModule* module,
-		  int bit_width)
+		  SizeType bit_width)
 {
-  MvnNode* node = new_unary_op(module, MvnNode::kInout,
-			       bit_width, bit_width);
+  auto node = new_unary_op(module, MvnNodeType::INOUT,
+			   bit_width, bit_width);
   return node;
 }
 
@@ -224,10 +220,10 @@ MvnMgr::new_inout(MvnModule* module,
 // @param[in] bit_width ビット幅
 MvnNode*
 MvnMgr::new_latch(MvnModule* module,
-		  int bit_width)
+		  SizeType bit_width)
 {
-  MvnNode* node = new_binary_op(module, MvnNode::kLatch,
-				bit_width, 1, bit_width);
+  auto node = new_binary_op(module, MvnNodeType::LATCH,
+			    bit_width, 1, bit_width);
   return node;
 }
 
@@ -237,9 +233,9 @@ MvnMgr::new_latch(MvnModule* module,
 // @return 生成したノードを返す．
 MvnNode*
 MvnMgr::new_through(MvnModule* module,
-		    int bit_width)
+		    SizeType bit_width)
 {
-  MvnNode* node = new_unary_op(module, MvnNode::kThrough,
+  auto node = new_unary_op(module, MvnNodeType::THROUGH,
 			       bit_width, bit_width);
   return node;
 }
@@ -250,10 +246,10 @@ MvnMgr::new_through(MvnModule* module,
 // @return 生成したノードを返す．
 MvnNode*
 MvnMgr::new_not(MvnModule* module,
-		int bit_width)
+		SizeType bit_width)
 {
-  MvnNode* node = new_unary_op(module, MvnNode::kNot,
-			       bit_width, bit_width);
+  auto node = new_unary_op(module, MvnNodeType::NOT,
+			   bit_width, bit_width);
   return node;
 }
 
@@ -264,11 +260,11 @@ MvnMgr::new_not(MvnModule* module,
 // @return 生成したノードを返す．
 MvnNode*
 MvnMgr::new_and(MvnModule* module,
-		int input_num,
-		int bit_width)
+		SizeType input_num,
+		SizeType bit_width)
 {
-  MvnNode* node = new_log_op(module, MvnNode::kAnd,
-			     input_num, bit_width);
+  auto node = new_log_op(module, MvnNodeType::AND,
+			 input_num, bit_width);
   return node;
 }
 
@@ -279,11 +275,11 @@ MvnMgr::new_and(MvnModule* module,
 // @return 生成したノードを返す．
 MvnNode*
 MvnMgr::new_or(MvnModule* module,
-	       int input_num,
-	       int bit_width)
+	       SizeType input_num,
+	       SizeType bit_width)
 {
-  MvnNode* node = new_log_op(module, MvnNode::kOr,
-			     input_num, bit_width);
+  auto node = new_log_op(module, MvnNodeType::OR,
+			 input_num, bit_width);
   return node;
 }
 
@@ -294,11 +290,11 @@ MvnMgr::new_or(MvnModule* module,
 // @return 生成したノードを返す．
 MvnNode*
 MvnMgr::new_xor(MvnModule* module,
-		int input_num,
-		int bit_width)
+		SizeType input_num,
+		SizeType bit_width)
 {
-  MvnNode* node = new_log_op(module, MvnNode::kXor,
-			     input_num, bit_width);
+  auto node = new_log_op(module, MvnNodeType::XOR,
+			 input_num, bit_width);
   return node;
 }
 
@@ -308,10 +304,10 @@ MvnMgr::new_xor(MvnModule* module,
 // @return 生成したノードを返す．
 MvnNode*
 MvnMgr::new_rand(MvnModule* module,
-		 int bit_width)
+		 SizeType bit_width)
 {
-  MvnNode* node = new_unary_op(module, MvnNode::kRand,
-			       bit_width, 1);
+  auto node = new_unary_op(module, MvnNodeType::RAND,
+			   bit_width, 1);
   return node;
 }
 
@@ -321,10 +317,10 @@ MvnMgr::new_rand(MvnModule* module,
 // @return 生成したノードを返す．
 MvnNode*
 MvnMgr::new_ror(MvnModule* module,
-		int bit_width)
+		SizeType bit_width)
 {
-  MvnNode* node = new_unary_op(module, MvnNode::kRor,
-			       bit_width, 1);
+  auto node = new_unary_op(module, MvnNodeType::ROR,
+			   bit_width, 1);
   return node;
 }
 
@@ -334,10 +330,10 @@ MvnMgr::new_ror(MvnModule* module,
 // @return 生成したノードを返す．
 MvnNode*
 MvnMgr::new_rxor(MvnModule* module,
-		 int bit_width)
+		 SizeType bit_width)
 {
-  MvnNode* node = new_unary_op(module, MvnNode::kRxor,
-			       bit_width, 1);
+  auto node = new_unary_op(module, MvnNodeType::RXOR,
+			   bit_width, 1);
   return node;
 }
 
@@ -348,10 +344,10 @@ MvnMgr::new_rxor(MvnModule* module,
 // @note 2の補数を計算する．
 MvnNode*
 MvnMgr::new_cmpl(MvnModule* module,
-		 int bit_width)
+		 SizeType bit_width)
 {
-  MvnNode* node = new_unary_op(module, MvnNode::kCmpl,
-			       bit_width, bit_width);
+  auto node = new_unary_op(module, MvnNodeType::CMPL,
+			   bit_width, bit_width);
   return node;
 }
 
@@ -363,12 +359,12 @@ MvnMgr::new_cmpl(MvnModule* module,
 // @return 生成したノードを返す．
 MvnNode*
 MvnMgr::new_add(MvnModule* module,
-		int bit_width1,
-		int bit_width2,
-		int bit_width3)
+		SizeType bit_width1,
+		SizeType bit_width2,
+		SizeType bit_width3)
 {
-  MvnNode* node = new_binary_op(module, MvnNode::kAdd,
-				bit_width1, bit_width2, bit_width3);
+  auto node = new_binary_op(module, MvnNodeType::ADD,
+			    bit_width1, bit_width2, bit_width3);
   return node;
 }
 
@@ -380,12 +376,12 @@ MvnMgr::new_add(MvnModule* module,
 // @return 生成したノードを返す．
 MvnNode*
 MvnMgr::new_sub(MvnModule* module,
-		int bit_width1,
-		int bit_width2,
-		int bit_width3)
+		SizeType bit_width1,
+		SizeType bit_width2,
+		SizeType bit_width3)
 {
-  MvnNode* node = new_binary_op(module, MvnNode::kSub,
-				bit_width1, bit_width2, bit_width3);
+  auto node = new_binary_op(module, MvnNodeType::SUB,
+			    bit_width1, bit_width2, bit_width3);
   return node;
 }
 
@@ -397,12 +393,12 @@ MvnMgr::new_sub(MvnModule* module,
 // @return 生成したノードを返す．
 MvnNode*
 MvnMgr::new_mult(MvnModule* module,
-		 int bit_width1,
-		 int bit_width2,
-		 int bit_width3)
+		 SizeType bit_width1,
+		 SizeType bit_width2,
+		 SizeType bit_width3)
 {
-  MvnNode* node = new_binary_op(module, MvnNode::kMult,
-				bit_width1, bit_width2, bit_width3);
+  auto node = new_binary_op(module, MvnNodeType::MUL,
+			    bit_width1, bit_width2, bit_width3);
   return node;
 }
 
@@ -414,12 +410,12 @@ MvnMgr::new_mult(MvnModule* module,
 // @return 生成したノードを返す．
 MvnNode*
 MvnMgr::new_div(MvnModule* module,
-		int bit_width1,
-		int bit_width2,
-		int bit_width3)
+		SizeType bit_width1,
+		SizeType bit_width2,
+		SizeType bit_width3)
 {
-  MvnNode* node = new_binary_op(module, MvnNode::kDiv,
-				bit_width1, bit_width2, bit_width3);
+  auto node = new_binary_op(module, MvnNodeType::DIV,
+			    bit_width1, bit_width2, bit_width3);
   return node;
 }
 
@@ -431,12 +427,12 @@ MvnMgr::new_div(MvnModule* module,
 // @return 生成したノードを返す．
 MvnNode*
 MvnMgr::new_mod(MvnModule* module,
-		int bit_width1,
-		int bit_width2,
-		int bit_width3)
+		SizeType bit_width1,
+		SizeType bit_width2,
+		SizeType bit_width3)
 {
-  MvnNode* node = new_binary_op(module, MvnNode::kMod,
-				bit_width1, bit_width2, bit_width3);
+  auto node = new_binary_op(module, MvnNodeType::MOD,
+			    bit_width1, bit_width2, bit_width3);
   return node;
 }
 
@@ -448,12 +444,12 @@ MvnMgr::new_mod(MvnModule* module,
 // @return 生成したノードを返す．
 MvnNode*
 MvnMgr::new_pow(MvnModule* module,
-		int bit_width1,
-		int bit_width2,
-		int bit_width3)
+		SizeType bit_width1,
+		SizeType bit_width2,
+		SizeType bit_width3)
 {
-  MvnNode* node = new_binary_op(module, MvnNode::kPow,
-				bit_width1, bit_width2, bit_width3);
+  auto node = new_binary_op(module, MvnNodeType::POW,
+			    bit_width1, bit_width2, bit_width3);
   return node;
 }
 
@@ -465,12 +461,12 @@ MvnMgr::new_pow(MvnModule* module,
 // @return 生成したノードを返す．
 MvnNode*
 MvnMgr::new_sll(MvnModule* module,
-		int bit_width1,
-		int bit_width2,
-		int bit_width3)
+		SizeType bit_width1,
+		SizeType bit_width2,
+		SizeType bit_width3)
 {
-  MvnNode* node = new_binary_op(module, MvnNode::kSll,
-				bit_width1, bit_width2, bit_width3);
+  auto node = new_binary_op(module, MvnNodeType::SLL,
+			    bit_width1, bit_width2, bit_width3);
   return node;
 }
 
@@ -482,12 +478,12 @@ MvnMgr::new_sll(MvnModule* module,
 // @return 生成したノードを返す．
 MvnNode*
 MvnMgr::new_srl(MvnModule* module,
-		int bit_width1,
-		int bit_width2,
-		int bit_width3)
+		SizeType bit_width1,
+		SizeType bit_width2,
+		SizeType bit_width3)
 {
-  MvnNode* node = new_binary_op(module, MvnNode::kSrl,
-				bit_width1, bit_width2, bit_width3);
+  auto node = new_binary_op(module, MvnNodeType::SRL,
+			    bit_width1, bit_width2, bit_width3);
   return node;
 }
 
@@ -499,12 +495,12 @@ MvnMgr::new_srl(MvnModule* module,
 // @return 生成したノードを返す．
 MvnNode*
 MvnMgr::new_sla(MvnModule* module,
-		int bit_width1,
-		int bit_width2,
-		int bit_width3)
+		SizeType bit_width1,
+		SizeType bit_width2,
+		SizeType bit_width3)
 {
-  MvnNode* node = new_binary_op(module, MvnNode::kSla,
-				bit_width1, bit_width2, bit_width3);
+  auto node = new_binary_op(module, MvnNodeType::SLA,
+			    bit_width1, bit_width2, bit_width3);
   return node;
 }
 
@@ -516,12 +512,12 @@ MvnMgr::new_sla(MvnModule* module,
 // @return 生成したノードを返す．
 MvnNode*
 MvnMgr::new_sra(MvnModule* module,
-		int bit_width1,
-		int bit_width2,
-		int bit_width3)
+		SizeType bit_width1,
+		SizeType bit_width2,
+		SizeType bit_width3)
 {
-  MvnNode* node = new_binary_op(module, MvnNode::kSra,
-				bit_width1, bit_width2, bit_width3);
+  auto node = new_binary_op(module, MvnNodeType::SRA,
+			    bit_width1, bit_width2, bit_width3);
   return node;
 }
 
@@ -531,10 +527,10 @@ MvnMgr::new_sra(MvnModule* module,
 // @return 生成したノードを返す．
 MvnNode*
 MvnMgr::new_equal(MvnModule* module,
-		  int bit_width)
+		  SizeType bit_width)
 {
-  MvnNode* node = new_binary_op(module, MvnNode::kEq,
-				bit_width, bit_width, 1);
+  auto node = new_binary_op(module, MvnNodeType::EQ,
+			    bit_width, bit_width, 1);
   return node;
 }
 
@@ -544,10 +540,10 @@ MvnMgr::new_equal(MvnModule* module,
 // @return 生成したノードを返す．
 MvnNode*
 MvnMgr::new_lt(MvnModule* module,
-	       int bit_width)
+	       SizeType bit_width)
 {
-  MvnNode* node = new_binary_op(module, MvnNode::kLt,
-				bit_width, bit_width, 1);
+  auto node = new_binary_op(module, MvnNodeType::LT,
+			    bit_width, bit_width, 1);
   return node;
 }
 
@@ -558,11 +554,11 @@ MvnMgr::new_lt(MvnModule* module,
 // @return 生成したノードを返す．
 MvnNode*
 MvnMgr::new_bitselect(MvnModule* module,
-		      int bit_width1,
-		      int bit_width2)
+		      SizeType bit_width1,
+		      SizeType bit_width2)
 {
-  MvnNode* node = new_binary_op(module, MvnNode::kBitSelect,
-				bit_width1, bit_width2, 1);
+  auto node = new_binary_op(module, MvnNodeType::BITSELECT,
+			    bit_width1, bit_width2, 1);
   return node;
 }
 
@@ -574,12 +570,12 @@ MvnMgr::new_bitselect(MvnModule* module,
 // @return 生成したノードを返す．
 MvnNode*
 MvnMgr::new_partselect(MvnModule* module,
-		       int bit_width1,
-		       int bit_width2,
-		       int bit_width3)
+		       SizeType bit_width1,
+		       SizeType bit_width2,
+		       SizeType bit_width3)
 {
-  MvnNode* node = new_binary_op(module, MvnNode::kPartSelect,
-				bit_width1, bit_width2, bit_width3);
+  auto node = new_binary_op(module, MvnNodeType::PARTSELECT,
+			    bit_width1, bit_width2, bit_width3);
   return node;
 }
 
@@ -589,10 +585,10 @@ MvnMgr::new_partselect(MvnModule* module,
 // @return 生成したノードを返す．
 MvnNode*
 MvnMgr::new_ite(MvnModule* module,
-		int bit_width)
+		SizeType bit_width)
 {
-  MvnNode* node = new_ternary_op(module, MvnNode::kIte,
-				 1, bit_width, bit_width, bit_width);
+  auto node = new_ternary_op(module, MvnNodeType::ITE,
+			     1, bit_width, bit_width, bit_width);
   return node;
 }
 
@@ -605,12 +601,12 @@ MvnNode*
 MvnMgr::new_concat(MvnModule* module,
 		   const vector<SizeType>& ibitwidth_array)
 {
-  SizeType ni = ibitwidth_array.size();
+  SizeType ni{ibitwidth_array.size()};
   SizeType obitwidth = 0;
   for ( SizeType i = 0; i < ni; ++ i ) {
     obitwidth += ibitwidth_array[i];
   }
-  return new_nary_op(module, MvnNode::kConcat, ibitwidth_array, obitwidth);
+  return new_nary_op(module, MvnNodeType::CONCAT, ibitwidth_array, obitwidth);
 }
 
 // @brief 多入力論理演算ノードを生成する．
@@ -620,12 +616,12 @@ MvnMgr::new_concat(MvnModule* module,
 // @param[in] bit_width ビット幅
 MvnNode*
 MvnMgr::new_log_op(MvnModule* module,
-		   MvnNode::tType type,
-		   int input_num,
-		   int bit_width)
+		   MvnNodeType type,
+		   SizeType input_num,
+		   SizeType bit_width)
 {
   vector<SizeType> ibitwidth_array(input_num);
-  for ( int i = 0; i < input_num; ++ i ) {
+  for ( SizeType i = 0; i < input_num; ++ i ) {
     ibitwidth_array[i] = bit_width;
   }
   return new_nary_op(module, type, ibitwidth_array, bit_width);
@@ -638,11 +634,11 @@ MvnMgr::new_log_op(MvnModule* module,
 // @param[in] bit_width2 出力のビット幅
 MvnNode*
 MvnMgr::new_unary_op(MvnModule* module,
-		     MvnNode::tType type,
-		     int bit_width1,
-		     int bit_width2)
+		     MvnNodeType type,
+		     SizeType bit_width1,
+		     SizeType bit_width2)
 {
-  MvnNode* node = new MvnNodeBase(module, type, 1);
+  auto node{new MvnNodeBase(module, type, 1)};
   reg_node(node);
 
   node->_input(0)->mBitWidth = bit_width1;
@@ -659,12 +655,12 @@ MvnMgr::new_unary_op(MvnModule* module,
 // @param[in] bit_width3 出力のビット幅
 MvnNode*
 MvnMgr::new_binary_op(MvnModule* module,
-		      MvnNode::tType type,
-		      int bit_width1,
-		      int bit_width2,
-		      int bit_width3)
+		      MvnNodeType type,
+		      SizeType bit_width1,
+		      SizeType bit_width2,
+		      SizeType bit_width3)
 {
-  MvnNode* node = new MvnNodeBase(module, type, 2);
+  auto node{new MvnNodeBase(module, type, 2)};
   reg_node(node);
 
   node->_input(0)->mBitWidth = bit_width1;
@@ -683,13 +679,13 @@ MvnMgr::new_binary_op(MvnModule* module,
 // @param[in] bit_width4 出力のビット幅
 MvnNode*
 MvnMgr::new_ternary_op(MvnModule* module,
-		       MvnNode::tType type,
-		       int bit_width1,
-		       int bit_width2,
-		       int bit_width3,
-		       int bit_width4)
+		       MvnNodeType type,
+		       SizeType bit_width1,
+		       SizeType bit_width2,
+		       SizeType bit_width3,
+		       SizeType bit_width4)
 {
-  MvnNode* node = new MvnNodeBase(module, type, 3);
+  auto node{new MvnNodeBase(module, type, 3)};
   reg_node(node);
 
   node->_input(0)->mBitWidth = bit_width1;
@@ -707,12 +703,12 @@ MvnMgr::new_ternary_op(MvnModule* module,
 // @param[in] obit_width 出力のビット幅
 MvnNode*
 MvnMgr::new_nary_op(MvnModule* module,
-		    MvnNode::tType type,
+		    MvnNodeType type,
 		    const vector<SizeType>& ibit_width_array,
-		    int obit_width)
+		    SizeType obit_width)
 {
-  SizeType ni = ibit_width_array.size();
-  MvnNode* node = new MvnNodeBase(module, type, ni);
+  SizeType ni{ibit_width_array.size()};
+  auto node{new MvnNodeBase(module, type, ni)};
   reg_node(node);
 
   for ( SizeType i = 0; i < ni; ++ i ) {

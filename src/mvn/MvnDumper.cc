@@ -15,6 +15,7 @@
 #include "ym/MvnPort.h"
 #include "ym/MvnNode.h"
 #include "ym/MvnInputPin.h"
+#include "ym/MvnBvConst.h"
 
 #include "ym/ClibCell.h"
 
@@ -40,7 +41,7 @@ dump_inputpin(ostream& s,
 {
   s << "  " << pin_name
     << "(" << pin->bit_width() << ")" << endl;
-  const MvnNode* onode = pin->src_node();
+  auto onode = pin->src_node();
   if ( onode ) {
     s << "    <== Output@" << node_idstr(onode) << endl;
   }
@@ -65,32 +66,29 @@ dump_node(ostream& s,
 {
   s << node_idstr(node) << " : ";
   switch ( node->type() ) {
-  case MvnNode::kInput:      s << "Input"; break;
-  case MvnNode::kInout:      s << "Inout"; break;
-  case MvnNode::kOutput:     s << "Output"; break;
-  case MvnNode::kDff:        s << "DFF"; break;
-  case MvnNode::kLatch:      s << "Latch"; break;
-  case MvnNode::kThrough:    s << "Through"; break;
-  case MvnNode::kNot:        s << "Not"; break;
-  case MvnNode::kAnd:        s << "And"; break;
-  case MvnNode::kOr:         s << "Or"; break;
-  case MvnNode::kXor:        s << "Xor"; break;
-  case MvnNode::kRand:       s << "Rand"; break;
-  case MvnNode::kRor:        s << "Ror"; break;
-  case MvnNode::kRxor:       s << "Rxor"; break;
-  case MvnNode::kEq:         s << "Eq"; break;
-  case MvnNode::kLt:         s << "Lt"; break;
-  case MvnNode::kCaseEq:
+  case MvnNodeType::INPUT:      s << "Input"; break;
+  case MvnNodeType::INOUT:      s << "Inout"; break;
+  case MvnNodeType::OUTPUT:     s << "Output"; break;
+  case MvnNodeType::DFF:        s << "DFF"; break;
+  case MvnNodeType::LATCH:      s << "Latch"; break;
+  case MvnNodeType::THROUGH:    s << "Through"; break;
+  case MvnNodeType::NOT:        s << "Not"; break;
+  case MvnNodeType::AND:        s << "And"; break;
+  case MvnNodeType::OR:         s << "Or"; break;
+  case MvnNodeType::XOR:        s << "Xor"; break;
+  case MvnNodeType::RAND:       s << "Rand"; break;
+  case MvnNodeType::ROR:        s << "Ror"; break;
+  case MvnNodeType::RXOR:       s << "Rxor"; break;
+  case MvnNodeType::EQ:         s << "Eq"; break;
+  case MvnNodeType::LT:         s << "Lt"; break;
+  case MvnNodeType::CASEEQ:
     {
       s << "CaseEq[";
-      vector<ymuint32> xmask;
-      node->xmask(xmask);
-      int bw = node->input(0)->bit_width();
-      for ( int i = 0; i < bw; ++ i ) {
-	int bitpos = bw - i - 1;
-	int blk = bitpos / 32;
-	int sft = bitpos % 32;
-	if ( xmask[blk] & (1U << sft) ) {
+      auto xmask = node->xmask();
+      SizeType bw{node->input(0)->bit_width()};
+      for ( SizeType i = 0; i < bw; ++ i ) {
+	SizeType bitpos = bw - i - 1;
+	if ( xmask[bitpos] ) {
 	  s << "-";
 	}
 	else {
@@ -100,46 +98,39 @@ dump_node(ostream& s,
       s << "]";
     }
     break;
-  case MvnNode::kSll:        s << "Sll"; break;
-  case MvnNode::kSrl:        s << "Srl"; break;
-  case MvnNode::kSla:        s << "Sla"; break;
-  case MvnNode::kSra:        s << "Sra"; break;
-  case MvnNode::kAdd:        s << "Add"; break;
-  case MvnNode::kSub:        s << "Sub"; break;
-  case MvnNode::kMult:       s << "Mult"; break;
-  case MvnNode::kDiv:        s << "Div"; break;
-  case MvnNode::kMod:        s << "Mod"; break;
-  case MvnNode::kPow:        s << "Pow"; break;
-  case MvnNode::kIte:        s << "Ite"; break;
-  case MvnNode::kConcat:     s << "Concat"; break;
-  case MvnNode::kConstBitSelect:
+  case MvnNodeType::SLL:        s << "Sll"; break;
+  case MvnNodeType::SRL:        s << "Srl"; break;
+  case MvnNodeType::SLA:        s << "Sla"; break;
+  case MvnNodeType::SRA:        s << "Sra"; break;
+  case MvnNodeType::ADD:        s << "Add"; break;
+  case MvnNodeType::SUB:        s << "Sub"; break;
+  case MvnNodeType::MUL:        s << "Mult"; break;
+  case MvnNodeType::DIV:        s << "Div"; break;
+  case MvnNodeType::MOD:        s << "Mod"; break;
+  case MvnNodeType::POW:        s << "Pow"; break;
+  case MvnNodeType::ITE:        s << "Ite"; break;
+  case MvnNodeType::CONCAT:     s << "Concat"; break;
+  case MvnNodeType::CONSTBITSELECT:
     s << "ConstBitSelect["
       << node->bitpos()
       << "]";
     break;
-  case MvnNode::kConstPartSelect:
+  case MvnNodeType::CONSTPARTSELECT:
     s << "ConstPartSelect["
       << node->msb()
       << ":"
       << node->lsb()
       << "]";
     break;
-  case MvnNode::kBitSelect:  s << "BitSelect"; break;
-  case MvnNode::kPartSelect: s << "PartSelect"; break;
-  case MvnNode::kConst:
+  case MvnNodeType::BITSELECT:  s << "BitSelect"; break;
+  case MvnNodeType::PARTSELECT: s << "PartSelect"; break;
+  case MvnNodeType::CONST:
     {
-      s << "Const(";
-      vector<ymuint32> val;
-      node->const_value(val);
-      int n = val.size();
-      s << hex;
-      for ( int i = 0; i < n; ++ i ) {
-	s << " " << val[n - i - 1];
-      }
-      s << dec << ")";
+      auto val = node->const_value();
+      s << "Const(" << val << ")";
     }
     break;
-  case MvnNode::kCell:
+  case MvnNodeType::CELL:
     {
       const ClibCell& cell = mgr.library().cell(node->cell_id());
       s << "Cell(" << cell.name() << ")";
@@ -150,29 +141,29 @@ dump_node(ostream& s,
   }
   s << endl;
 
-  if ( node->type() == MvnNode::kDff ) {
+  if ( node->type() == MvnNodeType::DFF ) {
     const MvnInputPin* input = node->input(0);
     dump_inputpin(s, input, "DataInput");
     const MvnInputPin* clock = node->input(1);
     dump_inputpin(s, clock, "Clock");
     s << "    ";
-    if ( node->clock_pol() ) {
+    if ( node->clock_pol() == MvnPolarity::Positive ) {
       s << "posedge";
     }
     else {
       s << "negedge";
     }
     s << endl;
-    int ni = node->input_num();
-    int nc = ni - 2;
-    for ( int i = 0; i < nc; ++ i ) {
-      const MvnInputPin* cpin = node->input(i + 2);
+    SizeType ni{node->input_num()};
+    SizeType nc{ni - 2};
+    for ( SizeType i = 0; i < nc; ++ i ) {
+      auto cpin{node->input(i + 2)};
       ostringstream buf;
       buf << "Control#" << i;
       string pin_name = buf.str();
       dump_inputpin(s, cpin, pin_name);
       s << "    ";
-      if ( node->control_pol(i) ) {
+      if ( node->control_pol(i) == MvnPolarity::Positive ) {
 	s << "posedge";
       }
       else {
@@ -183,20 +174,17 @@ dump_node(ostream& s,
       s << "  Data#" << i << " <== " << node_idstr(dnode) << endl;
     }
   }
-  else if ( node->type() == MvnNode::kLatch ) {
+  else if ( node->type() == MvnNodeType::LATCH ) {
     #warning "TODO: 未完"
   }
   else {
-    int ni = node->input_num();
-    for ( int i = 0; i < ni; ++ i ) {
-      const MvnInputPin* pin = node->input(i);
+    SizeType ni{node->input_num()};
+    for ( SizeType i = 0; i < ni; ++ i ) {
+      auto pin{node->input(i)};
       dump_inputpin(s, pin);
     }
     s << "  Output(" << node->bit_width() << ")" << endl;
-    const list<MvnInputPin*>& fo_list = node->dst_pin_list();
-    for (list<MvnInputPin*>::const_iterator p = fo_list.begin();
-	 p != fo_list.end(); ++ p) {
-      const MvnInputPin* ipin = *p;
+    for ( auto ipin: node->dst_pin_list() ) {
       s << "    ==> InputPin#" << ipin->pos()
 	<< "@" << node_idstr(ipin->node()) << endl;
     }
@@ -228,13 +216,13 @@ void
 MvnDumper::operator()(ostream& s,
 		      const MvnMgr& mgr)
 {
-  int n = mgr.max_module_id();
-  for ( int i = 0; i < n; ++ i ) {
-    const MvnModule* module = mgr.module(i);
+  SizeType n = mgr.max_module_id();
+  for ( SizeType i = 0; i < n; ++ i ) {
+    auto module = mgr.module(i);
     if ( module == nullptr ) continue;
 
     s << "Module#" << module->id() << "(" << module->name() << ")" << endl;
-    const MvnNode* pnode = module->parent();
+    auto pnode = module->parent();
     if ( pnode ) {
       s << "  parent node: Module#" << pnode->parent()->id()
 	<< ":" << node_idstr(pnode) << endl;
@@ -243,13 +231,13 @@ MvnDumper::operator()(ostream& s,
       s << "  toplevel module" << endl;
     }
 
-    int np = module->port_num();
-    for ( int j = 0; j < np; ++ j ) {
-      const MvnPort* port = module->port(j);
+    SizeType np{module->port_num()};
+    for ( SizeType j = 0; j < np; ++ j ) {
+      auto port{module->port(j)};
       s << "  Port#" << j << "(" << port->name() << ")" << endl;
-      int n = port->port_ref_num();
-      for ( int k = 0; k < n; ++ k ) {
-	const MvnPortRef& port_ref = port->port_ref(k);
+      SizeType n{port->port_ref_num()};
+      for ( SizeType k = 0; k < n; ++ k ) {
+	const auto& port_ref{port->port_ref(k)};
 	s << "    " << node_idstr(port_ref.node());
 	if ( port_ref.has_bitselect() ) {
 	  s << "[" << port_ref.bitpos() << "]";
@@ -261,19 +249,19 @@ MvnDumper::operator()(ostream& s,
       }
     }
 
-    int ni = module->input_num();
-    for ( int j = 0; j < ni; ++ j ) {
+    SizeType ni{module->input_num()};
+    for ( SizeType j = 0; j < ni; ++ j ) {
       dump_node(s, module->input(j), mgr);
     }
-    int no = module->output_num();
-    for ( int j = 0;j < no; ++ j ) {
+    SizeType no{module->output_num()};
+    for ( SizeType j = 0;j < no; ++ j ) {
       dump_node(s, module->output(j), mgr);
     }
-    int nio = module->inout_num();
-    for ( int j = 0; j < nio; ++ j ) {
+    SizeType nio{module->inout_num()};
+    for ( SizeType j = 0; j < nio; ++ j ) {
       dump_node(s, module->inout(j), mgr);
     }
-    for ( MvnNode* node: module->node_list() ) {
+    for ( auto node: module->node_list() ) {
       dump_node(s, node, mgr);
     }
 

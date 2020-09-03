@@ -5,7 +5,7 @@
 /// @brief MvnInputPin のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2014, 2020 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -42,12 +42,13 @@ public:
   node() const;
 
   /// @brief ビット幅を得る．
-  ymuint
+  SizeType
   bit_width() const;
 
   /// @brief ノードの何番目のピンかを返す．
-  /// @note 入力ピンと出力ピンは区別される．
-  ymuint
+  ///
+  /// 入力ピンと出力ピンは区別される．
+  SizeType
   pos() const;
 
   /// @brief 接続しているノードを得る．
@@ -63,7 +64,7 @@ private:
   /// @brief 設定用の関数
   void
   init(MvnNode* node,
-       ymuint pos);
+       SizeType pos);
 
 
 private:
@@ -75,16 +76,13 @@ private:
   MvnNode* mNode;
 
   // 位置
-  ymuint32 mPos;
+  SizeType mPos;
 
   // ビット幅
-  ymuint32 mBitWidth;
+  SizeType mBitWidth;
 
   // 接続しているノード
   MvnNode* mSrcNode;
-
-  // mSrcNode の mDstPinList 上の反復子
-  list<MvnInputPin*>::iterator mListIter;
 
 };
 
@@ -103,7 +101,7 @@ MvnInputPin::node() const
 
 // @brief ビット幅を得る．
 inline
-ymuint
+SizeType
 MvnInputPin::bit_width() const
 {
   return mBitWidth;
@@ -112,7 +110,7 @@ MvnInputPin::bit_width() const
 // @brief ノードの何番目のピンかを返す．
 // @note 入力ピンと出力ピンは区別される．
 inline
-ymuint
+SizeType
 MvnInputPin::pos() const
 {
   return mPos;
@@ -130,7 +128,7 @@ MvnInputPin::src_node() const
 inline
 void
 MvnInputPin::init(MvnNode* node,
-		  ymuint pos)
+		  SizeType pos)
 {
   mNode = node;
   mPos = pos;

@@ -26,9 +26,9 @@ MvnVlMap::MvnVlMap()
 MvnVlMap::MvnVlMap(const MvnVlMap& src) :
   mArray(src.mArray.size())
 {
-  int n = src.mArray.size();
-  for ( int i = 0; i < n; ++ i ) {
-    const MapRec* src_rec = src.mArray[i];
+  SizeType n{src.mArray.size()};
+  for ( SizeType i = 0; i < n; ++ i ) {
+    auto src_rec{src.mArray[i]};
     if ( src_rec ) {
       if ( src_rec->is_single_elem() ) {
 	reg_node(i, src_rec->get_single_elem());
@@ -46,10 +46,10 @@ MvnVlMap::operator=(const MvnVlMap& src)
 {
   if ( &src != this) {
     clear();
-    int n = src.mArray.size();
+    SizeType n{src.mArray.size()};
     mArray.resize(n, nullptr);
-    for ( int i = 0; i < n; ++ i ) {
-      const MapRec* src_rec = src.mArray[i];
+    for ( SizeType i = 0; i < n; ++ i ) {
+      auto src_rec{src.mArray[i]};
       if ( src_rec ) {
 	if ( src_rec->is_single_elem() ) {
 	  reg_node(i, src_rec->get_single_elem());
@@ -86,7 +86,7 @@ void
 MvnVlMap::reg_node(int id,
 		   const VlDecl* decl)
 {
-  auto rec = new SingleMapRec(decl);
+  auto rec{new SingleMapRec(decl)};
   put(id, rec);
 }
 
@@ -97,9 +97,9 @@ MvnVlMap::reg_node(int id,
 void
 MvnVlMap::reg_node(int id,
 		   const VlDeclArray* declarray,
-		   int offset)
+		   SizeType offset)
 {
-  auto rec = new ArrayMapRec(declarray, offset);
+  auto rec{new ArrayMapRec(declarray, offset)};
   put(id, rec);
 }
 
@@ -116,7 +116,7 @@ MvnVlMap::copy(int src_id,
 bool
 MvnVlMap::is_single_elem(int id) const
 {
-  auto rec = get(id);
+  auto rec{get(id)};
   if ( rec == nullptr ) {
     return false;
   }
@@ -128,7 +128,7 @@ MvnVlMap::is_single_elem(int id) const
 bool
 MvnVlMap::is_array_elem(int id) const
 {
-  auto rec = get(id);
+  auto rec{get(id)};
   if ( rec == nullptr ) {
     return false;
   }
@@ -141,7 +141,7 @@ MvnVlMap::is_array_elem(int id) const
 const VlDecl*
 MvnVlMap::get_single_elem(int id) const
 {
-  auto rec = get(id);
+  auto rec{get(id)};
   if ( rec == nullptr ) {
     return nullptr;
   }
@@ -154,7 +154,7 @@ MvnVlMap::get_single_elem(int id) const
 const VlDeclArray*
 MvnVlMap::get_array_elem(int id) const
 {
-  auto rec = get(id);
+  auto rec{get(id)};
   if ( rec == nullptr ) {
     return nullptr;
   }
@@ -164,10 +164,10 @@ MvnVlMap::get_array_elem(int id) const
 // @brief id に対応する宣言要素のオフセットを返す．(配列要素版)
 // @param[in] id MvNode の ID番号
 // @note is_array_elem(id) == false の時は 0 が返される．
-int
+SizeType
 MvnVlMap::get_array_offset(int id) const
 {
-  auto rec = get(id);
+  auto rec{get(id)};
   if ( rec == nullptr ) {
     return 0;
   }

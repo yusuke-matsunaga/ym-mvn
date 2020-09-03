@@ -3,7 +3,7 @@
 /// @brief MvnModule の実装ファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010, 2014 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2014, 2020 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -18,11 +18,11 @@ BEGIN_NAMESPACE_YM_MVN
 // @param[in] ni 入力ノード数
 // @param[in] no 出力ノード数
 // @param[in] nio 入出力ノード数
-MvnModule::MvnModule(const char* name,
-		     int np,
-		     int ni,
-		     int no,
-		     int nio) :
+MvnModule::MvnModule(const string& name,
+		     SizeType np,
+		     SizeType ni,
+		     SizeType no,
+		     SizeType nio) :
   mName(name),
   mParent(nullptr),
   mPortArray(np),

@@ -45,37 +45,48 @@ BEGIN_NAMESPACE_YM_MVN_VERILOG
 // @retval false エラーが起こった．
 bool
 ReaderImpl::gen_item(MvnModule* module,
-		     const VlNamedObj* vl_scope)
+		     const VlScope* vl_scope)
 {
   // モジュールインスタンスの生成
   {
-    vector<const VlModule*> module_list;
-    if ( mVlMgr.find_module_list(vl_scope, module_list) ) {
-      for ( auto vl_module: module_list ) {
-	gen_moduleinst(module, vl_module);
-      }
+    auto module_list{mVlMgr.find_module_list(vl_scope)};
+    for ( auto vl_module: module_list ) {
+      gen_moduleinst(module, vl_module);
     }
   }
 
   // モジュール配列インスタンスの生成
   {
-    vector<const VlModuleArray*> modulearray_list;
-    if ( mVlMgr.find_modulearray_list(vl_scope, modulearray_list) ) {
-      for ( auto vl_module_array: modulearray_list ) {
-	int n = vl_module_array->elem_num();
-	for ( int i = 0; i < n; ++ i ) {
-	  const VlModule* vl_module = vl_module_array->elem_by_offset(i);
-	  gen_moduleinst(module, vl_module);
-	}
+    auto modulearray_list{mVlMgr.find_modulearray_list(vl_scope)};
+    for ( auto vl_module_array: modulearray_list ) {
+      SizeType n{vl_module_array->elem_num()};
+      for ( SizeType i = 0; i < n; ++ i ) {
+	auto vl_module{vl_module_array->elem_by_offset(i)};
+	gen_moduleinst(module, vl_module);
       }
     }
   }
 
   // プリミティブインスタンスの生成
   {
-    vector<const VlPrimitive*> primitive_list;
-    if ( mVlMgr.find_primitive_list(vl_scope, primitive_list) ) {
-      for ( auto vl_prim: primitive_list ) {
+    auto primitive_list{mVlMgr.find_primitive_list(vl_scope)};
+    for ( auto vl_prim: primitive_list ) {
+      if ( vl_prim->prim_type() == VpiPrimType::Cell ) {
+	gen_cellinst(module, vl_prim);
+      }
+      else {
+	gen_priminst(module, vl_prim);
+      }
+    }
+  }
+
+  // プリミティブ配列インスタンスの生成
+  {
+    auto primarray_list{mVlMgr.find_primarray_list(vl_scope)};
+    for ( auto vl_primarray: primarray_list ) {
+      SizeType n{vl_primarray->elem_num()};
+      for ( SizeType i = 0; i < n; ++ i ) {
+	auto vl_prim{vl_primarray->elem_by_offset(i)};
 	if ( vl_prim->prim_type() == VpiPrimType::Cell ) {
 	  gen_cellinst(module, vl_prim);
 	}
@@ -86,57 +97,32 @@ ReaderImpl::gen_item(MvnModule* module,
     }
   }
 
-  // プリミティブ配列インスタンスの生成
-  {
-    vector<const VlPrimArray*> primarray_list;
-    if ( mVlMgr.find_primarray_list(vl_scope, primarray_list) ) {
-      for ( auto vl_primarray: primarray_list ) {
-	SizeType n = vl_primarray->elem_num();
-	for ( SizeType i = 0; i < n; ++ i ) {
-	  const VlPrimitive* vl_prim = vl_primarray->elem_by_offset(i);
-	  if ( vl_prim->prim_type() == VpiPrimType::Cell ) {
-	    gen_cellinst(module, vl_prim);
-	  }
-	  else {
-	    gen_priminst(module, vl_prim);
-	  }
-	}
-      }
-    }
-  }
-
   // 継続的代入文の生成
   {
-    vector<const VlContAssign*> contassign_list;
-    if ( mVlMgr.find_contassign_list(vl_scope, contassign_list) ) {
-      for ( auto cont_assign: contassign_list ) {
-	gen_cont_assign(module, cont_assign->lhs(), cont_assign->rhs());
-      }
+    auto contassign_list{mVlMgr.find_contassign_list(vl_scope)};
+    for ( auto cont_assign: contassign_list ) {
+      gen_cont_assign(module, cont_assign->lhs(), cont_assign->rhs());
     }
   }
 
   // プロセスの生成
   {
-    vector<const VlProcess*> process_list;
-    if ( mVlMgr.find_process_list(vl_scope, process_list) ) {
-      for ( auto process: process_list ) {
-	bool stat1 = gen_process(module, process);
-	if ( !stat1 ) {
-	  return false;
-	}
+    auto process_list{mVlMgr.find_process_list(vl_scope)};
+    for ( auto process: process_list ) {
+      bool stat1 = gen_process(module, process);
+      if ( !stat1 ) {
+	return false;
       }
     }
   }
 
   // 内部スコープ要素の生成
   {
-    vector<const VlNamedObj*> scope_list;
-    if ( mVlMgr.find_internalscope_list(vl_scope, scope_list) ) {
-      for ( auto vl_scope1: scope_list ) {
-	bool stat = gen_item(module, vl_scope1);
-	if ( !stat ) {
-	  return false;
-	}
+    auto scope_list{mVlMgr.find_internalscope_list(vl_scope)};
+    for ( auto vl_scope1: scope_list ) {
+      bool stat = gen_item(module, vl_scope1);
+      if ( !stat ) {
+	return false;
       }
     }
   }
@@ -164,7 +150,7 @@ ReaderImpl::gen_process(MvnModule* parent_module,
     return false;
   }
 
-  const VlStmt* stmt = process->stmt();
+  auto stmt{process->stmt()};
   if ( stmt->type() != VpiObjType::EventControl ) {
     // always の直後は '@' でなければダメ
     MsgMgr::put_msg(__FILE__, __LINE__,
@@ -178,10 +164,10 @@ ReaderImpl::gen_process(MvnModule* parent_module,
   // イベントリストをスキャンして edge 記述の有無を調べる．
   bool has_edge_event = false;
   bool has_normal_event = false;
-  const VlControl* control = stmt->control();
-  SizeType ev_num = control->event_num();
+  auto control{stmt->control()};
+  SizeType ev_num{control->event_num()};
   for ( SizeType i = 0; i < ev_num; ++ i ) {
-    const VlExpr* expr = control->event(i);
+    auto expr{control->event(i)};
     if ( expr->type() == VpiObjType::Operation ) {
       if ( expr->op_type() == VpiOpType::Posedge ||
 	   expr->op_type() == VpiOpType::Negedge ) {
@@ -222,18 +208,19 @@ ReaderImpl::gen_process(MvnModule* parent_module,
     }
 
     // イベントリストの解析を行う．
-    vector<pair<MvnNode*, ymuint32> > event_node_array(ev_num);
-    for ( int i = 0; i < ev_num; ++ i ) {
-      const VlExpr* expr = control->event(i);
-      const VlExpr* opr1 = expr->operand(0);
-      MvnNode* node1 = gen_primary(opr1, mGlobalEnv);
-      int pol = (expr->op_type() == VpiOpType::Posedge) ? 1 : 0;
+    vector<pair<MvnNode*, MvnPolarity>> event_node_array(ev_num);
+    for ( SizeType i = 0; i < ev_num; ++ i ) {
+      auto expr{control->event(i)};
+      auto opr1{expr->operand(0)};
+      auto node1 = gen_primary(opr1, mGlobalEnv);
+      MvnPolarity pol = (expr->op_type() == VpiOpType::Posedge) ?
+	MvnPolarity::Positive : MvnPolarity::Negative;
       event_node_array[i] = make_pair(node1, pol);
     }
     vector<bool> event_map(ev_num, false);
     vector<AsyncControl*> event_list;
     event_list.reserve(ev_num);
-    const VlStmt* stmt1 = stmt->body_stmt();
+    auto stmt1{stmt->body_stmt()};
     while ( stmt1 != nullptr ) {
       if ( (stmt1->type() == VpiObjType::NamedBegin || stmt1->type() == VpiObjType::Begin) &&
 	   stmt1->child_stmt_num() == 1 ) {
@@ -244,9 +231,9 @@ ReaderImpl::gen_process(MvnModule* parent_module,
       }
 
       // リセット条件を表す条件式
-      const VlExpr* cond = stmt1->expr();
-      // 極性(1 が正極性，0 が負極性)
-      int pol = 1;
+      auto cond{stmt1->expr()};
+      // 極性
+      auto pol{MvnPolarity::Positive};
       // 対象のノード
       MvnNode* node = nullptr;
       if ( !parse_cond(cond, mGlobalEnv, node, pol) ) {
@@ -254,8 +241,8 @@ ReaderImpl::gen_process(MvnModule* parent_module,
       }
 
       bool found = false;
-      for ( int i = 0; i < ev_num; ++ i ) {
-	MvnNode* node1 = event_node_array[i].first;
+      for ( SizeType i = 0; i < ev_num; ++ i ) {
+	auto node1 = event_node_array[i].first;
 	if ( node == node1 ) {
 	  if ( pol != event_node_array[i].second ) {
 	    MsgMgr::put_msg(__FILE__, __LINE__,
@@ -266,9 +253,10 @@ ReaderImpl::gen_process(MvnModule* parent_module,
 	    return false;
 	  }
 	  found = true;
-	  AsyncControl* ctrl = new AsyncControl{mGlobalEnv};
+	  auto ctrl{new AsyncControl{mGlobalEnv}};
 	  ctrl->mNode = node;
 	  ctrl->mPol = pol;
+
 	  EnvMerger2 merger(mMvnMgr, mGlobalEnv);
 	  gen_stmt(parent_module, stmt1->body_stmt(), ctrl->mEnv, merger);
 	  event_list.push_back(ctrl);
@@ -292,8 +280,8 @@ ReaderImpl::gen_process(MvnModule* parent_module,
 
     // クロック信号を調べる．
     MvnNode* clock_node = nullptr;
-    int clock_pol = 0;
-    for ( int i = 0; i < ev_num; ++ i ) {
+    auto clock_pol{MvnPolarity::Positive};
+    for ( SizeType i = 0; i < ev_num; ++ i ) {
       if ( !event_map[i] ) {
 	clock_node = event_node_array[i].first;
 	clock_pol = event_node_array[i].second;
@@ -306,39 +294,39 @@ ReaderImpl::gen_process(MvnModule* parent_module,
     EnvMerger2 merger(mMvnMgr, mGlobalEnv);
     gen_stmt(parent_module, stmt1, top_env, merger);
 
-    int n = mGlobalEnv.max_id();
-    for ( int i = 0; i < n; ++ i ) {
+    SizeType n{mGlobalEnv.max_id()};
+    for ( SizeType i = 0; i < n; ++ i ) {
       AssignInfo info1 = top_env.get_from_id(i);
-      MvnNode* rhs = info1.mRhs;
+      auto rhs{info1.mRhs};
       if ( rhs == nullptr ) {
 	continue;
       }
       ASSERT_COND( info1.mCond == nullptr );
-      MvnNode* node0 = mGlobalEnv.get_from_id(i);
+      auto node0 = mGlobalEnv.get_from_id(i);
       // FF を挿入
       // このノードに関係しているコントロールを調べる．
-      vector<int> pol_array;
+      vector<MvnPolarity> pol_array;
       vector<MvnNode*> val_array;
       vector<MvnNode*> control_array;
       pol_array.reserve(ev_num - 1);
       val_array.reserve(ev_num - 1);
       control_array.reserve(ev_num - 1);
-      for ( int j = 0; j < ev_num - 1; ++ j ) {
-	AsyncControl* control = event_list[j];
-	MvnNode* rhs1 = control->mEnv.get_from_id(i).mRhs;
+      for ( SizeType j = 0; j < ev_num - 1; ++ j ) {
+	auto control{event_list[j]};
+	auto rhs1{control->mEnv.get_from_id(i).mRhs};
 	if ( rhs1 ) {
 	  pol_array.push_back(control->mPol);
 	  val_array.push_back(rhs1);
 	  control_array.push_back(control->mNode);
 	}
       }
-      int n = val_array.size();
-      int bw = node0->bit_width();
-      MvnNode* ff = mMvnMgr->new_dff(parent_module, clock_pol, pol_array,
-				     val_array, bw);
+      SizeType n{val_array.size()};
+      SizeType bw{node0->bit_width()};
+      auto ff{mMvnMgr->new_dff(parent_module, clock_pol, pol_array,
+			       val_array, bw)};
       mMvnMgr->connect(rhs, 0, ff, 0);
       mMvnMgr->connect(clock_node, 0, ff, 1);
-      for ( int j = 0; j < n; ++ j ) {
+      for ( SizeType j = 0; j < n; ++ j ) {
 	mMvnMgr->connect(control_array[j], 0, ff, j + 2);
       }
       mMvnMgr->connect(ff, 0, node0, 0);
@@ -349,23 +337,24 @@ ReaderImpl::gen_process(MvnModule* parent_module,
     EnvMerger1 merger(mMvnMgr);
     gen_stmt(parent_module, stmt->body_stmt(), top_env, merger);
 
-    int n = mGlobalEnv.max_id();
-    for ( int i = 0; i < n; ++ i ) {
-      AssignInfo info1 = top_env.get_from_id(i);
-      MvnNode* rhs = info1.mRhs;
-      MvnNode* cond = info1.mCond;
+    SizeType n{mGlobalEnv.max_id()};
+    for ( SizeType i = 0; i < n; ++ i ) {
+      auto info1{top_env.get_from_id(i)};
+      auto rhs{info1.mRhs};
+      auto cond{info1.mCond};
       if ( rhs == nullptr ) {
 	continue;
       }
-      MvnNode* node0 = mGlobalEnv.get_from_id(i);
+
+      auto node0{mGlobalEnv.get_from_id(i)};
       if ( cond == nullptr ) {
 	// 単純な組み合わせ論理
 	mMvnMgr->connect(rhs, 0, node0, 0);
       }
       else {
 	// latch を挿入
-	int bw = node0->bit_width();
-	MvnNode* latch = mMvnMgr->new_latch(parent_module, bw);
+	SizeType bw{node0->bit_width()};
+	auto latch = mMvnMgr->new_latch(parent_module, bw);
 	mMvnMgr->connect(rhs, 0, latch, 0);
 	mMvnMgr->connect(cond, 0, latch, 1);
 	mMvnMgr->connect(latch, 0, node0, 0);
@@ -395,55 +384,61 @@ bool
 ReaderImpl::parse_cond(const VlExpr* cond,
 		       const Env& env,
 		       MvnNode*& node,
-		       int& pol)
+		       MvnPolarity& pol)
 {
   if ( cond->is_primary() ) {
     // (1)
     node = gen_primary(cond, env);
-    pol = 1;
+    pol = MvnPolarity::Positive;
     return true;
   }
 
   if ( cond->is_operation() ) {
-    if ( cond->op_type() == VpiOpType::Not ||
-	 cond->op_type() == VpiOpType::BitNeg ) {
-      const VlExpr* opr1 = cond->operand(0);
-      if ( !opr1->is_primary() ) {
-	return false;
-      }
-      // (2)(3)
-      node = gen_primary(opr1, env);
-      pol = 0;
-      return true;
-    }
-
     switch ( cond->op_type() ) {
+    case VpiOpType::Not:
+    case VpiOpType::BitNeg:
+      {
+	auto opr1{cond->operand(0)};
+	if ( !opr1->is_primary() ) {
+	  return false;
+	}
+	// (2)(3)
+	node = gen_primary(opr1, env);
+	pol = MvnPolarity::Negative;
+	return true;
+      }
+      break;
+
     case VpiOpType::Eq:
       {
-	const VlExpr* opr1 = cond->operand(0);
-	const VlExpr* opr2 = cond->operand(1);
+	auto opr1{cond->operand(0)};
+	auto opr2{cond->operand(1)};
 	if ( opr1->is_primary() && opr2->is_const() ) {
 	  // (4)
-	  return parse_cond_sub(opr1, opr2, env, 0, 1, node, pol);
+	  node = gen_primary(opr1, env);
+	  return parse_cond_sub(opr2, true, pol);
 	}
 	if ( opr1->is_const() && opr2->is_primary() ) {
 	  // (6)
-	  return parse_cond_sub(opr2, opr1, env, 0, 1, node, pol);
+	  node = gen_primary(opr2, env);
+	  return parse_cond_sub(opr1, true, pol);
 	}
       }
       break;
 
     case VpiOpType::Neq:
       {
-	const VlExpr* opr1 = cond->operand(0);
-	const VlExpr* opr2 = cond->operand(1);
+	auto opr1{cond->operand(0)};
+	auto opr2{cond->operand(1)};
 	if ( opr1->is_primary() && opr2->is_const() ) {
 	  // (5)
-	  return parse_cond_sub(opr1, opr2, env, 1, 0, node, pol);
+	  node = gen_primary(opr1, env);
+	  return parse_cond_sub(opr2, false, pol);
 	}
 	if ( opr1->is_const() && opr2->is_primary() ) {
 	  // (7)
-	  return parse_cond_sub(opr2, opr1, env, 1, 0, node, pol);
+	  node = gen_primary(opr2, env);
+	  return parse_cond_sub(opr1, false, pol);
 	}
       }
 
@@ -455,30 +450,31 @@ ReaderImpl::parse_cond(const VlExpr* cond,
 }
 
 // @brief parse_cond() の下請け関数
-// @param[in] opr_primary 識別子を表す式
 // @param[in] opr_const 定数を表す式
-// @param[in] env 環境
-// @param[in] pol0 値が0の時の極性値
-// @param[in] pol1 値が1の時の極性値
-// @param[out] node 対応するノード
+// @param[in] eq 等価フラグ
 // @param[out] pol 極性(1 が正極性，0　が負極性)
 bool
-ReaderImpl::parse_cond_sub(const VlExpr* opr_primary,
-			   const VlExpr* opr_const,
-			   const Env& env,
-			   int pol0,
-			   int pol1,
-			   MvnNode*& node,
-			   int& pol)
+ReaderImpl::parse_cond_sub(const VlExpr* opr_const,
+			   bool eq,
+			   MvnPolarity& pol)
 {
-  node = gen_primary(opr_primary, env);
-  VlValue val = opr_const->constant_value();
-  VlScalarVal v = val.scalar_value();
+  auto val{opr_const->constant_value()};
+  auto v{val.scalar_value()};
   if ( v.is_zero() ) {
-    pol = pol0;
+    if ( eq ) {
+      pol = MvnPolarity::Negative;
+    }
+    else {
+      pol = MvnPolarity::Positive;
+    }
   }
   else if ( v.is_one() ) {
-    pol = pol1;
+    if ( eq ) {
+      pol = MvnPolarity::Positive;
+    }
+    else {
+      pol = MvnPolarity::Negative;
+    }
   }
   else {
     return false;
@@ -507,12 +503,12 @@ ReaderImpl::gen_moduleinst(MvnModule* parent_module,
   }
 
   // ポートの接続を行う．
-  SizeType np = vl_module->port_num();
+  SizeType np{vl_module->port_num()};
   for ( SizeType i = 0; i < np; ++ i ) {
-    const VlPort* vl_port = vl_module->port(i);
-    const VlExpr* hi = vl_port->high_conn();
+    auto vl_port{vl_module->port(i)};
+    auto hi{vl_port->high_conn()};
     if ( hi == nullptr ) continue;
-    const VlExpr* lo = vl_port->low_conn();
+    auto lo{vl_port->low_conn()};
     switch ( vl_port->direction() ) {
     case VpiDir::Input:
       // hi は右辺式
@@ -558,20 +554,20 @@ ReaderImpl::gen_cellinst(MvnModule* parent_module,
   int no = cell.output_num();
   int nio = cell.inout_num();
 #endif
-  MvnNode* onode = mMvnMgr->new_cell(parent_module, cell_id);
-  const ClibCell& cell = mMvnMgr->library().cell(cell_id);
+  auto onode{mMvnMgr->new_cell(parent_module, cell_id)};
+  const auto& cell{mMvnMgr->library().cell(cell_id)};
   int pos = 0;
   for ( auto& pin: cell.pin_list() ) {
-    const VlPrimTerm* term = prim->prim_term(pos); ++ pos;
-    const VlExpr* expr = term->expr();
+    auto term{prim->prim_term(pos)}; ++ pos;
+    auto expr{term->expr()};
     if ( pin.is_input() ) {
       int input_id = pin.input_id();
-      MvnNode* node = gen_expr(parent_module, expr, mGlobalEnv);
+      auto node = gen_expr(parent_module, expr, mGlobalEnv);
       mMvnMgr->connect(node, 0, onode, input_id);
     }
     else if ( pin.is_output() ) {
       ASSERT_COND( pin.output_id() == 0 );
-      MvnNode* dst_node = gen_primary(expr, mGlobalEnv);
+      auto dst_node = gen_primary(expr, mGlobalEnv);
       connect_lhs(dst_node, expr, onode, prim->file_region());
     }
   }
@@ -603,7 +599,7 @@ ReaderImpl::gen_priminst(MvnModule* parent_module,
   switch ( prim->prim_type() ) {
   case VpiPrimType::Buf:
     {
-      MvnNode* node = mMvnMgr->new_through(parent_module, 1);
+      auto node = mMvnMgr->new_through(parent_module, 1);
       inputs[0] = make_pair(node, 0);
       for ( SizeType i = 0; i < no; ++ i ) {
 	outputs[i] = node;
@@ -613,7 +609,7 @@ ReaderImpl::gen_priminst(MvnModule* parent_module,
 
   case VpiPrimType::Not:
     {
-      MvnNode* node = mMvnMgr->new_not(parent_module, 1);
+      auto node = mMvnMgr->new_not(parent_module, 1);
       inputs[0] = make_pair(node, 0);
       outputs[0] = node;
     }
@@ -621,7 +617,7 @@ ReaderImpl::gen_priminst(MvnModule* parent_module,
 
   case VpiPrimType::And:
     {
-      MvnNode* node = mMvnMgr->new_and(parent_module, ni, 1);
+      auto node = mMvnMgr->new_and(parent_module, ni, 1);
       for ( SizeType i = 0; i < ni; ++ i ) {
 	inputs[i] = make_pair(node, i);
       }
@@ -631,11 +627,11 @@ ReaderImpl::gen_priminst(MvnModule* parent_module,
 
   case VpiPrimType::Nand:
     {
-      MvnNode* node = mMvnMgr->new_and(parent_module, ni, 1);
+      auto node = mMvnMgr->new_and(parent_module, ni, 1);
       for ( SizeType i = 0; i < ni; ++ i ) {
 	inputs[i] = make_pair(node, i);
       }
-      MvnNode* node1 = mMvnMgr->new_not(parent_module, 1);
+      auto node1 = mMvnMgr->new_not(parent_module, 1);
       mMvnMgr->connect(node, 0, node1, 0);
       outputs[0] = node1;
     }
@@ -643,7 +639,7 @@ ReaderImpl::gen_priminst(MvnModule* parent_module,
 
   case VpiPrimType::Or:
     {
-      MvnNode* node = mMvnMgr->new_or(parent_module, ni, 1);
+      auto node = mMvnMgr->new_or(parent_module, ni, 1);
       for ( SizeType i = 0; i < ni; ++ i ) {
 	inputs[i] = make_pair(node, i);
       }
@@ -653,11 +649,11 @@ ReaderImpl::gen_priminst(MvnModule* parent_module,
 
   case VpiPrimType::Nor:
     {
-      MvnNode* node = mMvnMgr->new_or(parent_module, ni, 1);
+      auto node = mMvnMgr->new_or(parent_module, ni, 1);
       for ( SizeType i = 0; i < ni; ++ i ) {
 	inputs[i] = make_pair(node, i);
       }
-      MvnNode* node1 = mMvnMgr->new_not(parent_module, 1);
+      auto node1 = mMvnMgr->new_not(parent_module, 1);
       mMvnMgr->connect(node, 0, node1, 0);
       outputs[0] = node1;
     }
@@ -665,7 +661,7 @@ ReaderImpl::gen_priminst(MvnModule* parent_module,
 
   case VpiPrimType::Xor:
     {
-      MvnNode* node = mMvnMgr->new_xor(parent_module, ni, 1);
+      auto node = mMvnMgr->new_xor(parent_module, ni, 1);
       for ( SizeType i = 0; i < ni; ++ i ) {
 	inputs[i] = make_pair(node, i);
       }
@@ -675,11 +671,11 @@ ReaderImpl::gen_priminst(MvnModule* parent_module,
 
   case VpiPrimType::Xnor:
     {
-      MvnNode* node = mMvnMgr->new_xor(parent_module, ni, 1);
+      auto node = mMvnMgr->new_xor(parent_module, ni, 1);
       for ( SizeType i = 0; i < ni; ++ i ) {
 	inputs[i] = make_pair(node, i);
       }
-      MvnNode* node1 = mMvnMgr->new_not(parent_module, 1);
+      auto node1 = mMvnMgr->new_not(parent_module, 1);
       mMvnMgr->connect(node, 0, node1, 0);
       outputs[0] = node1;
     }
@@ -712,18 +708,18 @@ ReaderImpl::gen_priminst(MvnModule* parent_module,
 
   SizeType pos = 0;
   for ( SizeType i = 0; i < no; ++ i ) {
-    const VlPrimTerm* term = prim->prim_term(pos);
+    auto term{prim->prim_term(pos)};
     ++ pos;
-    const VlExpr* expr = term->expr();
-    MvnNode* dst_node = gen_primary(expr, mGlobalEnv);
+    auto expr{term->expr()};
+    auto dst_node = gen_primary(expr, mGlobalEnv);
     connect_lhs(dst_node, expr, outputs[i], prim->file_region());
   }
   for ( SizeType i = 0; i < ni; ++ i ) {
-    const VlPrimTerm* term = prim->prim_term(pos);
+    auto term{prim->prim_term(pos)};
     ++ pos;
-    const VlExpr* expr = term->expr();
-    MvnNode* node = gen_expr(parent_module, expr, mGlobalEnv);
-    const pair<MvnNode*, int>& p = inputs[i];
+    auto expr{term->expr()};
+    auto node = gen_expr(parent_module, expr, mGlobalEnv);
+    const auto& p = inputs[i];
     mMvnMgr->connect(node, 0, p.first, p.second);
   }
 }
@@ -737,15 +733,15 @@ ReaderImpl::gen_cont_assign(MvnModule* parent_module,
 			    const VlExpr* lhs,
 			    const VlExpr* rhs)
 {
-  MvnNode* rhs_node = gen_rhs(parent_module, lhs, rhs, mGlobalEnv);
+  auto rhs_node = gen_rhs(parent_module, lhs, rhs, mGlobalEnv);
 
   SizeType n = lhs->lhs_elem_num();
   SizeType offset = 0;
   for ( SizeType i = 0; i < n; ++ i ) {
-    const VlExpr* lhs_elem = lhs->lhs_elem(i);
-    MvnNode* dst_node = gen_primary(lhs_elem, mGlobalEnv);
-    SizeType dst_bw = lhs_elem->bit_size();
-    MvnNode* src_node = splice_rhs(parent_module, rhs_node, offset, dst_bw);
+    auto lhs_elem{lhs->lhs_elem(i)};
+    auto dst_node = gen_primary(lhs_elem, mGlobalEnv);
+    SizeType dst_bw{lhs_elem->bit_size()};
+    auto src_node = splice_rhs(parent_module, rhs_node, offset, dst_bw);
     connect_lhs(dst_node, lhs_elem, src_node, rhs->file_region());
     offset += dst_bw;
   }

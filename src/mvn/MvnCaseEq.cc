@@ -18,9 +18,9 @@ BEGIN_NAMESPACE_YM_MVN
 // @param[in] input_num 入力数
 // @param[in] val 値
 MvnCaseEq::MvnCaseEq(MvnModule* module,
-		     const vector<ymuint32>& val) :
-  MvnNodeBase(module, MvnNode::kCaseEq, 2),
-  mVal(val)
+		     const MvnBvConst& val) :
+  MvnNodeBase(module, MvnNodeType::CASEEQ, 2),
+  mXmask{val}
 {
 }
 
@@ -32,10 +32,10 @@ MvnCaseEq::~MvnCaseEq()
 // @brief 定数値を得る．
 // @param[out] val 値を格納するベクタ
 // @note type() が kEqX の時のみ意味を持つ．
-void
-MvnCaseEq::xmask(vector<ymuint32>& val) const
+MvnBvConst
+MvnCaseEq::xmask() const
 {
-  val = mVal;
+  return mXmask;
 }
 
 // @brief eqx ノードを生成する．
@@ -44,18 +44,19 @@ MvnCaseEq::xmask(vector<ymuint32>& val) const
 // @param[in] xmask Xマスク値
 MvnNode*
 MvnMgr::new_caseeq(MvnModule* module,
-		   int bit_width,
-		   const vector<ymuint32>& xmask)
+		   SizeType bit_width,
+		   const MvnBvConst& xmask)
 {
+  ASSERT_COND( xmask.size() == bit_width );
   bool has_x = false;
-  for ( auto mask1: xmask ) {
-    if ( mask1 ) {
+  for ( SizeType i = 0; i < bit_width; ++ i ) {
+    if ( xmask[i] ) {
       has_x = true;
       break;
     }
   }
   if ( has_x ) {
-    MvnNode* node = new MvnCaseEq(module, xmask);
+    auto node = new MvnCaseEq(module, xmask);
     reg_node(node);
 
     node->_input(0)->mBitWidth = bit_width;

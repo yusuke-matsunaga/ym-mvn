@@ -47,6 +47,7 @@ include_directories(
 # サブディレクトリの設定
 # ===================================================================
 
+add_subdirectory ( tests )
 #add_subdirectory ( cython-src )
 
 
@@ -55,6 +56,7 @@ include_directories(
 # ===================================================================
 
 set ( mvn_SOURCES
+  src/mvn/MvnBvConst.cc
   src/mvn/MvnCaseEq.cc
   src/mvn/MvnCellNode.cc
   src/mvn/MvnConst.cc
@@ -80,7 +82,6 @@ set ( verilog_reader_SOURCES
   src/verilog_reader/ReaderImpl_expr.cc
   src/verilog_reader/ReaderImpl_item.cc
   src/verilog_reader/ReaderImpl_stmt.cc
-  src/verilog_reader/Xmask.cc
   )
 
 set ( verilog_writer_SOURCES

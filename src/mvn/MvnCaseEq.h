@@ -10,6 +10,7 @@
 
 
 #include "MvnNodeBase.h"
+#include "ym/MvnBvConst.h"
 
 
 BEGIN_NAMESPACE_YM_MVN
@@ -32,7 +33,7 @@ private:
   /// @param[in] module 親のモジュール
   /// @param[in] val 値
   MvnCaseEq(MvnModule* module,
-	    const vector<ymuint32>& val);
+	    const MvnBvConst& val);
 
   /// @brief デストラクタ
   ~MvnCaseEq();
@@ -47,9 +48,8 @@ public:
   /// @param[out] val 値を格納するベクタ
   /// @note type() が kEqX の時のみ意味を持つ．
   /// @note デフォルトの実装ではなにもしない．
-  virtual
-  void
-  xmask(vector<ymuint32>& val) const;
+  MvnBvConst
+  xmask() const override;
 
 
 private:
@@ -57,8 +57,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // 値
-  vector<ymuint32> mVal;
+  // Xマスク
+  MvnBvConst mXmask;
 
 };
 

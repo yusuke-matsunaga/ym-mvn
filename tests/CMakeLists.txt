@@ -29,11 +29,11 @@ include_directories(
 
 add_executable ( mvn_read_test
   read_test.cc
-  $<TARGET_OBJECTS:ym_mvn_obj_ad>
-  $<TARGET_OBJECTS:ym_verilog_obj_ad>
-  $<TARGET_OBJECTS:ym_cell_obj_ad>
-  $<TARGET_OBJECTS:ym_logic_obj_ad>
-  $<TARGET_OBJECTS:ym_base_obj_ad>
+  $<TARGET_OBJECTS:ym_mvn_obj_d>
+  $<TARGET_OBJECTS:ym_verilog_obj_d>
+  $<TARGET_OBJECTS:ym_cell_obj_d>
+  $<TARGET_OBJECTS:ym_logic_obj_d>
+  $<TARGET_OBJECTS:ym_base_obj_d>
   )
 
 target_compile_options ( mvn_read_test

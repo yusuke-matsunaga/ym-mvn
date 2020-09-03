@@ -3,7 +3,7 @@
 /// @brief ReaderImpl の実装クラス
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010, 2014 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2014, 2020 Yusuke Matsunaga
 /// All rights reserved.
 
 
@@ -11,10 +11,10 @@
 #include "DeclMap.h"
 #include "Env.h"
 #include "EnvMerger.h"
-#include "Xmask.h"
 
 #include "ym/MvnMgr.h"
 #include "ym/MvnNode.h"
+#include "ym/MvnBvConst.h"
 #include "ym/BitVector.h"
 #include "ym/vl/VlDecl.h"
 #include "ym/vl/VlDeclArray.h"
@@ -54,9 +54,9 @@ ReaderImpl::gen_stmt(MvnModule* module,
   case VpiObjType::Begin:
   case VpiObjType::NamedBegin:
     {
-      SizeType n = stmt->child_stmt_num();
+      SizeType n{stmt->child_stmt_num()};
       for ( SizeType i = 0; i < n; ++ i ) {
-	const VlStmt* stmt1 = stmt->child_stmt(i);
+	auto stmt1{stmt->child_stmt(i)};
 	bool stat = gen_stmt(module, stmt1, env, merge);
 	if ( !stat ) {
 	  return false;
@@ -67,8 +67,8 @@ ReaderImpl::gen_stmt(MvnModule* module,
 
   case VpiObjType::If:
     {
-      const VlExpr* cond = stmt->expr();
-      MvnNode* cond_node = gen_expr(module, cond, env);
+      auto cond{stmt->expr()};
+      auto cond_node = gen_expr(module, cond, env);
       ProcEnv then_env(env);
       bool stat = gen_stmt(module, stmt->body_stmt(), then_env, merge);
       if ( !stat ) {
@@ -80,13 +80,15 @@ ReaderImpl::gen_stmt(MvnModule* module,
 
   case VpiObjType::IfElse:
     {
-      const VlExpr* cond = stmt->expr();
-      MvnNode* cond_node = gen_expr(module, cond, env);
+      auto cond{stmt->expr()};
+      auto cond_node = gen_expr(module, cond, env);
+
       ProcEnv then_env(env);
       bool stat1 = gen_stmt(module, stmt->body_stmt(), then_env, merge);
       if ( !stat1 ) {
 	return false;
       }
+
       ProcEnv else_env(env);
       bool stat2 = gen_stmt(module, stmt->else_stmt(), else_env, merge);
       if ( !stat2 ) {
@@ -98,9 +100,9 @@ ReaderImpl::gen_stmt(MvnModule* module,
 
   case VpiObjType::Case:
     {
-      const VlExpr* expr = stmt->expr();
-      Xmask xmask;
-      MvnNode* expr_node = gen_expr(module, expr, stmt->case_type(), env, xmask);
+      auto expr{stmt->expr()};
+      MvnBvConst xmask;
+      auto expr_node = gen_expr(module, expr, stmt->case_type(), env, xmask);
       if ( expr_node == nullptr ) {
 	MsgMgr::put_msg(__FILE__, __LINE__,
 			expr->file_region(),
@@ -142,20 +144,20 @@ bool
 ReaderImpl::gen_caseitem(MvnModule* module,
 			 const VlStmt* stmt,
 			 MvnNode* expr,
-			 const Xmask& xmask,
+			 const MvnBvConst& xmask,
 			 int pos,
 			 ProcEnv& env,
 			 EnvMerger& merge)
 {
-  SizeType n = stmt->caseitem_num();
+  SizeType n{stmt->caseitem_num()};
   if ( pos == n ) {
     return true;
   }
 
   // pos 番めの条件を作る．
-  VpiCaseType case_type = stmt->case_type();
-  const VlCaseItem* caseitem = stmt->caseitem(pos);
-  SizeType ne = caseitem->expr_num();
+  auto case_type{stmt->case_type()};
+  auto caseitem{stmt->caseitem(pos)};
+  SizeType ne{caseitem->expr_num()};
   if ( ne == 0 ) {
     // default caseitem
     ASSERT_COND( pos == n - 1 );
@@ -166,11 +168,11 @@ ReaderImpl::gen_caseitem(MvnModule* module,
   vector<MvnNode*> cond_list;
   cond_list.reserve(ne);
   for ( SizeType i = 0; i < ne; ++ i ) {
-    const VlExpr* label_expr = caseitem->expr(i);
-    SizeType bw = label_expr->bit_size();
-    Xmask label_xmask;
-    MvnNode* label = gen_expr(module, label_expr, case_type,
-			      env, label_xmask);
+    auto label_expr{caseitem->expr(i)};
+    SizeType bw{label_expr->bit_size()};
+    MvnBvConst label_xmask;
+    auto label = gen_expr(module, label_expr, case_type,
+			  env, label_xmask);
     if ( label == nullptr ) {
       ostringstream buf;
       buf << "Expression '" << label_expr->decompile()
@@ -182,15 +184,14 @@ ReaderImpl::gen_caseitem(MvnModule* module,
 		      buf.str());
     }
     else {
-      Xmask xmask1 = xmask | label_xmask;
+      auto xmask1 = xmask | label_xmask;
       MvnNode* cond = nullptr;
-      if ( xmask1.has_x() ) {
-	vector<ymuint32> xmask_vect;
-	xmask1.to_vector(xmask_vect);
-	cond = mMvnMgr->new_caseeq(module, bw, xmask_vect);
+      if ( xmask1.is_all0() ) {
+	cond = mMvnMgr->new_equal(module, bw);
       }
       else {
-	cond = mMvnMgr->new_equal(module, bw);
+	// xマスク付きの等価比較
+	cond = mMvnMgr->new_caseeq(module, bw, xmask1);
       }
       mMvnMgr->connect(expr, 0, cond, 0);
       mMvnMgr->connect(label, 0, cond, 1);
@@ -198,7 +199,7 @@ ReaderImpl::gen_caseitem(MvnModule* module,
     }
   }
 
-  SizeType ni = cond_list.size();
+  SizeType ni{cond_list.size()};
   if ( ni == 0 ) {
     // この caseitem に合致する条件はない．
     gen_caseitem(module, stmt, expr, xmask, pos + 1, env, merge);
@@ -217,10 +218,14 @@ ReaderImpl::gen_caseitem(MvnModule* module,
   }
   ASSERT_COND( all_cond != nullptr );
 
+  // case を if-else の連鎖に置き換える．
+
   ProcEnv then_env(env);
   gen_stmt(module, caseitem->body_stmt(), then_env, merge);
+
   ProcEnv else_env(env);
   gen_caseitem(module, stmt, expr, xmask, pos + 1, else_env, merge);
+
   merge(module, env, all_cond, then_env, else_env);
   return true;
 }
@@ -234,19 +239,19 @@ ReaderImpl::gen_assign(MvnModule* module,
 		       const VlStmt* stmt,
 		       ProcEnv& env)
 {
-  const VlExpr* rhs = stmt->rhs();
-  const VlExpr* lhs = stmt->lhs();
+  auto rhs{stmt->rhs()};
+  auto lhs{stmt->lhs()};
 
-  MvnNode* rhs_node = gen_rhs(module, lhs, rhs, env);
+  auto rhs_node = gen_rhs(module, lhs, rhs, env);
 
-  SizeType n = lhs->lhs_elem_num();
+  SizeType n{lhs->lhs_elem_num()};
   SizeType offset = 0;
   for ( SizeType i = 0; i < n; ++ i ) {
-    const VlExpr* lhs1 = lhs->lhs_elem(i);
-    const VlDecl* lhs_decl = lhs1->decl_obj();
-    const VlDeclArray* lhs_declarray = lhs1->declarray_obj();
-    const VlDeclBase* lhs_declbase = lhs1->decl_base();
-    SizeType bw = lhs_declbase->bit_size();
+    auto lhs1{lhs->lhs_elem(i)};
+    auto lhs_decl{lhs1->decl_obj()};
+    auto lhs_declarray{lhs1->declarray_obj()};
+    auto lhs_declbase{lhs1->decl_base()};
+    SizeType bw{lhs_declbase->bit_size()};
     AssignInfo old_dst;
     SizeType lhs_offset = 0;
     if ( lhs_decl ) {
@@ -269,7 +274,7 @@ ReaderImpl::gen_assign(MvnModule* module,
 
     MvnNode* dst_node = nullptr;
     if ( lhs1->is_primary() ) {
-      MvnNode* src_node = splice_rhs(module, rhs_node, offset, bw);
+      auto src_node{splice_rhs(module, rhs_node, offset, bw)};
       dst_node = mMvnMgr->new_through(module, bw);
       mMvnMgr->connect(src_node, 0, dst_node, 0);
     }
@@ -279,8 +284,8 @@ ReaderImpl::gen_assign(MvnModule* module,
 #else
       if ( lhs1->is_constant_select() ) {
 	// 固定インデックス
-	MvnNode* src_node = splice_rhs(module, rhs_node, offset, 0);
-	int offset;
+	auto src_node = splice_rhs(module, rhs_node, offset, 0);
+	SizeType offset;
 	if ( !lhs_declbase->calc_bit_offset(lhs1->index_val(), offset) ) {
 	  MsgMgr::put_msg(__FILE__, __LINE__,
 			  lhs1->file_region(),
@@ -301,10 +306,10 @@ ReaderImpl::gen_assign(MvnModule* module,
 	dst_node = mMvnMgr->new_concat(module, bw_array);
 	int pos = 0;
 	if ( offset < bw - 1 ) {
-	  MvnNode* tmp_node = mMvnMgr->new_constpartselect(module,
-							   bw - 1,
-							   offset + 1,
-							   bw);
+	  auto tmp_node = mMvnMgr->new_constpartselect(module,
+						       bw - 1,
+						       offset + 1,
+						       bw);
 	  mMvnMgr->connect(old_dst, 0, tmp_node, 0);
 	  mMvnMgr->connect(tmp_node, 0, dst_node, pos);
 	  ++ pos;
@@ -312,10 +317,10 @@ ReaderImpl::gen_assign(MvnModule* module,
 	mMvnMgr->connect(src_node, 0, dst_node, pos);
 	++ pos;
 	if ( offset > 0 ) {
-	  MvnNode* tmp_node = mMvnMgr->new_constpartselect(module,
-							   offset - 1,
-							   0,
-							   bw);
+	  auto tmp_node = mMvnMgr->new_constpartselect(module,
+						       offset - 1,
+						       0,
+						       bw);
 	  mMvnMgr->connect(old_dst, 0, tmp_node, 0);
 	  mMvnMgr->connect(tmp_node, 0, dst_node, pos);
 	}
@@ -330,7 +335,7 @@ ReaderImpl::gen_assign(MvnModule* module,
 #warning "未完"
 #else
       if ( lhs1->is_constant_select() ) {
-	int msb;
+	SizeType msb;
 	if ( !lhs_declbase->calc_bit_offset(lhs1->left_range_val(), msb) ) {
 	  MsgMgr::put_msg(__FILE__, __LINE__,
 			  lhs1->file_region(),
@@ -339,7 +344,8 @@ ReaderImpl::gen_assign(MvnModule* module,
 			  "Left index is out of range");
 	  return;
 	}
-	int lsb;
+
+	SizeType lsb;
 	if ( !lhs_declbase->calc_bit_offset(lhs1->right_range_val(), lsb) ) {
 	  MsgMgr::put_msg(__FILE__, __LINE__,
 			  lhs1->file_region(),
@@ -348,8 +354,10 @@ ReaderImpl::gen_assign(MvnModule* module,
 			  "Right index is out of range");
 	  return;
 	}
-	int lbw = msb - lsb + 1;
-	MvnNode* src_node = splice_rhs(module, rhs_node, offset, lbw);
+
+	SizeType lbw = msb - lsb + 1;
+	auto src_node{splice_rhs(module, rhs_node, offset, lbw)};
+
 	vector<SizeType> bw_array;
 	bw_array.reserve(3);
 	if ( msb < bw - 1 ) {
@@ -362,10 +370,10 @@ ReaderImpl::gen_assign(MvnModule* module,
 	dst_node = mMvnMgr->new_concat(module, bw_array);
 	int pos = 0;
 	if ( msb < bw - 1 ) {
-	  MvnNode* tmp_node = mMvnMgr->new_constpartselect(module,
-							   bw - 1,
-							   msb + 1,
-							   bw);
+	  auto tmp_node = mMvnMgr->new_constpartselect(module,
+						       bw - 1,
+						       msb + 1,
+						       bw);
 	  mMvnMgr->connect(old_dst, 0, tmp_node, 0);
 	  mMvnMgr->connect(tmp_node, 0, dst_node, pos);
 	  ++ pos;
@@ -373,10 +381,10 @@ ReaderImpl::gen_assign(MvnModule* module,
 	mMvnMgr->connect(src_node, 0, dst_node, pos);
 	++ pos;
 	if ( lsb > 0 ) {
-	  MvnNode* tmp_node = mMvnMgr->new_constpartselect(module,
-							   lsb - 1,
-							   0,
-							   bw);
+	  auto tmp_node = mMvnMgr->new_constpartselect(module,
+						       lsb - 1,
+						       0,
+						       bw);
 	  mMvnMgr->connect(old_dst, 0, tmp_node, 0);
 	  mMvnMgr->connect(tmp_node, 0, dst_node, pos);
 	}

@@ -18,28 +18,31 @@ BEGIN_NAMESPACE_YM_MVN
 //////////////////////////////////////////////////////////////////////
 
 // @brief コンストラクタ
-MvnPortRef::MvnPortRef()
+MvnPortRef::MvnPortRef() :
+  mNode{nullptr},
+  mMsb{0UL},
+  mLsb{0UL}
 {
 }
 
 // @brief ノード単体のポート要素用のコンストラクタ
 // @param[in] node ノード
-MvnPortRef::MvnPortRef(const MvnNode* node)
+MvnPortRef::MvnPortRef(const MvnNode* node) :
+  mNode{node},
+  mMsb{0UL},
+  mLsb{0UL}
 {
-  mNode = node;
-  mMsb = 0U;
-  mLsb = 0U;
 }
 
 // @brief ビット指定のポート要素用のコンストラクタ
 // @param[in] node ノード
 // @param[in] bitpos ビット位置
 MvnPortRef::MvnPortRef(const MvnNode* node,
-		       int bitpos)
+		       SizeType bitpos) :
+  mNode{node},
+  mMsb{(bitpos << 1) | 1U},
+  mLsb{0UL}
 {
-  mNode = node;
-  mMsb = (bitpos << 1) | 1U;
-  mLsb = 0U;
 }
 
 // @brief 範囲指定のポート要素用のコンストラクタ
@@ -47,12 +50,12 @@ MvnPortRef::MvnPortRef(const MvnNode* node,
 // @param[in] msb 範囲指定の MSB
 // @param[in] lsb 範囲指定の LSB
 MvnPortRef::MvnPortRef(const MvnNode* node,
-		       int msb,
-		       int lsb)
+		       SizeType msb,
+		       SizeType lsb) :
+  mNode{node},
+  mMsb{(msb << 1)},
+  mLsb{(lsb << 1) | 1U}
 {
-  mNode = node;
-  mMsb = (msb << 1);
-  mLsb = (lsb << 1) | 1U;
 }
 
 // @brief デストラクタ
@@ -61,7 +64,7 @@ MvnPortRef::~MvnPortRef()
 }
 
 // @brief この実体のビット幅を返す．
-int
+SizeType
 MvnPortRef::bit_width() const
 {
   if ( has_bitselect() ) {
@@ -71,14 +74,14 @@ MvnPortRef::bit_width() const
     return msb() - lsb() + 1;
   }
   else {
-    const MvnNode* n = node();
-    if ( n->type() == MvnNode::kInput ) {
+    auto n{node()};
+    if ( n->type() == MvnNodeType::INPUT ) {
       return n->bit_width();
     }
-    else if ( n->type() == MvnNode::kOutput ) {
+    else if ( n->type() == MvnNodeType::OUTPUT ) {
       return n->input(0)->bit_width();
     }
-    else if ( n->type() == MvnNode::kInout ) {
+    else if ( n->type() == MvnNodeType::INOUT ) {
       return n->bit_width();
     }
   }
@@ -98,18 +101,12 @@ MvnPortRef::bit_width() const
 // 名前がない場合(name == nullptr)もありうる．
 // name == "" の場合も考慮する．
 MvnPort::MvnPort(const vector<MvnPortRef>& portref_list,
-		 const char* name)
+		 const string& name) :
+  mName{name},
+  mPortRefNum{portref_list.size()},
+  mPortRefArray{new MvnPortRef[mPortRefNum]}
 {
-  if ( name == nullptr || name[0] == '\0' ) {
-    mName = string();
-  }
-  else {
-    mName = string(name);
-  }
-
-  mPortRefNum = portref_list.size();
-  mPortRefArray = new MvnPortRef[mPortRefNum];
-  for ( int i = 0; i < mPortRefNum; ++ i ) {
+  for ( SizeType i = 0; i < mPortRefNum; ++ i ) {
     mPortRefArray[i] = portref_list[i];
   }
 }
@@ -121,12 +118,12 @@ MvnPort::~MvnPort()
 }
 
 // @brief ビット幅を得る．
-int
+SizeType
 MvnPort::bit_width() const
 {
-  int ans = 0;
-  for ( int i = 0; i < mPortRefNum; ++ i ) {
-    MvnPortRef& pr = mPortRefArray[i];
+  SizeType ans = 0;
+  for ( SizeType i = 0; i < mPortRefNum; ++ i ) {
+    auto& pr{mPortRefArray[i]};
     ans += pr.bit_width();
   }
   return ans;

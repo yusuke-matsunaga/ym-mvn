@@ -24,7 +24,7 @@ BEGIN_NAMESPACE_YM_MVN
 // @param[in] cell_id セル番号
 MvnCellNode::MvnCellNode(MvnModule* module,
 			 int cell_id) :
-  MvnNodeBase(module, MvnNode::kCell, 0),
+  MvnNodeBase(module, MvnNodeType::CELL, 0),
   mCellId(cell_id)
 {
 }
@@ -71,7 +71,7 @@ MvnCellNode::cell_node() const
 MvnExtCellNode::MvnExtCellNode(MvnModule* module,
 			       MvnNode* cell_node,
 			       int opos) :
-  MvnNodeBase(module, MvnNode::kCell, 0),
+  MvnNodeBase(module, MvnNodeType::CELL, 0),
   mCellNode(cell_node),
   mOpos(opos)
 {
