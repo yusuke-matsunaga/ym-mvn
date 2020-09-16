@@ -18,7 +18,7 @@ BEGIN_NAMESPACE_YM_MVN
 // @param[in] val 値
 MvnConst::MvnConst(MvnModule* module,
 		   const MvnBvConst& val) :
-  MvnNodeBase(module, MvnNodeType::CONST, 0),
+  MvnNodeBase(module, MvnNodeType::CONSTVALUE, 0),
   mVal{val}
 {
 }

@@ -126,7 +126,7 @@ enum class MvnNodeType {
   PARTSELECT,
 
   /// @brief constant ( 0入力 )
-  CONST,
+  CONSTVALUE,
 
   /// @brief cell ( n入力 )
   CELL

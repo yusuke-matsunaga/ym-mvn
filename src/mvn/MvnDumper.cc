@@ -124,7 +124,7 @@ dump_node(ostream& s,
     break;
   case MvnNodeType::BITSELECT:  s << "BitSelect"; break;
   case MvnNodeType::PARTSELECT: s << "PartSelect"; break;
-  case MvnNodeType::CONST:
+  case MvnNodeType::CONSTVALUE:
     {
       auto val = node->const_value();
       s << "Const(" << val << ")";

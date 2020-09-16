@@ -593,7 +593,7 @@ VerilogWriterImpl::dump_node(ostream& s,
     }
     break;
 
-  case MvnNodeType::CONST:
+  case MvnNodeType::CONSTVALUE:
     {
       SizeType ni{node->input_num()};
       ASSERT_COND( ni == 0 );
