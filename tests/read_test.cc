@@ -143,7 +143,7 @@ main(int argc,
 #if !defined(YM_DEBUG)
   try {
 #endif
-    MsgHandler* mh = new StreamMsgHandler(&cerr);
+    MsgHandler* mh = new StreamMsgHandler(cerr);
     mh->set_mask(kMsgMaskAll);
     mh->delete_mask(MsgType::Info);
     mh->delete_mask(MsgType::Debug);
