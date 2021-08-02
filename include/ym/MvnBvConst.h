@@ -5,7 +5,7 @@
 /// @brief MvnBvConst のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2020 Yusuke Matsunaga
+/// Copyright (C) 2020, 2021 Yusuke Matsunaga
 /// All rights reserved.
 
 #include "ym/mvn.h"
@@ -16,40 +16,42 @@ BEGIN_NAMESPACE_YM_MVN
 //////////////////////////////////////////////////////////////////////
 /// @class MvnBvConst MvnBvConst.h "MvnBvConst.h"
 /// @brief ビットベクタの定数を表すクラス
+///
+/// 各ビットの値は純粋な bool であり，ドントケア(不定値)はない．
 //////////////////////////////////////////////////////////////////////
 class MvnBvConst
 {
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] size サイズ(ビット長)
   ///
   /// 内容は 0 に初期化される．
-  MvnBvConst(SizeType size = 0);
+  explicit
+  MvnBvConst(
+    SizeType size = 0 ///< [in] サイズ(ビット長)
+  );
 
   /// @brief 文字列からの変換コンストラクタ
-  /// @param[in] str 内容を表す文字列
-  ///
-  /// * str の長さがビット長になる．
-  /// * '0', '1' 以外の文字が含まれていたときの動作は不定
-  MvnBvConst(const char* str);
+  explicit
+  MvnBvConst(
+    const char* str ///< [in] 内容を表す文字列
+                    ///< - この文字列の長さがビット長になる．
+                    ///< - '0', '1' 以外の文字が含まれていたときの動作は不定
+  );
 
   /// @brief 文字列からの変換コンストラクタ
-  /// @param[in] str 内容を表す文字列
-  ///
-  /// * str の長さがビット長になる．
-  /// * '0', '1' 以外の文字が含まれていたときの動作は不定
-  MvnBvConst(const string& str);
+  explicit
+  MvnBvConst(
+    const string& str ///< [in] 内容を表す文字列
+		      ///< - この文字列の長さがビット長になる．
+		      ///< - '0', '1' 以外の文字が含まれていたときの動作は不定
+  )
+  {
+    MvnBvConst(str.c_str());
+  }
 
-  MvnBvConst(const MvnBvConst& src) = default;
-
-  MvnBvConst(MvnBvConst&& src) = default;
-
-  MvnBvConst&
-  operator=(const MvnBvConst& src) = default;
-
-  MvnBvConst&
-  operator=(MvnBvConst&& src) = default;
+  // コピーコンストラクタ，ムーブコンストラクタ
+  // コピー代入，ムーブ代入はデフォルト
 
   /// @brief デストラクタ
   ~MvnBvConst() = default;
@@ -62,52 +64,63 @@ public:
 
   /// @brief サイズを返す．
   SizeType
-  size() const;
+  size() const
+  {
+    return mSize;
+  }
 
   /// @brief 内容が全て0の時 true を返す．
   bool
   is_all0() const;
 
   /// @brief 要素を返す．
-  /// @param[in] pos 位置 ( 0 <= pos < size() )
   bool
-  operator[](int pos) const;
+  operator[](
+    int pos ///< [in] 位置 ( 0 <= pos < size() )
+  ) const
+  {
+    ASSERT_COND( 0 <= pos && pos < size() );
+    SizeType b = block(pos);
+    SizeType s = shift(pos);
+    return static_cast<bool>((mBody[b] >> s) & 1U);
+  }
 
   /// @brief [] の別名
-  /// @param[in] pos 位置 ( 0 <= pos < size() )
   bool
-  val(int pos) const;
+  val(
+    int pos ///< [in] 位置 ( 0 <= pos < size() )
+  ) const
+  {
+    return operator[](pos);
+  }
 
   /// @brief 値をセットする．
-  /// @param[in] pos 位置 ( 0 <= pos < size() )
-  /// @param[in] val 設定する値
   void
-  set_val(int pos,
-	  bool val);
+  set_val(
+    int pos, ///< [in] 位置 ( 0 <= pos < size() )
+    bool val ///< [in] 設定する値
+  )
+  {
+    ASSERT_COND( 0 <= pos && pos < size() );
+    SizeType b = block(pos);
+    SizeType s = shift(pos);
+    ymuint64 mask = (1UL << s);
+    if ( val ) {
+      mBody[b] |= mask;
+    }
+    else {
+      mBody[b] &= ~mask;
+    }
+  }
 
   /// @brief ビット反転演算子
   ///
   /// 自身のビットを反転した値を返す．
   MvnBvConst
-  operator~() const;
-
-  /// @brief ビットワイズAND演算子
-  /// @param[in] right オペランド
-  /// @return 演算結果を返す．
-  MvnBvConst
-  operator&(const MvnBvConst& right) const;
-
-  /// @brief ビットワイズOR算子
-  /// @param[in] right オペランド
-  /// @return 演算結果を返す．
-  MvnBvConst
-  operator|(const MvnBvConst& right) const;
-
-  /// @brief ビットワイズXOR演算子
-  /// @param[in] right オペランド
-  /// @return 演算結果を返す．
-  MvnBvConst
-  operator^(const MvnBvConst& right) const;
+  operator~() const
+  {
+    return MvnBvConst(*this).negate();
+  }
 
   /// @brief 自身の値をビット反転する．
   /// @return 自身への参照を返す．
@@ -115,66 +128,41 @@ public:
   negate();
 
   /// @brief intern bitwise AND
-  /// @param[in] right オペランド
   /// @return 自身への参照を返す．
   MvnBvConst&
-  operator&=(const MvnBvConst& right);
+  operator&=(
+    const MvnBvConst& right ///< [in] オペランド
+  );
 
   /// @brief intern bitwise OR
-  /// @param[in] right オペランド
   /// @return 自身への参照を返す．
   MvnBvConst&
-  operator|=(const MvnBvConst& right);
+  operator|=(
+    const MvnBvConst& right ///< [in] オペランド
+  );
 
   /// @brief intern bitwise XOR
-  /// @param[in] right オペランド
   /// @return 自身への参照を返す．
   MvnBvConst&
-  operator^=(const MvnBvConst& right);
+  operator^=(
+    const MvnBvConst& right ///< [in] オペランド
+  );
 
   /// @brief 等価比較演算子
-  /// @param[in] right オペランド
   /// @return 等しければ true を返す．
   bool
-  operator==(const MvnBvConst& right) const;
-
-  /// @brief 非等価比較演算子
-  /// @param[in] right オペランド
-  /// @return 等しくなければ true を返す．
-  bool
-  operator!=(const MvnBvConst& right) const;
+  operator==(
+    const MvnBvConst& right ///< [in] オペランド
+  ) const;
 
   /// @brief 小なり比較演算子
-  /// @param[in] right オペランド
   /// @return this < right の時に true を返す．
   ///
   /// 符号なし2進数と見なして大小比較を行う．
   bool
-  operator<(const MvnBvConst& right) const;
-
-  /// @brief 大なり比較演算子
-  /// @param[in] right オペランド
-  /// @return this > right の時に true を返す．
-  ///
-  /// 符号なし2進数と見なして大小比較を行う．
-  bool
-  operator>(const MvnBvConst& right) const;
-
-  /// @brief 小なりイコール比較演算子
-  /// @param[in] right オペランド
-  /// @return this <= right の時に true を返す．
-  ///
-  /// 符号なし2進数と見なして大小比較を行う．
-  bool
-  operator<=(const MvnBvConst& right) const;
-
-  /// @brief 大なりイコール比較演算子
-  /// @param[in] right オペランド
-  /// @return this >= right の時に true を返す．
-  ///
-  /// 符号なし2進数と見なして大小比較を行う．
-  bool
-  operator>=(const MvnBvConst& right) const;
+  operator<(
+    const MvnBvConst& right ///< [in] オペランド
+  ) const;
 
   /// @brief 内容を表す文字列を返す．
   /// @return 2進数と見なした時の表現を返す．
@@ -188,16 +176,24 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 位置からブロック番号を得る．
-  /// @param[in] pos 位置
   static
   SizeType
-  block(int pos);
+  block(
+    int pos ///< [in] pos 位置
+  )
+  {
+    return pos / 64;
+  }
 
   /// @brief 位置からシフト量を得る．
-  /// @param[in] pos 位置
   static
   SizeType
-  shift(int pos);
+  shift(
+    int pos ///< [in] 位置
+  )
+  {
+    return pos % 64;
+  }
 
 
 private:
@@ -213,187 +209,113 @@ private:
 
 };
 
+
+/// @relates MvnBvConst
+/// @brief ビットワイズAND演算子
+/// @return 演算結果を返す．
+inline
+MvnBvConst
+operator&(
+  const MvnBvConst& left, ///< [in] 左のオペランド
+  const MvnBvConst& right ///< [in] 右のオペランド
+)
+{
+  return MvnBvConst(left) &= right;
+}
+
+/// @relates MvnBvConst
+/// @brief ビットワイズOR算子
+/// @return 演算結果を返す．
+inline
+MvnBvConst
+operator|(
+  const MvnBvConst& left, ///< [in] 左のオペランド
+  const MvnBvConst& right ///< [in] 右のオペランド
+)
+{
+  return MvnBvConst(left) |= right;
+}
+
+/// @relates MvnBvConst
+/// @brief ビットワイズXOR演算子
+/// @return 演算結果を返す．
+inline
+MvnBvConst
+operator^(
+  const MvnBvConst& left, ///< [in] 左のオペランド
+  const MvnBvConst& right ///< [in] 右のオペランド
+)
+{
+  return MvnBvConst(left) ^= right;
+}
+
+/// @relates MvnBvConst
+/// @brief 非等価比較演算子
+/// @return 等しくなければ true を返す．
+inline
+bool
+operator!=(
+  const MvnBvConst& left, ///< [in] 左のオペランド
+  const MvnBvConst& right ///< [in] 右のオペランド
+)
+{
+  return !left.operator==(right);
+}
+
+/// @relates MvnBvConst
+/// @brief 大なり比較演算子
+/// @return this > right の時に true を返す．
+///
+/// 符号なし2進数と見なして大小比較を行う．
+inline
+bool
+operator>(
+  const MvnBvConst& left, ///< [in] 左のオペランド
+  const MvnBvConst& right ///< [in] 右のオペランド
+)
+{
+  return right.operator<(left);
+}
+
+/// @relates MvnBvConst
+/// @brief 小なりイコール比較演算子
+/// @return this <= right の時に true を返す．
+///
+/// 符号なし2進数と見なして大小比較を行う．
+inline
+bool
+operator<=(
+  const MvnBvConst& left, ///< [in] 左のオペランド
+  const MvnBvConst& right ///< [in] 右のオペランド
+)
+{
+  return !right.operator<(left);
+}
+
+/// @relates MvnBvConst
+/// @brief 大なりイコール比較演算子
+/// @return this >= right の時に true を返す．
+///
+/// 符号なし2進数と見なして大小比較を行う．
+inline
+bool
+operator>=(
+  const MvnBvConst& left, ///< [in] 左のオペランド
+  const MvnBvConst& right ///< [in] 右のオペランド
+)
+{
+  return !left.operator<(right);
+}
+
 /// @relates MvnBvconst
 /// @brief MvnBvConst のストリーム出力
-ostream&
-operator<<(ostream& s,
-	   const MvnBvConst& obj);
-
-
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
-
-// @brief 文字列からの変換コンストラクタ
-// @param[in] str 内容を表す文字列
-//
-// * str の長さがビット長になる．
-// * '0', '1' 以外の文字が含まれていたときの動作は不定
-inline
-MvnBvConst::MvnBvConst(const string& str)
-{
-  MvnBvConst(str.c_str());
-}
-
-// @brief サイズを返す．
-inline
-SizeType
-MvnBvConst::size() const
-{
-  return mSize;
-}
-
-// @brief 要素を返す．
-// @param[in] pos 位置 ( 0 <= pos < size() )
-inline
-bool
-MvnBvConst::operator[](int pos) const
-{
-  ASSERT_COND( 0 <= pos && pos < size() );
-  SizeType b = block(pos);
-  SizeType s = shift(pos);
-  return static_cast<bool>((mBody[b] >> s) & 1U);
-}
-
-// @brief [] の別名
-// @param[in] pos 位置 ( 0 <= pos < size() )
-inline
-bool
-MvnBvConst::val(int pos) const
-{
-  return operator[](pos);
-}
-
-// @brief 値をセットする．
-// @param[in] pos 位置 ( 0 <= pos < size() )
-// @param[in] val 設定する値
-inline
-void
-MvnBvConst::set_val(int pos,
-		    bool val)
-{
-  ASSERT_COND( 0 <= pos && pos < size() );
-  SizeType b = block(pos);
-  SizeType s = shift(pos);
-  ymuint64 mask = (1UL << s);
-  if ( val ) {
-    mBody[b] |= mask;
-  }
-  else {
-    mBody[b] &= ~mask;
-  }
-}
-
-// @brief ビット反転演算子
-//
-// 自身のビットを反転した値を返す．
-inline
-MvnBvConst
-MvnBvConst::operator~() const
-{
-  return MvnBvConst(*this).negate();
-}
-
-// @brief ビットワイズAND演算子
-// @param[in] right オペランド
-// @return 演算結果を返す．
-inline
-MvnBvConst
-MvnBvConst::operator&(const MvnBvConst& right) const
-{
-  return MvnBvConst(*this) &= right;
-}
-
-// @brief ビットワイズOR算子
-// @param[in] right オペランド
-// @return 演算結果を返す．
-inline
-MvnBvConst
-MvnBvConst::operator|(const MvnBvConst& right) const
-{
-  return MvnBvConst(*this) |= right;
-}
-
-// @brief ビットワイズXOR演算子
-// @param[in] right オペランド
-// @return 演算結果を返す．
-inline
-MvnBvConst
-MvnBvConst::operator^(const MvnBvConst& right) const
-{
-  return MvnBvConst(*this) ^= right;
-}
-
-// @brief 非等価比較演算子
-// @param[in] right オペランド
-// @return 等しくなければ true を返す．
-inline
-bool
-MvnBvConst::operator!=(const MvnBvConst& right) const
-{
-  return !operator==(right);
-}
-
-// @brief 大なり比較演算子
-// @param[in] right オペランド
-// @return this > right の時に true を返す．
-//
-// 符号なし2進数と見なして大小比較を行う．
-inline
-bool
-MvnBvConst::operator>(const MvnBvConst& right) const
-{
-  return right.operator<(*this);
-}
-
-// @brief 小なりイコール比較演算子
-// @param[in] right オペランド
-// @return this <= right の時に true を返す．
-//
-// 符号なし2進数と見なして大小比較を行う．
-inline
-bool
-MvnBvConst::operator<=(const MvnBvConst& right) const
-{
-  return !right.operator<(*this);
-}
-
-// @brief 大なりイコール比較演算子
-// @param[in] right オペランド
-// @return this >= right の時に true を返す．
-//
-// 符号なし2進数と見なして大小比較を行う．
-inline
-bool
-MvnBvConst::operator>=(const MvnBvConst& right) const
-{
-  return !operator<(right);
-}
-
-// @brief 位置からブロック番号を得る．
-// @param[in] pos 位置
-inline
-SizeType
-MvnBvConst::block(int pos)
-{
-  return pos / 64;
-}
-
-// @brief 位置からシフト量を得る．
-// @param[in] pos 位置
-inline
-SizeType
-MvnBvConst::shift(int pos)
-{
-  return pos % 64;
-}
-
-// @relates MvnBvconst
-// @brief MvnBvConst のストリーム出力
+/// @return 出力ストリームを返す．
 inline
 ostream&
-operator<<(ostream& s,
-	   const MvnBvConst& obj)
+operator<<(
+  ostream& s,           ///< [in] 出力ストリーム
+  const MvnBvConst& obj ///< [in] ビットベクタ
+)
 {
   s << obj.to_string();
   return s;

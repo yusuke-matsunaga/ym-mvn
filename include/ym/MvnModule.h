@@ -5,9 +5,8 @@
 /// @brief MvnModule のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010, 2014, 2020 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2014, 2020, 2021 Yusuke Matsunaga
 /// All rights reserved.
-
 
 #include "ym/mvn.h"
 
@@ -31,61 +30,109 @@ public:
   /// @{
 
   /// @brief ID番号を得る．
-  int
-  id() const;
+  SizeType
+  id() const
+  {
+    return mId;
+  }
 
   /// @brief 名前を得る．
   string
-  name() const;
+  name() const
+  {
+    return mName;
+  }
 
   /// @brief 親のノードを得る．
-  /// @note トップレベルモジュールの場合には nullptr を返す．
+  ///
+  /// トップレベルモジュールの場合には nullptr を返す．
   MvnNode*
-  parent() const;
+  parent() const
+  {
+    return mParent;
+  }
 
   /// @brief ポート数を得る．
   SizeType
-  port_num() const;
+  port_num() const
+  {
+    return mPortArray.size();
+  }
 
   /// @brief ポートを得る．
-  /// @param[in] pos 位置 ( 0 <= pos < port_num() )
   const MvnPort*
-  port(int pos) const;
+  port(
+    SizeType pos ///< [in] 位置 ( 0 <= pos < port_num() )
+  ) const
+  {
+    ASSERT_COND( 0 <= pos && pos < port_num() );
+    return mPortArray[pos];
+  }
 
   /// @brief 入力ノード数を得る．
   SizeType
-  input_num() const;
+  input_num() const
+  {
+    return mInputArray.size();
+  }
 
   /// @brief 入力ノードを得る．
-  /// @param[in] pos 位置 ( 0 <= pos < input_num() )
   MvnNode*
-  input(int pos) const;
+  input(
+    SizeType pos ///< [in] 位置 ( 0 <= pos < input_num() )
+  ) const
+  {
+    ASSERT_COND( 0 <= pos && pos < input_num() );
+    return mInputArray[pos];
+  }
 
   /// @brief 出力ノード数を得る．
   SizeType
-  output_num() const;
+  output_num() const
+  {
+    return mOutputArray.size();
+  }
 
   /// @brief 出力ノードを得る．
-  /// @param[in] pos 位置 ( 0 <= pos < output_num() )
   MvnNode*
-  output(int pos) const;
+  output(
+    SizeType pos ///< [in] 位置 ( 0 <= pos < output_num() )
+  ) const
+  {
+    ASSERT_COND( 0 <= pos && pos < output_num() );
+    return mOutputArray[pos];
+  }
 
   /// @brief 入出力ノード数を得る．
   SizeType
-  inout_num() const;
+  inout_num() const
+  {
+    return mInoutArray.size();
+  }
 
   /// @brief 入出力ノードを得る．
-  /// @param[in] pos 位置 ( 0 <= pos < inout_num() )
   MvnNode*
-  inout(int pos) const;
+  inout(
+    SizeType pos ///< [in] 位置 ( 0 <= pos < inout_num() )
+  ) const
+  {
+    ASSERT_COND( 0 <= pos && pos < input_num() );
+    return mInoutArray[pos];
+  }
 
   /// @brief 内部ノードの数を得る．
   SizeType
-  node_num() const;
+  node_num() const
+  {
+    return mNodeList.size();
+  }
 
   /// @brief 内部ノードのリストを得る．
   const vector<MvnNode*>&
-  node_list() const;
+  node_list() const
+  {
+    return mNodeList;
+  }
 
   /// @}
 
@@ -96,19 +143,16 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief コンストラクタ
-  /// @param[in] name 名前
-  /// @param[in] np ポート数
-  /// @param[in] ni 入力ノード数
-  /// @param[in] no 出力ノード数
-  /// @param[in] nio 入出力ノード数
-  MvnModule(const string& name,
-	    SizeType np,
-	    SizeType ni,
-	    SizeType no,
-	    SizeType nio);
+  MvnModule(
+    const string& name, ///< [in] 名前
+    SizeType np,        ///< [in] ポート数
+    SizeType ni,        ///< [in] 入力ノード数
+    SizeType no,        ///< [in] 出力ノード数
+    SizeType nio        ///< [in] 入出力ノード数
+  );
 
   /// @brief デストラクタ
-  ~MvnModule();
+  ~MvnModule() = default;
 
 
 private:
@@ -141,120 +185,6 @@ private:
   vector<MvnNode*> mNodeList;
 
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
-
-// @brief ID番号を得る．
-inline
-int
-MvnModule::id() const
-{
-  return mId;
-}
-
-// @brief 名前を得る．
-inline
-string
-MvnModule::name() const
-{
-  return mName;
-}
-
-// @brief 親のノードを得る．
-// @note トップレベルモジュールの場合には nullptr を返す．
-inline
-MvnNode*
-MvnModule::parent() const
-{
-  return mParent;
-}
-
-// @brief ポート数を得る．
-inline
-SizeType
-MvnModule::port_num() const
-{
-  return mPortArray.size();
-}
-
-// @brief ポートを得る．
-// @param[in] pos 位置 ( 0 <= pos < port_num() )
-inline
-const MvnPort*
-MvnModule::port(int pos) const
-{
-  return mPortArray[pos];
-}
-
-// @brief 入力ノード数を得る．
-inline
-SizeType
-MvnModule::input_num() const
-{
-  return mInputArray.size();
-}
-
-// @brief 入力ノードを得る．
-// @param[in] pos 位置 ( 0 <= pos < input_num() )
-inline
-MvnNode*
-MvnModule::input(int pos) const
-{
-  return mInputArray[pos];
-}
-
-// @brief 出力ノード数を得る．
-inline
-SizeType
-MvnModule::output_num() const
-{
-  return mOutputArray.size();
-}
-
-// @brief 出力ノードを得る．
-// @param[in] pos 位置 ( 0 <= pos < output_num() )
-inline
-MvnNode*
-MvnModule::output(int pos) const
-{
-  return mOutputArray[pos];
-}
-
-// @brief 入出力ノード数を得る．
-inline
-SizeType
-MvnModule::inout_num() const
-{
-  return mInoutArray.size();
-}
-
-// @brief 入出力ノードを得る．
-// @param[in] pos 位置 ( 0 <= pos < inout_num() )
-inline
-MvnNode*
-MvnModule::inout(int pos) const
-{
-  return mInoutArray[pos];
-}
-
-// @brief 内部ノードの数を得る．
-inline
-SizeType
-MvnModule::node_num() const
-{
-  return mNodeList.size();
-}
-
-// @brief 内部ノードのリストを得る．
-inline
-const vector<MvnNode*>&
-MvnModule::node_list() const
-{
-  return mNodeList;
-}
 
 END_NAMESPACE_YM_MVN
 

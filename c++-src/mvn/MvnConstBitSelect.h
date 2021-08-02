@@ -1,0 +1,62 @@
+﻿#ifndef MVNCONSTBITSELECT_H
+#define MVNCONSTBITSELECT_H
+
+/// @file MvnConstBitSelect.h
+/// @brief MvnConstBitSelect のヘッダファイル
+/// @author Yusuke Matsunaga (松永 裕介)
+///
+/// Copyright (C) 2005-2011, 2014, 2021 Yusuke Matsunaga
+/// All rights reserved.
+
+#include "MvnNodeBase.h"
+
+
+BEGIN_NAMESPACE_YM_MVN
+
+//////////////////////////////////////////////////////////////////////
+/// @class MvnConstBitSelect MvnConstBitSelect.h "MvnConstBitSelect.h"
+/// @brief 定数ビット指定を表すノード
+//////////////////////////////////////////////////////////////////////
+class MvnConstBitSelect :
+  public MvnNodeBase
+{
+  friend class MvnMgr;
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // コンストラクタ / デストラクタ
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief コンストラクタ
+  MvnConstBitSelect(
+    MvnModule* module, ///< [in] 親のモジュール
+    SizeType bitpos    ///< [in] ビット位置
+  );
+
+  /// @brief デストラクタ
+  ~MvnConstBitSelect();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 情報を参照するための関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief ビット位置を得る．
+  SizeType
+  bitpos() const override;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // ビット位置
+  SizeType mBitPos;
+
+};
+
+END_NAMESPACE_YM_MVN
+
+#endif // MVNCONSTBITSELECT_H

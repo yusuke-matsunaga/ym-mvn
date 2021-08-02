@@ -5,9 +5,8 @@
 /// @brief MvnPort のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2010, 2014, 2016, 2020 Yusuke Matsunaga
+/// Copyright (C) 2005-2010, 2014, 2016, 2020, 2021 Yusuke Matsunaga
 /// All rights reserved.
-
 
 #include "ym/mvn.h"
 
@@ -38,28 +37,40 @@ public:
   /// @brief 空のコンストラクタ
   ///
   /// 内容は不定
-  MvnPortRef();
+  MvnPortRef() = default;
 
   /// @brief ノード単体のポート要素用のコンストラクタ
-  /// @param[in] node ノード
-  MvnPortRef(const MvnNode* node);
+  MvnPortRef(
+    const MvnNode* node ///< [in] ノード
+  ) : mNode{node},
+      mMsb{0UL},
+      mLsb{0UL}
+  {
+  }
 
   /// @brief ビット指定のポート要素用のコンストラクタ
-  /// @param[in] node ノード
-  /// @param[in] bitpos ビット位置
-  MvnPortRef(const MvnNode* node,
-	     SizeType bitpos);
+  MvnPortRef(
+    const MvnNode* node, ///< [in] ノード
+    SizeType bitpos      ///< [in] ビット位置
+  ) : mNode{node},
+      mMsb{(bitpos << 1) | 1U},
+      mLsb{0UL}
+  {
+  }
 
   /// @brief 範囲指定のポート要素用のコンストラクタ
-  /// @param[in] node ノード
-  /// @param[in] msb 範囲指定の MSB
-  /// @param[in] lsb 範囲指定の LSB
-  MvnPortRef(const MvnNode* node,
-	     SizeType msb,
-	     SizeType lsb);
+  MvnPortRef(
+    const MvnNode* node, ///< [in] ノード
+    SizeType msb,        ///< [in] 範囲指定の MSB
+    SizeType lsb         ///< [in] 範囲指定の LSB
+  ) : mNode{node},
+      mMsb{(msb << 1)},
+      mLsb{(lsb << 1) | 1U}
+  {
+  }
 
   /// @brief デストラクタ
-  ~MvnPortRef();
+  ~MvnPortRef() = default;
 
 
 public:
@@ -70,20 +81,32 @@ public:
   /// @brief ノードを返す．
   /// @note ノードのタイプは kInput か kOutput
   const MvnNode*
-  node() const;
+  node() const
+  {
+    return mNode;
+  }
 
   /// @brief 単純な形式の場合 true を返す．
   bool
-  is_simple() const;
+  is_simple() const
+  {
+    return mMsb == 0U && mLsb == 0U;
+  }
 
   /// @brief ビット指定ありの場合 true を返す．
   bool
-  has_bitselect() const;
+  has_bitselect() const
+  {
+    return static_cast<bool>(mMsb & 1U);
+  }
 
   /// @brief 範囲指定ありの場合 true を返す．
   /// @note ビット指定は含まない．
   bool
-  has_partselect() const;
+  has_partselect() const
+  {
+    return static_cast<bool>(mLsb & 1U);
+  }
 
   /// @brief この実体のビット幅を返す．
   SizeType
@@ -92,17 +115,27 @@ public:
   /// @brief ビット指定位置を返す．
   /// @note has_bitselect() == true の時のみ意味を持つ．
   SizeType
-  bitpos() const;
+  bitpos() const
+  {
+    // 実は msb() のエイリアス
+    return msb();
+  }
 
   /// @brief 範囲指定の MSB を返す．
   /// @note has_partselect() == true の時のみ意味を持つ．
   SizeType
-  msb() const;
+  msb() const
+  {
+    return mMsb >> 1;
+  }
 
   /// @brief 範囲指定の LSB を返す．
   /// @note has_partselect() == true の時のみ意味を持つ．
   SizeType
-  lsb() const;
+  lsb() const
+  {
+    return mLsb >> 1;
+  }
 
   /// @}
 
@@ -113,15 +146,15 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // ノード
-  const MvnNode* mNode;
+  const MvnNode* mNode{nullptr};
 
   // 範囲指定の MSB
   // ただし下位1ビットは範囲指定/ビット指定ありのフラグ
-  SizeType mMsb;
+  SizeType mMsb{0};
 
   // 範囲指定の LSB
   // ただし下位1ビットは範囲指定ありのフラグ
-  SizeType mLsb;
+  SizeType mLsb{0};
 
 };
 
@@ -143,13 +176,14 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief コンストラクタ
-  /// @param[in] portref_list ポート参照式のリスト
-  /// @param[in] name 名前
   ///
   /// 名前がない場合(name == nullptr)もありうる．
   /// name == "" の場合も考慮する．
-  MvnPort(const vector<MvnPortRef>& portref_list = vector<MvnPortRef>(),
-	  const string& name = string());
+  MvnPort(
+    const vector<MvnPortRef>& portref_list ///< [in] ポート参照式のリスト
+    = vector<MvnPortRef>{},
+    const string& name = string()          ///< [in] 名前
+  );
 
   /// @brief デストラクタ
   ~MvnPort();
@@ -163,7 +197,10 @@ public:
   /// @brief 名前を得る．
   /// @note 空("")の場合もある．
   string
-  name() const;
+  name() const
+  {
+    return mName;
+  }
 
   /// @brief ビット幅を得る．
   SizeType
@@ -171,12 +208,21 @@ public:
 
   /// @brief port_ref 数を得る．
   SizeType
-  port_ref_num() const;
+  port_ref_num() const
+  {
+    return mPortRefNum;
+  }
 
   /// @brief port_ref を得る．
-  /// @param[in] pos 位置 ( 0 <= pos < port_ref_num() )
   const MvnPortRef&
-  port_ref(int pos) const;
+  port_ref(
+    SizeType pos ///< [in] 位置 ( 0 <= pos < port_ref_num() )
+  ) const
+  {
+    ASSERT_COND( 0 <= pos && pos < port_ref_num() );
+
+    return mPortRefArray[pos];
+  }
 
   /// @}
 
@@ -196,101 +242,6 @@ private:
   MvnPortRef* mPortRefArray;
 
 };
-
-
-//////////////////////////////////////////////////////////////////////
-// インライン関数の定義
-//////////////////////////////////////////////////////////////////////
-
-// @brief ノードを返す．
-// @note ノードのタイプは INPUT, OUTPUT, INOUT のいずれか．
-inline
-const MvnNode*
-MvnPortRef::node() const
-{
-  return mNode;
-}
-
-// @brief 単純な形式の場合 true を返す．
-inline
-bool
-MvnPortRef::is_simple() const
-{
-  return mMsb == 0U && mLsb == 0U;
-}
-
-// @brief ビット指定ありの場合 true を返す．
-inline
-bool
-MvnPortRef::has_bitselect() const
-{
-  return static_cast<bool>(mMsb & 1U);
-}
-
-// @brief 範囲指定ありの場合 true を返す．
-// @note ビット指定は含まない．
-inline
-bool
-MvnPortRef::has_partselect() const
-{
-  return static_cast<bool>(mLsb & 1U);
-}
-
-// @brief ビット指定位置を返す．
-// @note has_bitselect() == true の時のみ意味を持つ．
-inline
-SizeType
-MvnPortRef::bitpos() const
-{
-  // 実は msb() のエイリアス
-  return msb();
-}
-
-// @brief 範囲指定の MSB を返す．
-// @note has_partselect() == true の時のみ意味を持つ．
-inline
-SizeType
-MvnPortRef::msb() const
-{
-  return mMsb >> 1;
-}
-
-// @brief 範囲指定の LSB を返す．
-// @note has_partselect() == true の時のみ意味を持つ．
-inline
-SizeType
-MvnPortRef::lsb() const
-{
-  return mLsb >> 1;
-}
-
-// @brief 名前を得る．
-// @note 空(nullptr)の場合もある．
-inline
-string
-MvnPort::name() const
-{
-  return mName;
-}
-
-// @brief port_ref 数を得る．
-inline
-SizeType
-MvnPort::port_ref_num() const
-{
-  return mPortRefNum;
-}
-
-// @brief port_ref を得る．
-// @param[in] pos 位置 ( 0 <= pos < port_ref_num() )
-inline
-const MvnPortRef&
-MvnPort::port_ref(int pos) const
-{
-  ASSERT_COND( 0 <= pos && pos < port_ref_num() );
-
-  return mPortRefArray[pos];
-}
 
 END_NAMESPACE_YM_MVN
 

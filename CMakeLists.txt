@@ -56,37 +56,35 @@ add_subdirectory ( tests )
 # ===================================================================
 
 set ( mvn_SOURCES
-  src/mvn/MvnBvConst.cc
-  src/mvn/MvnCaseEq.cc
-  src/mvn/MvnCellNode.cc
-  src/mvn/MvnConst.cc
-  src/mvn/MvnConstBitSelect.cc
-  src/mvn/MvnConstPartSelect.cc
-  src/mvn/MvnDff.cc
-  src/mvn/MvnDumper.cc
-  src/mvn/MvnMgr.cc
-  src/mvn/MvnModule.cc
-  src/mvn/MvnNode.cc
-  src/mvn/MvnNodeBase.cc
-  src/mvn/MvnPort.cc
+  c++-src/mvn/MvnBvConst.cc
+  c++-src/mvn/MvnCaseEq.cc
+  c++-src/mvn/MvnCellNode.cc
+  c++-src/mvn/MvnConst.cc
+  c++-src/mvn/MvnConstBitSelect.cc
+  c++-src/mvn/MvnConstPartSelect.cc
+  c++-src/mvn/MvnDff.cc
+  c++-src/mvn/MvnDumper.cc
+  c++-src/mvn/MvnMgr.cc
+  c++-src/mvn/MvnNodeBase.cc
+  c++-src/mvn/MvnPort.cc
   )
 
 set ( verilog_reader_SOURCES
-  src/verilog_reader/DeclHash.cc
-  src/verilog_reader/DeclMap.cc
-  src/verilog_reader/Env.cc
-  src/verilog_reader/EnvMerger.cc
-  src/verilog_reader/MvnVerilogReader.cc
-  src/verilog_reader/MvnVlMap.cc
-  src/verilog_reader/ReaderImpl.cc
-  src/verilog_reader/ReaderImpl_expr.cc
-  src/verilog_reader/ReaderImpl_item.cc
-  src/verilog_reader/ReaderImpl_stmt.cc
+  c++-src/verilog_reader/DeclHash.cc
+  c++-src/verilog_reader/DeclMap.cc
+  c++-src/verilog_reader/Env.cc
+  c++-src/verilog_reader/EnvMerger.cc
+  c++-src/verilog_reader/MvnVerilogReader.cc
+  c++-src/verilog_reader/MvnVlMap.cc
+  c++-src/verilog_reader/ReaderImpl.cc
+  c++-src/verilog_reader/ReaderImpl_expr.cc
+  c++-src/verilog_reader/ReaderImpl_item.cc
+  c++-src/verilog_reader/ReaderImpl_stmt.cc
   )
 
 set ( verilog_writer_SOURCES
-  src/verilog_writer/MvnVerilogWriter.cc
-  src/verilog_writer/VerilogWriterImpl.cc
+  c++-src/verilog_writer/MvnVerilogWriter.cc
+  c++-src/verilog_writer/VerilogWriterImpl.cc
   )
 
 

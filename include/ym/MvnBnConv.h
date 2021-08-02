@@ -5,9 +5,8 @@
 /// @brief MvnBnConv のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2016 Yusuke Matsunaga
+/// Copyright (C) 2016, 2021 Yusuke Matsunaga
 /// All rights reserved.
-
 
 #include "ym/mvn.h"
 #include "ym/ym_bnet.h"
@@ -19,7 +18,7 @@ class MvnConv;
 
 //////////////////////////////////////////////////////////////////////
 /// @class MvnBdnConv MvnBdnConv.h "MvnBdnConv.h"
-/// @brief Mvn から BdnMgr に変換するクラス
+/// @brief Mvn から BnNetwork に変換するクラス
 //////////////////////////////////////////////////////////////////////
 class MvnBnConv
 {
@@ -38,13 +37,12 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief MvnMgr の内容を BnNetwork に変換する．
-  /// @param[in] mvmgr 対象の MvNetwork
-  /// @param[out] bnetwork 変換先の BnNetwork
-  /// @param[out] mvnode_map 対応関係を格納するオブジェクト
   void
-  operator()(const MvnMgr& mvmgr,
-	     BnNetwork& bnetwork,
-	     MvnBnMap& mvnode_map);
+  operator()(
+    const MvnMgr& mvmgr, ///< [in] 対象の MvNetwork
+    BnNetwork& bnetwork, ///< [out] 変換先の BnNetwork
+    MvnBnMap& mvnode_map ///< [out] 対応関係を格納するオブジェクト
+  );
 
 
 private:
@@ -53,7 +51,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // MvNode の変換関数のリスト
-  vector<MvnConv*> mConvList;
+  vector<unique_ptr<MvnConv>> mConvList;
 
 };
 

@@ -5,9 +5,8 @@
 /// @brief MvnDumper のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2014 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2014, 2021 Yusuke Matsunaga
 /// All rights reserved.
-
 
 #include "ym/mvn.h"
 
@@ -35,11 +34,11 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 内容を Verilog-HDL 形式で出力する
-  /// @param[in] s 出力先のストリーム
-  /// @param[in] mgr MvnMgr
   void
-  operator()(ostream& s,
-	     const MvnMgr& mgr);
+  operator()(
+    ostream& s,       ///< [in] 出力先のストリーム
+    const MvnMgr& mgr ///< [in] Mvn ネットワーク
+  );
 
 };
 

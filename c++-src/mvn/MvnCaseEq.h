@@ -1,0 +1,65 @@
+﻿#ifndef MVNCASEEQ_H
+#define MVNCASEEQ_H
+
+/// @file MvnCaseEq.h
+/// @brief MvnCaseEq のヘッダファイル
+/// @author Yusuke Matsunaga (松永 裕介)
+///
+/// Copyright (C) 2005-2010, 2014, 2021 Yusuke Matsunaga
+/// All rights reserved.
+
+#include "MvnNodeBase.h"
+#include "ym/MvnBvConst.h"
+
+
+BEGIN_NAMESPACE_YM_MVN
+
+//////////////////////////////////////////////////////////////////////
+/// @class MvnCaseEq MvnCaseEq.h "MvnCaseEq.h"
+/// @brief Xマスク付きの等価比較ノードを表すクラス
+//////////////////////////////////////////////////////////////////////
+class MvnCaseEq :
+  public MvnNodeBase
+{
+  friend class MvnMgr;
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // コンストラクタ / デストラクタ
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief コンストラクタ
+  MvnCaseEq(
+    MvnModule* module,      ///< [in] 親のモジュール
+    const MvnBvConst& x_val ///< [in] Xマスクの値
+  );
+
+  /// @brief デストラクタ
+  ~MvnCaseEq();
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 情報を参照するための関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief Xマスクを得る．
+  ///
+  /// type() が kEqX の時のみ意味を持つ．
+  MvnBvConst
+  xmask() const override;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // Xマスク
+  MvnBvConst mXmask;
+
+};
+
+END_NAMESPACE_YM_MVN
+
+#endif // MVNEQX_H

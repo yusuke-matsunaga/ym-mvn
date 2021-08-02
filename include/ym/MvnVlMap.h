@@ -5,9 +5,8 @@
 /// @brief MvnVlMap のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2005-2011, 2014, 2016, 2019 Yusuke Matsunaga
+/// Copyright (C) 2005-2011, 2014, 2016, 2019, 2021 Yusuke Matsunaga
 /// All rights reserved.
-
 
 #include "ym/mvn.h"
 #include "ym/vl/VlFwd.h"
@@ -29,11 +28,15 @@ public:
   MvnVlMap();
 
   /// @brief コピーコンストラクタ
-  MvnVlMap(const MvnVlMap& src);
+  MvnVlMap(
+    const MvnVlMap& src ///< [in] コピー元のオブジェクト
+  );
 
   /// @brief 代入演算子
-  const MvnVlMap&
-  operator=(const MvnVlMap& src);
+  MvnVlMap&
+  operator=(
+    const MvnVlMap& src ///< [in] コピー元のオブジェクト
+  );
 
   /// @brief デストラクタ
   ~MvnVlMap();
@@ -49,25 +52,26 @@ public:
   clear();
 
   /// @brief 単一の宣言要素を登録する．
-  /// @param[in] id MvNode の ID番号
-  /// @param[in] decl 宣言要素
   void
-  reg_node(int id,
-	   const VlDecl* decl);
+  reg_node(
+    SizeType id,       ///< [in] MvNode の ID番号
+    const VlDecl* decl ///< [in] 宣言要素
+  );
 
   /// @brief 配列の宣言要素を登録する．
-  /// @param[in] id MvNode の ID番号
-  /// @param[in] declarray 配列宣言要素
-  /// @param[in] offset オフセット
   void
-  reg_node(int id,
-	   const VlDeclArray* declarray,
-	   SizeType offset);
+  reg_node(
+    SizeType id,                  ///< [in] MvNode の ID番号
+    const VlDeclArray* declarray, ///< [in] 配列宣言要素
+    SizeType offset               ///< [in] オフセット
+  );
 
-  /// @brief src_id の内容を dst_id にコピーする．
+  /// @brief src_id の内容を dst_id にムーブする．
   void
-  copy(int src_id,
-       int dst_id);
+  move(
+    SizeType src_id, ///< [in] 元のID
+    SizeType dst_id  ///< [in] 移動先のID
+  );
 
 
 public:
@@ -76,32 +80,40 @@ public:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief id に対応する宣言要素が単一要素の時に true を返す．
-  /// @param[in] id MvNode の ID番号
   bool
-  is_single_elem(int id) const;
+  is_single_elem(
+    SizeType id ///< [in] MvNode の ID番号
+  ) const;
 
   /// @brief id に対応する宣言要素が配列要素の時に true を返す．
-  /// @param[in] id MvNode の ID番号
   bool
-  is_array_elem(int id) const;
+  is_array_elem(
+    SizeType id ///< [in] MvNode の ID番号
+  ) const;
 
   /// @brief id に対応する宣言要素を返す．(単一要素版)
-  /// @param[in] id MvNode の ID番号
-  /// @note is_single_elem(id) == false の時は nullptr が返される．
+  ///
+  /// is_single_elem(id) == false の時は nullptr が返される．
   const VlDecl*
-  get_single_elem(int id) const;
+  get_single_elem(
+    SizeType id ///< [in] MvNode の ID番号
+  ) const;
 
   /// @brief id に対応する宣言要素を返す．(配列要素版)
-  /// @param[in] id MvNode の ID番号
-  /// @note is_array_elem(id) == false の時は nullptr が返される．
+  ///
+  /// is_array_elem(id) == false の時は nullptr が返される．
   const VlDeclArray*
-  get_array_elem(int id) const;
+  get_array_elem(
+    SizeType id ///< [in] MvNode の ID番号
+  ) const;
 
   /// @brief id に対応する宣言要素のオフセットを返す．(配列要素版)
-  /// @param[in] id MvNode の ID番号
-  /// @note is_array_elem(id) == false の時は 0 が返される．
+  ///
+  /// is_array_elem(id) == false の時は 0 が返される．
   SizeType
-  get_array_offset(int id) const;
+  get_array_offset(
+    SizeType id ///< [in] MvNode の ID番号
+  ) const;
 
 
 private:
@@ -110,17 +122,19 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   /// @brief 要素を設定する．
-  /// @param[in] id ID番号
-  /// @param[in] elem 設定する要素
   void
-  put(int id,
-      MapRec* elem);
+  put(
+    SizeType id,              ///< [in] ID番号
+    unique_ptr<MapRec>&& elem ///< [in] 設定する要素
+  );
 
   /// @brief 要素を取り出す．
-  /// @param[in] id ID番号
-  /// @note id が範囲外の時は nullptr が返される．
+  ///
+  /// id が範囲外の時は nullptr が返される．
   MapRec*
-  get(int id) const;
+  get(
+    SizeType id ///< [in] ID番号
+  ) const;
 
 
 private:
@@ -129,7 +143,7 @@ private:
   //////////////////////////////////////////////////////////////////////
 
   // MvNode の ID 番号をキーとして VlDecl/VlDeclArray を保持する配列
-  vector<MapRec*> mArray;
+  vector<unique_ptr<MapRec>> mArray;
 
 };
 

@@ -1,0 +1,448 @@
+﻿#ifndef NODEDUMPER_H
+#define NODEDUMPER_H
+
+/// @file NodeDumper.h
+/// @brief NodeDumper のヘッダファイル
+/// @author Yusuke Matsunaga (松永 裕介)
+///
+/// Copyright (C) 2005-2011, 2014, 2021 Yusuke Matsunaga
+/// All rights reserved.
+
+#include "ym/mvn.h"
+
+BEGIN_NAMESPACE_YM_MVN
+
+//////////////////////////////////////////////////////////////////////
+/// @class NodeDumper NodeDumper.h
+/// @brief MvnNode の内容を Verilog-HDL の形式で出力するためのクラス
+//////////////////////////////////////////////////////////////////////
+class NodeDumper
+{
+public:
+
+  /// @brief デストラクタ
+  virtual
+  ~NodeDumper() = default;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // 継承クラスが実装する仮想関数
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief ノードの内容を出力する．
+  virtual
+  void
+  operator()(
+    ostream& s,         ///< [in] 出力先のストリーム
+    const MvnNode* node ///< [in] 対象のノード
+  ) = 0;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class UnaryOpDumper NodeDumper.h
+/// @brief 単項演算子用のクラス
+//////////////////////////////////////////////////////////////////////
+class UnaryOpDumper :
+  public NodeDumper
+{
+public:
+
+  /// @brief コンストラクタ
+  UnaryOpDumper(
+    const char* opr_str ///< [in] 演算子を表す文字列
+  ) : mOprStr(opr_str)
+  {
+  }
+
+  /// @brief デストラクタ
+  ~UnaryOpDumper() = default;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // NodeDumper の継承クラス
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief ノードの内容を出力する．
+  void
+  operator()(
+    ostream& s,         ///< [in] 出力先のストリーム
+    const MvnNode* node ///< [in] 対象のノード
+  ) override;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 演算子を表す文字列
+  const char* mOprStr;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class BinaryOpDumper NodeDumper.h
+/// @brief 二項演算子用のクラス
+//////////////////////////////////////////////////////////////////////
+class BinaryOpDumper :
+  public NodeDumper
+{
+public:
+
+  /// @brief コンストラクタ
+  BinaryOpDumper(
+    const char* opr_str,    ///< [in] 演算子を表す文字列
+    bool need_paren = false ///< [in] 括弧をつける時に true にするフラグ
+  ) : mOprStr(opr_str),
+      mNeedParen(need_paren)
+  {
+  }
+
+  /// @brief デストラクタ
+  ~BinaryOpDumper() = default;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // NodeDumper の継承クラス
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief ノードの内容を出力する．
+  void
+  operator()(
+    ostream& s,         ///< [in] 出力先のストリーム
+    const MvnNode* node	///< [in] 対象のノード
+  ) override;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 演算子を表す文字列
+  const char* mOprStr;
+
+  // 括弧を制御するフラグ
+  bool mNeedParen;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class TernaryOpDumper NodeDumper.h
+/// @brief さん項演算子用のクラス
+//////////////////////////////////////////////////////////////////////
+class TernaryOpDumper :
+  public NodeDumper
+{
+public:
+
+  /// @brief コンストラクタ
+  TernaryOpDumper(
+    const char* opr_str1, ///< [in] 演算子を表す文字列1
+    const char* opr_str2  ///< [in] 演算子を表す文字列2
+  ) : mOprStr1(opr_str1),
+      mOprStr2(opr_str2)
+  {
+  }
+
+  /// @brief デストラクタ
+  ~TernaryOpDumper() = default;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // NodeDumper の継承クラス
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief ノードの内容を出力する．
+  void
+  operator()(
+    ostream& s,         ///< [in] 出力先のストリーム
+    const MvnNode* node	///< [in] 対象のノード
+  ) override;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 演算子を表す文字列その1
+  const char* mOprStr1;
+
+  // 演算子を表す文字列その2
+  const char* mOprStr2;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class NaryOpDumper NodeDumper.h
+/// @brief 多項演算子用のクラス
+//////////////////////////////////////////////////////////////////////
+class NaryOpDumper :
+  public NodeDumper
+{
+public:
+
+  /// @brief コンストラクタ
+  NaryOpDumper(
+    const char* opr_str ///< [in] 演算子を表す文字列
+  ) : mOprStr(opr_str)
+  {
+  }
+
+  /// @brief デストラクタ
+  ~NaryOpDumper() = default;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // NodeDumper の継承クラス
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief ノードの内容を出力する．
+  void
+  operator()(
+    ostream& s,         ///< [in] 出力先のストリーム
+    const MvnNode* node	///< [in] 対象のノード
+  ) override;
+
+
+private:
+  //////////////////////////////////////////////////////////////////////
+  // データメンバ
+  //////////////////////////////////////////////////////////////////////
+
+  // 演算子を表す文字列
+  const char* mOprStr;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class ConcatDumper NodeDumper.h
+/// @brief 連結演算子用のクラス
+//////////////////////////////////////////////////////////////////////
+class ConcatDumper :
+  public NodeDumper
+{
+public:
+
+  /// @brief コンストラクタ
+  ConcatDumper() = default;
+
+  /// @brief デストラクタ
+  ~ConcatDumper() = default;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // NodeDumper の継承クラス
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief ノードの内容を出力する．
+  void
+  operator()(
+    ostream& s,         ///< [in] 出力先のストリーム
+    const MvnNode* node	///< [in] 対象のノード
+  ) override;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class CaseEqDumper NodeDumper.h
+/// @brief CaseEq演算子用のクラス
+//////////////////////////////////////////////////////////////////////
+class CaseEqDumper :
+  public NodeDumper
+{
+public:
+
+  /// @brief コンストラクタ
+  CaseEqDumper() = default;
+
+  /// @brief デストラクタ
+  ~CaseEqDumper() = default;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // NodeDumper の継承クラス
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief ノードの内容を出力する．
+  void
+  operator()(
+    ostream& s,         ///< [in] 出力先のストリーム
+    const MvnNode* node	///< [in] 対象のノード
+  ) override;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class ConstBitSelectDumper NodeDumper.h
+/// @brief ConstBitSelect演算子用のクラス
+//////////////////////////////////////////////////////////////////////
+class ConstBitSelectDumper :
+  public NodeDumper
+{
+public:
+
+  /// @brief コンストラクタ
+  ConstBitSelectDumper() = default;
+
+  /// @brief デストラクタ
+  ~ConstBitSelectDumper() = default;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // NodeDumper の継承クラス
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief ノードの内容を出力する．
+  void
+  operator()(
+    ostream& s,         ///< [in] 出力先のストリーム
+    const MvnNode* node	///< [in] 対象のノード
+  ) override;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class ConstPartSelectDumper NodeDumper.h
+/// @brief ConstPartSelect演算子用のクラス
+//////////////////////////////////////////////////////////////////////
+class ConstPartSelectDumper :
+  public NodeDumper
+{
+public:
+
+  /// @brief コンストラクタ
+  ConstPartSelectDumper() = default;
+
+  /// @brief デストラクタ
+  ~ConstPartSelectDumper() = default;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // NodeDumper の継承クラス
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief ノードの内容を出力する．
+  void
+  operator()(
+    ostream& s,         ///< [in] 出力先のストリーム
+    const MvnNode* node	///< [in] 対象のノード
+  ) override;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class BitSelectDumper NodeDumper.h
+/// @brief BitSelect演算子用のクラス
+//////////////////////////////////////////////////////////////////////
+class BitSelectDumper :
+  public NodeDumper
+{
+public:
+
+  /// @brief コンストラクタ
+  BitSelectDumper() = default;
+
+  /// @brief デストラクタ
+  ~BitSelectDumper() = default;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // NodeDumper の継承クラス
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief ノードの内容を出力する．
+  void
+  operator()(
+    ostream& s,         ///< [in] 出力先のストリーム
+    const MvnNode* node	///< [in] 対象のノード
+  ) override;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class PartSelectDumper NodeDumper.h
+/// @brief PartSelect演算子用のクラス
+//////////////////////////////////////////////////////////////////////
+class PartSelectDumper :
+  public NodeDumper
+{
+public:
+
+  /// @brief コンストラクタ
+  PartSelectDumper() = default;
+
+  /// @brief デストラクタ
+  ~PartSelectDumper() = default;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // NodeDumper の継承クラス
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief ノードの内容を出力する．
+  void
+  operator()(
+    ostream& s,         ///< [in] 出力先のストリーム
+    const MvnNode* node	///< [in] 対象のノード
+  ) override;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////
+/// @class ConstDumper NodeDumper.h
+/// @brief Const演算子用のクラス
+//////////////////////////////////////////////////////////////////////
+class ConstDumper :
+  public NodeDumper
+{
+public:
+
+  /// @brief コンストラクタ
+  ConstDumper() = default;
+
+  /// @brief デストラクタ
+  ~ConstDumper() = default;
+
+
+public:
+  //////////////////////////////////////////////////////////////////////
+  // NodeDumper の継承クラス
+  //////////////////////////////////////////////////////////////////////
+
+  /// @brief ノードの内容を出力する．
+  void
+  operator()(
+    ostream& s,         ///< [in] 出力先のストリーム
+    const MvnNode* node	///< [in] 対象のノード
+  ) override;
+
+};
+
+END_NAMESPACE_YM_MVN
+
+#endif // NODEDUMPER_H

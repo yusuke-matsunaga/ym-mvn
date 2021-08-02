@@ -5,9 +5,8 @@
 /// @brief MvnBnMap のヘッダファイル
 /// @author Yusuke Matsunaga (松永 裕介)
 ///
-/// Copyright (C) 2016 Yusuke Matsunaga
+/// Copyright (C) 2016, 2021 Yusuke Matsunaga
 /// All rights reserved.
-
 
 #include "ym/mvn.h"
 #include "ym/ym_bnet.h"
@@ -24,8 +23,9 @@ class MvnBnMap
 public:
 
   /// @brief コンストラクタ
-  /// @param[in] n MvnNode の ID の最大値
-  MvnBnMap(ymuint n);
+  MvnBnMap(
+    int n ///< [in] MvnNode の ID の最大値
+  );
 
   /// @brief デストラクタ
   ~MvnBnMap();
@@ -34,34 +34,34 @@ public:
 public:
 
   /// @brief 登録する．(1ビット版)
-  /// @param[in] mvnode MvnNode
-  /// @param[in] handle BnNodeHandle
   void
-  put(const MvnNode* mvnode,
-      BnNodeHandle handle);
+  put(
+    const MvnNode* mvnode, ///< [in] 元のノード
+    BnNodeHandle handle    ///< [in] 対応するBnNodeハンドル
+  );
 
   /// @brief 登録する．(ベクタ版)
-  /// @param[in] mvnode MvnNode
-  /// @param[in] index ビット位置
-  /// @param[in] handle BnNodeHandle
   void
-  put(const MvnNode* mvnode,
-      ymuint index,
-      BnNodeHandle handle);
+  put(
+    const MvnNode* mvnode, ///< [in] 元のノードMvnNode
+    int index,             ///< [in] ビット位置
+    BnNodeHandle handle    ///< [in] 対応するBnNodeハンドル
+  );
 
   /// @brief 探す．(1ビット版)
-  /// @param[in] mvnode MvnNode
   /// @return 対応するハンドルを返す．
   BnNodeHandle
-  get(const MvnNode* mvnode) const;
+  get(
+    const MvnNode* mvnode ///< [in] 元のノード
+  ) const;
 
   /// @brief 探す．(ベクタ版)
-  /// @param[in] mvnode MvnNode
-  /// @param[in] index ビット位置
   /// @return 対応するハンドルを返す．
   BnNodeHandle
-  get(const MvnNode* mvnode,
-      ymuint index) const;
+  get(
+    const MvnNode* mvnode, ///< [in] 元のノード
+    int index              ///< [in] ビット位置
+  ) const;
 
 
 private:
@@ -77,9 +77,11 @@ private:
 /// @relates MvnBnMap, MvnMgr
 /// @brief MvnBnMap の内容を出力する．
 void
-dump_mvnode_map(ostream& s,
-		const MvnMgr& mvmgr,
-		const MvnBnMap& mvnode_map);
+dump_mvnode_map(
+  ostream& s,                 ///< [in] 出力ストリーム
+  const MvnMgr& mvmgr,        ///< [in] Mvn ネットワーク
+  const MvnBnMap& mvnode_map  ///< [in] 対応関係のマップ
+);
 
 END_NAMESPACE_YM_NETWORKSBDNCONV
 
