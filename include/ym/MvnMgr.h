@@ -266,9 +266,10 @@ public:
   ///
   /// すべての入力と出力のビット幅は同一
   MvnNode*
-  new_and(MvnModule* module,     ///< [in] ノードが属するモジュール
-	  SizeType input_num,	 ///< [in] 入力数
-	  SizeType bit_width = 1 ///< [in] ビット幅
+  new_and(
+    MvnModule* module,     ///< [in] ノードが属するモジュール
+    SizeType input_num,    ///< [in] 入力数
+    SizeType bit_width = 1 ///< [in] ビット幅
   );
 
   /// @brief or ノードを生成する．
