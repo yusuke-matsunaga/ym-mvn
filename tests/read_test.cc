@@ -53,13 +53,15 @@ main(int argc,
 
   ClibCellLibrary cell_library;
   if ( popt_dotlib.is_specified() ) {
-    if ( !cell_library.read_liberty(popt_dotlib.val()) ) {
+    cell_library = ClibCellLibrary::read_liberty(popt_dotlib.val());
+    if ( !cell_library.is_valid() ) {
       cerr << "Error: could not read " << popt_dotlib.val() << endl;
       return -1;
     }
   }
   else if ( popt_mislib.is_specified() ) {
-    if ( !cell_library.read_mislib(popt_mislib.val()) ) {
+    cell_library = ClibCellLibrary::read_mislib(popt_mislib.val());
+    if ( !cell_library.is_valid() ) {
       cerr << "Error: could not read " << popt_mislib.val() << endl;
       return -1;
     }
