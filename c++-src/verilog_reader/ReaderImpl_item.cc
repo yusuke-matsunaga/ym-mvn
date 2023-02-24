@@ -559,18 +559,15 @@ ReaderImpl::gen_cellinst(
   const VlPrimitive* prim
 )
 {
-  int cell_id = prim->cell_id();
-#if 0
+  auto cell = prim->cell();
   int np = cell.pin_num();
   int ni = cell.input_num();
   int no = cell.output_num();
   int nio = cell.inout_num();
-#endif
-  auto onode{mMvnMgr->new_cell(parent_module, cell_id)};
-  const auto& cell{mMvnMgr->library().cell(cell_id)};
+  auto onode = mMvnMgr->new_cell(parent_module, cell);
   SizeType pos = 0;
   for ( auto id: Range(cell.pin_num()) ) {
-    auto& pin = cell.pin(id);
+    auto pin = cell.pin(id);
     auto term{prim->prim_term(pos)}; ++ pos;
     auto expr{term->expr()};
     if ( pin.is_input() ) {

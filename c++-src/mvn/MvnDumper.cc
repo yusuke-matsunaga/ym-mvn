@@ -139,7 +139,7 @@ dump_node(
     break;
   case MvnNodeType::CELL:
     {
-      const ClibCell& cell = mgr.library().cell(node->cell_id());
+      auto cell = node->cell();
       s << "Cell(" << cell.name() << ")";
     }
     break;

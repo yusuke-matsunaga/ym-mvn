@@ -621,7 +621,7 @@ VerilogWriterImpl::dump_node(
 
   case MvnNodeType::CELL:
     {
-      auto& cell{mgr.library().cell(node->cell_id())};
+      auto cell = node->cell();
       SizeType ni{cell.input_num()};
       SizeType no{cell.output_num()};
       SizeType nio{cell.inout_num()};
@@ -637,9 +637,9 @@ VerilogWriterImpl::dump_node(
 
       // 入力
       for ( SizeType i = 0; i < ni; ++ i ) {
-	auto& pin{cell.input(i)};
-	auto ipin{node->input(i)};
-	auto src_node{ipin->src_node()};
+	auto pin = cell.input(i);
+	auto ipin = node->input(i);
+	auto src_node = ipin->src_node();
 
 	s << ", ." << pin.name()
 	  << "(" << node_name(src_node) << ")";

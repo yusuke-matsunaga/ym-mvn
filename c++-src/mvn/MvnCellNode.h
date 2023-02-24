@@ -9,6 +9,7 @@
 /// All rights reserved.
 
 #include "MvnNodeBase.h"
+#include "ym/ClibCell.h"
 
 
 BEGIN_NAMESPACE_YM_MVN
@@ -29,8 +30,8 @@ private:
 
   /// @brief コンストラクタ
   MvnCellNode(
-    MvnModule* module, ///< [in] 親のモジュール
-    int cell_id        ///< [in] セル番号
+    MvnModule* module,   ///< [in] 親のモジュール
+    const ClibCell& cell ///< [in] セル
   );
 
   /// @brief デストラクタ
@@ -44,8 +45,8 @@ public:
 
   /// @brief セル番号を得る．
   /// @note type() が kCell の時のみ意味を持つ．
-  int
-  cell_id() const override;
+  ClibCell
+  cell() const override;
 
   /// @brief セルの出力ピン番号を返す．
   /// @note type() が kCell の時のみ意味を持つ．
@@ -64,8 +65,8 @@ private:
   // データメンバ
   //////////////////////////////////////////////////////////////////////
 
-  // セル番号
-  int mCellId;
+  // セル
+  ClibCell mCell;
 
 };
 
@@ -102,8 +103,8 @@ public:
 
   /// @brief セル番号を得る．
   /// @note type() が kCell の時のみ意味を持つ．
-  int
-  cell_id() const override;
+  ClibCell
+  cell() const override;
 
   /// @brief セルの出力ピン番号を返す．
   /// @note type() が kCell の時のみ意味を持つ．

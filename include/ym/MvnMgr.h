@@ -540,8 +540,8 @@ public:
   /// @brief セルノードを生成する．
   MvnNode*
   new_cell(
-    MvnModule* module, ///< [in] ノードが属するモジュール
-    int cell_id        ///< [in] セル番号
+    MvnModule* module,   ///< [in] ノードが属するモジュール
+    const ClibCell& cell ///< [in] セル
   );
 
   /// @brief ノードを削除する．

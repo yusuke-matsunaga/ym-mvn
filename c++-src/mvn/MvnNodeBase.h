@@ -117,9 +117,9 @@ public:
   /// @brief セル番号を得る．
   ///
   /// type() が kCell の時のみ意味を持つ．
-  /// デフォルトの実装では -1 を返す．
-  int
-  cell_id() const override;
+  /// デフォルトの実装では不正値を返す．
+  ClibCell
+  cell() const override;
 
   /// @brief セルの出力ピン番号を返す．
   ///

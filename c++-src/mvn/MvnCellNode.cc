@@ -20,12 +20,12 @@ BEGIN_NAMESPACE_YM_MVN
 
 // @brief コンストラクタ
 // @param[in] module 親のモジュール
-// @param[in] cell_id セル番号
+// @param[in] cell セル
 MvnCellNode::MvnCellNode(
   MvnModule* module,
-  int cell_id
+  const ClibCell& cell
 ) : MvnNodeBase(module, MvnNodeType::CELL, 0),
-    mCellId{cell_id}
+    mCell{cell}
 {
 }
 
@@ -36,10 +36,10 @@ MvnCellNode::~MvnCellNode()
 
 // @brief セル番号を得る．
 // @note type() が kCell の時のみ意味を持つ．
-int
-MvnCellNode::cell_id() const
+ClibCell
+MvnCellNode::cell() const
 {
-  return mCellId;
+  return mCell;
 }
 
 // @brief セルの出力ピン番号を返す．
@@ -85,10 +85,10 @@ MvnExtCellNode::~MvnExtCellNode()
 
 // @brief セル番号を得る．
 // @note type() が kCell の時のみ意味を持つ．
-int
-MvnExtCellNode::cell_id() const
+ClibCell
+MvnExtCellNode::cell() const
 {
-  return mCellNode->cell_id();
+  return mCellNode->cell();
 }
 
 // @brief セルの出力ピン番号を返す．
@@ -115,7 +115,7 @@ MvnExtCellNode::cell_node() const
 MvnNode*
 MvnMgr::new_cell(
   MvnModule* module,
-  int cell_id
+  const ClibCell& cell
 )
 {
 #if 0
@@ -145,7 +145,7 @@ MvnMgr::new_cell(
   }
 #endif
 
-  MvnCellNode* node = new MvnCellNode(module, cell_id);
+  MvnCellNode* node = new MvnCellNode(module, cell);
   reg_node(node);
 
 #if 0

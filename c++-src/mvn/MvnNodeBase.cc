@@ -9,6 +9,7 @@
 #include "MvnNodeBase.h"
 #include "ym/MvnMgr.h"
 #include "ym/MvnBvConst.h"
+#include "ym/ClibCell.h"
 
 
 BEGIN_NAMESPACE_YM_MVN
@@ -156,10 +157,11 @@ MvnNodeBase::xmask() const
 // @brief セル番号を得る．
 // @note type() が kCell の時のみ意味をモツ．
 // @note デフォルトの実装では nullptr を返す．
-int
-MvnNodeBase::cell_id() const
+ClibCell
+MvnNodeBase::cell() const
 {
-  return -1;
+  // 不正値
+  return {};
 }
 
 // @brief セルの出力ピン番号を返す．

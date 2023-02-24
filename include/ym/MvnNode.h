@@ -154,13 +154,13 @@ public:
   MvnBvConst
   xmask() const = 0;
 
-  /// @brief セル番号を得る．
+  /// @brief セルを得る．
   ///
   /// type() が CELL の時のみ意味を持つ．
-  /// デフォルトの実装では -1 を返す．
+  /// デフォルトの実装では不正値を返す．
   virtual
-  int
-  cell_id() const = 0;
+  ClibCell
+  cell() const = 0;
 
   /// @brief セルの出力ピン番号を返す．
   ///
