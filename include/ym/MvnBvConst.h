@@ -104,7 +104,7 @@ public:
     ASSERT_COND( 0 <= pos && pos < size() );
     SizeType b = block(pos);
     SizeType s = shift(pos);
-    ymuint64 mask = (1UL << s);
+    std::uint64_t mask = (1UL << s);
     if ( val ) {
       mBody[b] |= mask;
     }
@@ -205,7 +205,7 @@ private:
   SizeType mSize;
 
   // 本体
-  vector<ymuint64> mBody;
+  vector<std::uint64_t> mBody;
 
 };
 

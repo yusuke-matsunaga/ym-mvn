@@ -31,7 +31,7 @@ MvnDff::MvnDff(
   SizeType np{pol_array.size()};
 
   SizeType n1{(np + 32) / 32};
-  mPolArray = new ymuint32[n1];
+  mPolArray = new std::uint32_t[n1];
   for ( SizeType i = 0; i < n1; ++ i ) {
     mPolArray[i] = 0UL;
   }

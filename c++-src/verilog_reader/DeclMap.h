@@ -24,7 +24,7 @@ struct hash<pair<const nsYm::VlObj*, int>>
   {
     auto obj = src.first;
     auto offset = src.second;
-    return reinterpret_cast<ympuint>(obj) * (offset + 1) + offset;
+    return reinterpret_cast<PtrIntType>(obj) * (offset + 1) + offset;
   }
 };
 

@@ -124,7 +124,7 @@ MvnMgr::new_cell(
   int np = cell->pin_num();
 #endif
 #if 0 // 2018/03/01 わけわからいのでコメントアウトした
-  vector<ymuint32> pin_pos(np);
+  vector<std::uint32_t> pin_pos(np);
   for ( int i = 0; i < np; ++ i ) {
     const ClibPin* pin = cell->pin(i);
     if ( pin->is_input() ) {

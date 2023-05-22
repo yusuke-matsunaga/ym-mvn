@@ -157,10 +157,10 @@ private:
   MvnNode* mNode;
 
   // ビット指定位置 or 範囲指定の MSB
-  ymuint32 mMsb;
+  std::uint32_t mMsb;
 
   // 範囲指定の LSB
-  ymuint32 mLsb;
+  std::uint32_t mLsb;
 
 };
 

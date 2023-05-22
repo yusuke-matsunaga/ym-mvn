@@ -127,7 +127,7 @@ private:
   MvnNode* mCellNode;
 
   // 出力ピン番号
-  ymuint32 mOpos;
+  std::uint32_t mOpos;
 
 };
 

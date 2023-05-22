@@ -49,7 +49,7 @@ main(int argc,
 
   // 残りの引数はすべてファイル名と見なす
   vector<string> filename_list;
-  ymuint n_files = popt.get_args(filename_list);
+  auto n_files = popt.get_args(filename_list);
 
   ClibCellLibrary cell_library;
   if ( popt_dotlib.is_specified() ) {

@@ -137,7 +137,7 @@ EnvMerger1::operator()(
     }
     else {
       // node1 も node2 も nullptr ではない．
-      ymuint bw = node1->bit_width();
+      auto bw = node1->bit_width();
       new_node = mgr()->new_ite(parent_module, bw);
       mgr()->connect(cond, 0, new_node, 0);
       mgr()->connect(node1, 0, new_node, 1);
@@ -204,7 +204,7 @@ EnvMerger2::operator()(
       if ( node0 == nullptr ) {
 	node0 = mGlobalEnv.get_from_id(i);
       }
-      ymuint bw = node0->bit_width();
+      auto bw = node0->bit_width();
       if ( node2->bit_width() != bw ) {
 	// ビット幅が異なる．
 #warning "TODO: エラー処理"
@@ -221,7 +221,7 @@ EnvMerger2::operator()(
       if ( node0 == nullptr ) {
 	node0 = mGlobalEnv.get_from_id(i);
       }
-      ymuint bw = node0->bit_width();
+      auto bw = node0->bit_width();
       if ( node1->bit_width() != bw ) {
 	// ビット幅が異なる．
 #warning "TODO: エラー処理"
@@ -235,7 +235,7 @@ EnvMerger2::operator()(
     else {
       // node1 も node2 も nullptr ではない．
       //ASSERT_COND( node0 != nullptr );
-      ymuint bw = node1->bit_width();
+      auto bw = node1->bit_width();
       if ( node1->bit_width() != bw ) {
 	// ビット幅が異なる．
 #warning "TODO: エラー処理"

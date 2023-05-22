@@ -74,7 +74,7 @@ main(int argc,
 
     MvnModule* module1 = mgr.new_module("sub", 8, 4, 4, 0);
 
-    vector<ymuint32> val(1);
+    vector<std::uint32_t> val(1);
     val[0] = 10;
     MvnNode* node41 = mgr.new_const(module, 8, val);
 
